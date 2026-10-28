@@ -1,0 +1,907 @@
+[
+  {
+    "merk": "SAMSUNG",
+    "detail": [
+      {
+        "tipe": "S.TV HD 32",
+        "nama": "UA32H5000 FKLXD 32”",
+        "cashback": 0,
+        "ram": "",
+        "harga": 2000
+      },
+      {
+        "tipe": "A07",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2050
+      },
+      {
+        "tipe": "A07",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2600
+      },
+      {
+        "tipe": "A08",
+        "cashback": 50,
+        "ram": "4/64",
+        "harga": 2925
+      },
+      {
+        "tipe": "A08",
+        "cashback": 50,
+        "ram": "4/128",
+        "harga": 3525
+      },
+      {
+        "tipe": "A17 4G",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 4600
+      },
+      {
+        "tipe": "A17 4G",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 4975
+      },
+      {
+        "tipe": "A18 4G",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 4260
+      },
+      {
+        "tipe": "A18 4G",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 5180
+      },
+      {
+        "tipe": "A27 5G",
+        "cashback": 150,
+        "ram": "6/128",
+        "harga": 5450
+      },
+      {
+        "tipe": "A27 5G",
+        "cashback": 150,
+        "ram": "8/256",
+        "harga": 6750
+      },
+      {
+        "tipe": "A37 5G",
+        "cashback": 200,
+        "ram": "8/128",
+        "harga": 6400
+      },
+      {
+        "tipe": "A37 5G",
+        "cashback": 200,
+        "ram": "8/256",
+        "harga": 7050
+      },
+      {
+        "tipe": "A57 5G",
+        "cashback": 700,
+        "ram": "8/128",
+        "harga": 7250
+      },
+      {
+        "tipe": "A57 5G",
+        "cashback": 1000,
+        "ram": "8/256",
+        "harga": 8020
+      },
+      {
+        "tipe": "A57 5G",
+        "cashback": 1100,
+        "ram": "12/256",
+        "harga": 8600
+      },
+      {
+        "tipe": "S25 FE",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 9600
+      },
+      {
+        "tipe": "S26 FE",
+        "cashback": 1500,
+        "ram": "8/256",
+        "harga": 13400
+      },
+      {
+        "tipe": "S26",
+        "cashback": 2200,
+        "ram": "12/256",
+        "harga": 16500
+      },
+      {
+        "tipe": "S26",
+        "cashback": 2200,
+        "ram": "12/512",
+        "harga": 18475
+      },
+      {
+        "tipe": "S26 ULTRA",
+        "cashback": 3000,
+        "ram": "12/256",
+        "harga": 22975
+      },
+      {
+        "tipe": "S26 ULTRA",
+        "cashback": 3200,
+        "ram": "12/512",
+        "harga": 25850
+      },
+      {
+        "tipe": "Z FLIP 8",
+        "cashback": 1200,
+        "ram": "12/512",
+        "harga": 20000
+      },
+      {
+        "tipe": "Z FOLD 8",
+        "cashback": 1700,
+        "ram": "12/512",
+        "harga": 30500
+      },
+      {
+        "tipe": "Z FOLD 8 ULTRA",
+        "cashback": 2200,
+        "ram": "12/512",
+        "harga": 34500
+      },
+      {
+        "tipe": "TAB A11 8.7”",
+        "cashback": 150,
+        "ram": "4/64",
+        "harga": 2725
+      },
+      {
+        "tipe": "TAB A11 8.7” 4G",
+        "cashback": 500,
+        "ram": "4/64",
+        "harga": 3525
+      },
+      {
+        "tipe": "TAB A11 PLUS 11” WF",
+        "cashback": 150,
+        "ram": "6/128",
+        "harga": 4450
+      },
+      {
+        "tipe": "TAB A11 PLUS 11” 5G",
+        "cashback": 700,
+        "ram": "6/128",
+        "harga": 5850
+      },
+      {
+        "tipe": "TAB S10 LITE WF",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 6300
+      },
+      {
+        "tipe": "TAB S10 LITE 4G",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 7700
+      },
+      {
+        "tipe": "TAB S10FE 10.9” 5G",
+        "cashback": 800,
+        "ram": "8/128",
+        "harga": 11000
+      },
+      {
+        "tipe": "FIT 3",
+        "cashback": 0,
+        "ram": "",
+        "harga": 900
+      },
+      {
+        "tipe": "BUDS CORE",
+        "cashback": 0,
+        "ram": "",
+        "harga": 800
+      },
+      {
+        "tipe": "BUDS FE",
+        "cashback": 0,
+        "ram": "",
+        "harga": 1395
+      },
+      {
+        "tipe": "BUDS 3FE",
+        "cashback": 300,
+        "ram": "",
+        "harga": 1775
+      },
+      {
+        "tipe": "Silicone case Z Flip 6",
+        "cashback": 0,
+        "ram": "",
+        "harga": 475
+      },
+      {
+        "tipe": "Kindsuit case Z Flip 6",
+        "cashback": 0,
+        "ram": "",
+        "harga": 845
+      },
+      {
+        "tipe": "TA. 25W A07",
+        "cashback": 0,
+        "ram": "",
+        "harga": 125
+      },
+      {
+        "tipe": "TA. 25W Type C non cable black",
+        "cashback": 0,
+        "ram": "",
+        "harga": 180
+      },
+      {
+        "tipe": "TA. 45W Type C + cable",
+        "cashback": 0,
+        "ram": "",
+        "harga": 475
+      },
+      {
+        "tipe": "TA. 50W Type C + cable 2Slot USB",
+        "cashback": 0,
+        "ram": "",
+        "harga": 550
+      }
+    ]
+  },
+  {
+    "merk": "XIAOMI",
+    "detail": [
+      {
+        "tipe": "REDMI A7PRO",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2000
+      },
+      {
+        "tipe": "REDMI A7PRO",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2200
+      },
+      {
+        "tipe": "REDMI 17",
+        "cashback": 100,
+        "ram": "4/128",
+        "harga": 2900
+      },
+      {
+        "tipe": "REDMI 17",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 3300
+      },
+      {
+        "tipe": "REDMI 17",
+        "cashback": 150,
+        "ram": "6/256",
+        "harga": 3850
+      },
+      {
+        "tipe": "R. NOTE 17 4G",
+        "cashback": 300,
+        "ram": "6/128",
+        "harga": 4000
+      },
+      {
+        "tipe": "R. NOTE 17 4G",
+        "cashback": 300,
+        "ram": "6/256",
+        "harga": 4300
+      },
+      {
+        "tipe": "R. NOTE 17 5G",
+        "cashback": 300,
+        "ram": "6/128",
+        "harga": 4600
+      },
+      {
+        "tipe": "R. NOTE 17 5G",
+        "cashback": 300,
+        "ram": "8/256",
+        "harga": 5200
+      },
+      {
+        "tipe": "R. NOTE 17 PRO 5G",
+        "cashback": 200,
+        "ram": "8/256",
+        "harga": 6000
+      },
+      {
+        "tipe": "R. NOTE 17 PRO 5G",
+        "cashback": 200,
+        "ram": "8/512",
+        "harga": 7000
+      },
+      {
+        "tipe": "",
+        "cashback": 0,
+        "ram": "",
+        "harga": 7200
+      },
+      {
+        "tipe": "MI 17T",
+        "cashback": 100,
+        "ram": "12/512",
+        "harga": 10000
+      },
+      {
+        "tipe": "MI 17T PRO",
+        "cashback": 100,
+        "ram": "12/512",
+        "harga": 13000
+      },
+      {
+        "tipe": "REDMI PAD 2 WF ONLY 9.7”",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2650
+      },
+      {
+        "tipe": "REDMI PAD 2 WF ONLY 11”",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3300
+      },
+      {
+        "tipe": "REDMI PAD 2 4G 9.7”",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 3100
+      },
+      {
+        "tipe": "REDMI PAD 2 4G 9.7”",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3300
+      },
+      {
+        "tipe": "REDMI PAD 2 4G 11”",
+        "cashback": 0,
+        "ram": "4/256",
+        "harga": 4000
+      },
+      {
+        "tipe": "XIAOMI PAD 8 + KEYBOARD",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 8500
+      },
+      {
+        "tipe": "KEYBOARD PAD 7/7PRO",
+        "cashback": 0,
+        "ram": "",
+        "harga": 1000
+      },
+      {
+        "tipe": "SMART BAND 9 ACTIVE",
+        "cashback": 0,
+        "ram": "",
+        "harga": 430
+      },
+      {
+        "tipe": "BUDS 6",
+        "cashback": 0,
+        "ram": "",
+        "harga": 190
+      },
+      {
+        "tipe": "EARPHONE TYPE C",
+        "cashback": 0,
+        "ram": "",
+        "harga": 75
+      },
+      {
+        "tipe": "TA TYPE C 20W",
+        "cashback": 0,
+        "ram": "",
+        "harga": 90
+      },
+      {
+        "tipe": "TA TYPE C 120W + CABLE (A-C)",
+        "cashback": 0,
+        "ram": "",
+        "harga": 295
+      },
+      {
+        "tipe": "TA MOBIL USB DUAL PORT 37W",
+        "cashback": 0,
+        "ram": "",
+        "harga": 100
+      }
+    ]
+  },
+  {
+    "merk": "OPPO",
+    "detail": [
+      {
+        "tipe": "A6C",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2700
+      },
+      {
+        "tipe": "A6C",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3200
+      },
+      {
+        "tipe": "A6",
+        "cashback": 100,
+        "ram": "6/128",
+        "harga": 4300
+      },
+      {
+        "tipe": "A6",
+        "cashback": 100,
+        "ram": "6/256",
+        "harga": 4800
+      },
+      {
+        "tipe": "A6 S",
+        "cashback": 100,
+        "ram": "8/128",
+        "harga": 4800
+      },
+      {
+        "tipe": "A6 S",
+        "cashback": 100,
+        "ram": "8/256",
+        "harga": 5300
+      },
+      {
+        "tipe": "A7PRO",
+        "cashback": 200,
+        "ram": "6/256",
+        "harga": 7700
+      },
+      {
+        "tipe": "RENO 16F 5G",
+        "cashback": 300,
+        "ram": "8/128",
+        "harga": 8000
+      },
+      {
+        "tipe": "RENO 16F 5G",
+        "cashback": 300,
+        "ram": "8/256",
+        "harga": 8700
+      },
+      {
+        "tipe": "ENCO BUDS 3 PRO",
+        "cashback": 0,
+        "ram": "",
+        "harga": 250
+      }
+    ]
+  },
+  {
+    "merk": "VIVO",
+    "detail": [
+      {
+        "tipe": "Y05E",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2300
+      },
+      {
+        "tipe": "Y05",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2650
+      },
+      {
+        "tipe": "Y05",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3000
+      },
+      {
+        "tipe": "Y11D",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2800
+      },
+      {
+        "tipe": "Y11D",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3300
+      },
+      {
+        "tipe": "Y11D",
+        "cashback": 50,
+        "ram": "6/128",
+        "harga": 3800
+      },
+      {
+        "tipe": "Y31D",
+        "cashback": 50,
+        "ram": "4/128",
+        "harga": 3600
+      },
+      {
+        "tipe": "Y31D PRO",
+        "cashback": 50,
+        "ram": "4/128",
+        "harga": 4200
+      },
+      {
+        "tipe": "Y31D PRO",
+        "cashback": 75,
+        "ram": "6/128",
+        "harga": 4700
+      },
+      {
+        "tipe": "Y31D PRO",
+        "cashback": 100,
+        "ram": "8/128",
+        "harga": 5300
+      },
+      {
+        "tipe": "Y31D PRO",
+        "cashback": 100,
+        "ram": "8/256",
+        "harga": 5500
+      },
+      {
+        "tipe": "Y500 4G",
+        "cashback": 100,
+        "ram": "6/128",
+        "harga": 5500
+      },
+      {
+        "tipe": "Y500 4G",
+        "cashback": 100,
+        "ram": "6/256",
+        "harga": 6300
+      }
+    ]
+  },
+  {
+    "merk": "REALME",
+    "detail": [
+      {
+        "tipe": "NOTE 80",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2100
+      },
+      {
+        "tipe": "NOTE 80",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2400
+      },
+      {
+        "tipe": "C01 NFC",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2650
+      },
+      {
+        "tipe": "C01 NFC",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3000
+      },
+      {
+        "tipe": "C100i",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2900
+      },
+      {
+        "tipe": "C100i",
+        "cashback": 0,
+        "ram": "4/256",
+        "harga": 3200
+      },
+      {
+        "tipe": "C85 PRO",
+        "cashback": 50,
+        "ram": "8/128",
+        "harga": 4000
+      },
+      {
+        "tipe": "C85 PRO",
+        "cashback": 50,
+        "ram": "8/256",
+        "harga": 4400
+      },
+      {
+        "tipe": "C100 X",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 3400
+      },
+      {
+        "tipe": "C100 X",
+        "cashback": 0,
+        "ram": "6/256",
+        "harga": 3800
+      },
+      {
+        "tipe": "C100",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 4000
+      },
+      {
+        "tipe": "C100",
+        "cashback": 100,
+        "ram": "8/256",
+        "harga": 4600
+      }
+    ]
+  },
+  {
+    "merk": "INFINIX",
+    "detail": [
+      {
+        "tipe": "SMART 20",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2100
+      },
+      {
+        "tipe": "SMART 20",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2400
+      },
+      {
+        "tipe": "HOT 70",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2800
+      },
+      {
+        "tipe": "HOT 70",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 3800
+      },
+      {
+        "tipe": "HOT 70",
+        "cashback": 0,
+        "ram": "6/256",
+        "harga": 3800
+      },
+      {
+        "tipe": "NOTE EDGE 5G",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 4200
+      },
+      {
+        "tipe": "NOTE EDGE 5G",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 4400
+      },
+      {
+        "tipe": "NOTE 60",
+        "cashback": 100,
+        "ram": "8/256",
+        "harga": 5000
+      },
+      {
+        "tipe": "NOTE 60 PRO",
+        "cashback": 100,
+        "ram": "8/256",
+        "harga": 6000
+      },
+      {
+        "tipe": "NOTE 60 PRO",
+        "cashback": 100,
+        "ram": "12/256",
+        "harga": 7000
+      },
+      {
+        "tipe": "GT50 PRO",
+        "cashback": 100,
+        "ram": "12/256",
+        "harga": 7000
+      },
+      {
+        "tipe": "GT50 PRO",
+        "cashback": 100,
+        "ram": "12/512",
+        "harga": 8000
+      },
+      {
+        "tipe": "XPAD 30E 11” 4G",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2700
+      },
+      {
+        "tipe": "XPAD 30 PRO",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3500
+      },
+      {
+        "tipe": "XPAD EDGE 4G",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 5300
+      },
+      {
+        "tipe": "XPAD 20 KEYBOARD",
+        "cashback": 0,
+        "ram": "",
+        "harga": 525
+      },
+      {
+        "tipe": "XWATCH H4",
+        "cashback": 0,
+        "ram": "",
+        "harga": 225
+      },
+      {
+        "tipe": "SMART XWATCH H5 PRO",
+        "cashback": 0,
+        "ram": "",
+        "harga": 350
+      },
+      {
+        "tipe": "XBUDS 3 LITE",
+        "cashback": 0,
+        "ram": "",
+        "harga": 160
+      },
+      {
+        "tipe": "TWS EARPHONE XBUDS3",
+        "cashback": 0,
+        "ram": "",
+        "harga": 205
+      }
+    ]
+  },
+  {
+    "merk": "TECNO",
+    "detail": [
+      {
+        "tipe": "SPARK GO 3",
+        "cashback": 0,
+        "ram": "4/64",
+        "harga": 2000
+      },
+      {
+        "tipe": "SPARK GO 3",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2200
+      },
+      {
+        "tipe": "SPARK 50",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 2800
+      },
+      {
+        "tipe": "SPARK 50",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 3200
+      },
+      {
+        "tipe": "SPARK 50",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 3400
+      },
+      {
+        "tipe": "CAMON 50",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 4000
+      },
+      {
+        "tipe": "CAMON 50",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 4600
+      },
+      {
+        "tipe": "CAMON 50",
+        "cashback": 0,
+        "ram": "12/256",
+        "harga": 4800
+      },
+      {
+        "tipe": "CAMON 50 PRO",
+        "cashback": 50,
+        "ram": "8/256",
+        "harga": 5800
+      },
+      {
+        "tipe": "CAMON 50 PRO",
+        "cashback": 50,
+        "ram": "12/256",
+        "harga": 6500
+      },
+      {
+        "tipe": "CAMON 50 PRO",
+        "cashback": 50,
+        "ram": "12/512",
+        "harga": 7300
+      },
+      {
+        "tipe": "POVA 8 5G",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 4300
+      },
+      {
+        "tipe": "POVA 8 5G",
+        "cashback": 0,
+        "ram": "8/128",
+        "harga": 5000
+      },
+      {
+        "tipe": "POVA 8 5G",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 5600
+      },
+      {
+        "tipe": "POVA 8 PRO 5G",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 6000
+      },
+      {
+        "tipe": "Megapad SE 4G",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3000
+      },
+      {
+        "tipe": "Megapad SE DUA 4G",
+        "cashback": 0,
+        "ram": "4/128",
+        "harga": 3400
+      },
+      {
+        "tipe": "Megapad SE DUA 4G",
+        "cashback": 0,
+        "ram": "6/128",
+        "harga": 4400
+      },
+      {
+        "tipe": "Megapad SE DUA 4G",
+        "cashback": 0,
+        "ram": "8/256",
+        "harga": 5000
+      }
+    ]
+  },
+  {
+    "merk": "NOKIA",
+    "detail": [
+      {
+        "tipe": "105",
+        "cashback": 0,
+        "ram": "",
+        "harga": 290
+      }
+    ]
+  }
+]
