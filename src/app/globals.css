@@ -1,44 +1,45 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Notion Design System Tokens
+   macOS Window + Pastel Notes Aesthetic Tokens
    ========================================================================== */
 :root {
-  --notion-bg: #FFFFFF;
-  --notion-subtle-bg: #F7F6F3;
-  --notion-hover: #EFEFED;
-  --notion-active: #E3E2DE;
-  --notion-border: #E9E9E7;
-  --notion-border-dark: #D3D1CB;
-  
-  --notion-text: #37352F;
-  --notion-text-muted: #787774;
-  --notion-text-light: #9B9A97;
+  --app-bg: #FFFFFF;
+  --app-subtle-bg: #F7F6F3;
+  --app-border: #EAE9E4;
+  --app-text: #201F1D;
+  --app-text-muted: #7E7C77;
+  --app-text-light: #A3A19C;
 
   /* Primary Blue Theme */
   --primary: #1F6FB6;
   --primary-hover: #185A94;
-  --primary-light: #E8F3FA;
-  --primary-border: #BCD8F0;
+  --primary-light: #EEF4FF;
 
-  /* Notion Tag Colors */
-  --tag-blue-bg: #E8F3FA;
-  --tag-blue-text: #1F6FB6;
-  --tag-green-bg: #E7F3E8;
-  --tag-green-text: #2B7830;
-  --tag-orange-bg: #FAEBDD;
-  --tag-orange-text: #D9730D;
-  --tag-purple-bg: #F3EDF7;
-  --tag-purple-text: #6940A5;
-  --tag-gray-bg: #EFEFED;
-  --tag-gray-text: #5A5A58;
-  --tag-red-bg: #FDEBEC;
-  --tag-red-text: #DF5452;
+  /* Pastel Card Themes (From Reference Image) */
+  --theme-pink-bg: #FFF0F3;
+  --theme-pink-border: #FDE0E6;
+  --theme-pink-text: #D6336C;
 
-  --notion-shadow-xs: 0 1px 2px rgba(15, 15, 15, 0.05);
-  --notion-shadow-sm: 0 1px 3px rgba(15, 15, 15, 0.08);
-  --notion-shadow-md: 0 4px 12px rgba(15, 15, 15, 0.08), 0 0 1px rgba(15, 15, 15, 0.15);
-  --notion-shadow-lg: 0 12px 28px rgba(15, 15, 15, 0.12), 0 0 1px rgba(15, 15, 15, 0.2);
+  --theme-blue-bg: #EFF5FF;
+  --theme-blue-border: #D8E6FD;
+  --theme-blue-text: #285BC7;
+
+  --theme-beige-bg: #F7F6F3;
+  --theme-beige-border: #EAE8E1;
+  --theme-beige-text: #4D4B46;
+
+  --theme-green-bg: #F0F8EE;
+  --theme-green-border: #DBECD7;
+  --theme-green-text: #3B7A38;
+
+  --theme-purple-bg: #F7F0FE;
+  --theme-purple-border: #EADBFC;
+  --theme-purple-text: #7A45C2;
+
+  --theme-amber-bg: #FFF5EB;
+  --theme-amber-border: #FDE2CA;
+  --theme-amber-text: #C2621C;
 }
 
 * {
@@ -48,13 +49,18 @@
 }
 
 body {
-  background-color: var(--notion-bg);
-  color: var(--notion-text);
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+  color: var(--app-text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  background: 
+    radial-gradient(ellipse 90% 80% at 50% -20%, rgba(200, 225, 255, 0.45), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 100% 100%, rgba(255, 235, 215, 0.5), transparent 70%),
+    linear-gradient(145deg, #d8e5f3 0%, #e8e3d9 50%, #d5dfd7 100%);
+  background-attachment: fixed;
 }
+
 
 /* Notion Scrollbar */
 ::-webkit-scrollbar {

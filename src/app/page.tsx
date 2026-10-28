@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import Navbar from "@/components/Navbar";
-import FilterBar from "@/components/FilterBar";
+import Sidebar from "@/components/Sidebar";
 import ContentCard from "@/components/ContentCard";
 import ContentTable from "@/components/ContentTable";
 import InstagramPreviewModal from "@/components/InstagramPreviewModal";
@@ -19,7 +18,19 @@ import {
 } from "@/lib/firebase";
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
 import { contentItemsToCSV } from "@/lib/csvHelper";
-import { Plus, CheckSquare, Clock, Smartphone, Table, LayoutGrid, FileText } from "lucide-react";
+import { 
+  Search, 
+  Filter, 
+  LayoutGrid, 
+  AlignJustify, 
+  Plus, 
+  ChevronLeft, 
+  Download, 
+  Menu, 
+  X,
+  Sparkles,
+  Smartphone
+} from "lucide-react";
 
 const STORAGE_KEY = "semarang_cell_brief_contents_v2";
 
@@ -28,14 +39,19 @@ export default function DashboardPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
 
-  // Tab & Filter states
-  const [activeTab, setActiveTab] = useState<"all" | "pending" | "executed" | "gallery" | "simulator">("all");
+  // Navigation & View Mode
+  const [activeSidebarView, setActiveSidebarView] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "table" | "simulator">("grid");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Search & Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedPlatform, setSelectedPlatform] = useState("Semua");
-  const [sortBy, setSortBy] = useState<"no-asc" | "no-desc" | "title-asc">("no-asc");
+  const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false);
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
-  // Modal states
+  // Modals
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [previewItem, setPreviewItem] = useState<ContentItem | null>(null);
@@ -43,7 +59,7 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
-  // 1. Initial Load from LocalStorage + Cloud Firestore Check
+  // 1. Initial Load from LocalStorage + Firestore check
   useEffect(() => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
@@ -81,7 +97,6 @@ export default function DashboardPage() {
     }
   };
 
-  // 2. Persist to localStorage
   const updateItemsState = (newItems: ContentItem[]) => {
     setItems(newItems);
     try {
@@ -91,7 +106,7 @@ export default function DashboardPage() {
     }
   };
 
-  // 3. Category count aggregation
+  // Aggregations
   const categoriesWithCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const item of items) {
@@ -103,56 +118,57 @@ export default function DashboardPage() {
       .sort((a, b) => b.count - a.count);
   }, [items]);
 
-  const uniqueCategoryNames = useMemo(() => {
-    return categoriesWithCounts.map(c => c.name);
-  }, [categoriesWithCounts]);
-
   const executedCount = useMemo(() => {
     return items.filter(i => Boolean(i.executed)).length;
   }, [items]);
 
   const pendingCount = items.length - executedCount;
 
-  // 4. Filtering and Sorting logic
+  // Filter & Search Logic
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      // Tab filter
-      if (activeTab === "pending" && item.executed) return false;
-      if (activeTab === "executed" && !item.executed) return false;
+      // Sidebar Navigation filter
+      if (activeSidebarView === "pending" && item.executed) return false;
+      if (activeSidebarView === "executed" && !item.executed) return false;
+      if (activeSidebarView === "favorites" && !item.judul.toLowerCase().includes("promo") && !item.kategori.toLowerCase().includes("promo")) {
+        return false;
+      }
+      if (activeSidebarView === "feed" && (item.platform || "").includes("Reels")) {
+        return false;
+      }
+      if (activeSidebarView === "reels" && !(item.platform || "").includes("Reels") && !(item.platform || "").includes("Carousel")) {
+        return false;
+      }
 
-      // Search
+      // Search Query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchTitle = item.judul.toLowerCase().includes(q);
         const matchCopy = item.copywriting.toLowerCase().includes(q);
         const matchAmbience = item.ambience.toLowerCase().includes(q);
         const matchCaption = item.caption.toLowerCase().includes(q);
+        const matchCat = (item.kategori || "").toLowerCase().includes(q);
         const matchNo = item.no.toString().includes(q);
-        if (!matchTitle && !matchCopy && !matchAmbience && !matchCaption && !matchNo) {
+        if (!matchTitle && !matchCopy && !matchAmbience && !matchCaption && !matchCat && !matchNo) {
           return false;
         }
       }
 
-      // Category
+      // Category filter
       if (selectedCategory !== "Semua" && item.kategori !== selectedCategory) {
         return false;
       }
 
-      // Platform
+      // Platform filter
       if (selectedPlatform !== "Semua" && (item.platform || "Instagram Feed") !== selectedPlatform) {
         return false;
       }
 
       return true;
-    }).sort((a, b) => {
-      if (sortBy === "no-asc") return a.no - b.no;
-      if (sortBy === "no-desc") return b.no - a.no;
-      if (sortBy === "title-asc") return a.judul.localeCompare(b.judul);
-      return 0;
-    });
-  }, [items, activeTab, searchQuery, selectedCategory, selectedPlatform, sortBy]);
+    }).sort((a, b) => a.no - b.no);
+  }, [items, activeSidebarView, searchQuery, selectedCategory, selectedPlatform]);
 
-  // 5. Toggle Checkbox Execution Status (Core Notion Action)
+  // Handlers
   const handleToggleExecuted = async (item: ContentItem) => {
     const newExecuted = !Boolean(item.executed);
     const updated = { ...item, executed: newExecuted, updatedAt: new Date().toISOString() };
@@ -162,11 +178,10 @@ export default function DashboardPage() {
     try {
       await saveContentToDb(updated);
     } catch (e) {
-      // silent local fallback
+      // Local first fallback
     }
   };
 
-  // 6. CRUD Handlers
   const handleOpenCreate = () => {
     setEditingItem(null);
     setIsContentModalOpen(true);
@@ -194,13 +209,11 @@ export default function DashboardPage() {
       await saveContentToDb(savedItem);
       setFirebaseStatus("connected");
     } catch (err) {
-      console.warn("Could not save to Firestore:", err);
+      console.warn("Save remote error", err);
     }
   };
 
-  // 7. Batch Save Handler (CSV or JSON)
   const handleSaveBatch = async (batchItems: ContentItem[]) => {
-    // Avoid duplicate numbers: if item number already exists, update it, otherwise append
     const itemMap = new Map<number, ContentItem>();
     items.forEach(it => itemMap.set(it.no, it));
     batchItems.forEach(it => itemMap.set(it.no, it));
@@ -212,7 +225,7 @@ export default function DashboardPage() {
       await seedContentsToDb(nextList);
       setFirebaseStatus("connected");
     } catch (e) {
-      console.warn("Batch sync error:", e);
+      console.warn("Batch sync error", e);
     }
   };
 
@@ -240,7 +253,32 @@ export default function DashboardPage() {
     }
   };
 
-  // 8. Sync Handlers
+  // Exports
+  const handleExportJSON = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    setIsExportMenuOpen(false);
+  };
+
+  const handleExportCSV = () => {
+    const csvContent = contentItemsToCSV(items);
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", url);
+    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    URL.revokeObjectURL(url);
+    setIsExportMenuOpen(false);
+  };
+
   const handlePushToFirebase = async () => {
     setFirebaseStatus("syncing");
     await seedContentsToDb(items);
@@ -260,218 +298,389 @@ export default function DashboardPage() {
     updateItemsState(INITIAL_BRIEF_DATA);
   };
 
-  // 9. Export Functions
-  const handleExportJSON = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
-  const handleExportCSV = () => {
-    const csvContent = contentItemsToCSV(items);
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", url);
-    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    URL.revokeObjectURL(url);
-  };
-
   const nextSuggestedNo = useMemo(() => {
     if (items.length === 0) return 1;
     return Math.max(...items.map(i => i.no)) + 1;
   }, [items]);
 
-  const hasActiveFilters = searchQuery !== "" || selectedCategory !== "Semua" || selectedPlatform !== "Semua";
+  const viewTitle = useMemo(() => {
+    switch (activeSidebarView) {
+      case "pending": return "Recent notes (Belum Eksekusi)";
+      case "executed": return "Shared (Sudah Eksekusi)";
+      case "favorites": return "Favorites (Prioritas Promo)";
+      case "tags": return "Tags (Kategori Produk)";
+      case "feed": return "Notebooks (Instagram Feed)";
+      case "reels": return "Projects (Reels & Carousel)";
+      default: return "All notes";
+    }
+  }, [activeSidebarView]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#37352F]">
-      {/* Top Navigation */}
-      <Navbar
-        firebaseStatus={firebaseStatus}
-        totalCount={items.length}
-        executedCount={executedCount}
-        onOpenCreate={handleOpenCreate}
-        onOpenSync={() => setIsSyncModalOpen(true)}
-        onExportJSON={handleExportJSON}
-        onExportCSV={handleExportCSV}
-      />
-
-      {/* Main Notion Page Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-5">
+    <div className="min-h-screen p-2 sm:p-5 lg:p-7 flex items-center justify-center">
+      
+      {/* Floating macOS Window Container */}
+      <div className="
+        w-full max-w-[1460px] min-h-[92vh] max-h-[96vh]
+        bg-white/95 backdrop-blur-xl rounded-[28px] sm:rounded-[32px]
+        border border-white/80 shadow-[0_25px_70px_rgba(0,0,0,0.14)]
+        flex flex-col md:flex-row overflow-hidden
+      ">
         
-        {/* Notion Header Banner */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl select-none">📱</span>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#37352F]">
-              Manajemen Konten Semarang Cell
-            </h1>
-          </div>
-          <p className="text-xs text-[#787774] max-w-2xl leading-relaxed">
-            Database 60 brief konten pemasaran Instagram. Centang checkbox untuk menandai konten yang telah dieksekusi atau dipublikasikan.
-          </p>
-        </div>
-
-        {/* Database View Tabs & Filter Toolbar */}
-        <FilterBar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
+        {/* Left Sidebar */}
+        <Sidebar
+          activeView={activeSidebarView}
+          onSelectView={(v) => {
+            setActiveSidebarView(v);
+            if (v === "tags") {
+              setIsFilterPopoverOpen(true);
+            }
+          }}
           totalCount={items.length}
           pendingCount={pendingCount}
           executedCount={executedCount}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-          categories={categoriesWithCounts}
-          selectedPlatform={selectedPlatform}
-          onSelectPlatform={setSelectedPlatform}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          onResetFilters={() => {
-            setSearchQuery("");
-            setSelectedCategory("Semua");
-            setSelectedPlatform("Semua");
-          }}
-          hasActiveFilters={hasActiveFilters}
+          firebaseStatus={firebaseStatus}
+          onOpenSyncModal={() => setIsSyncModalOpen(true)}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
 
-        {/* Views Rendering */}
-        {filteredItems.length === 0 ? (
-          <div className="border border-[#E9E9E7] rounded-lg p-10 text-center bg-[#F7F6F3] text-xs text-[#787774]">
-            <p className="font-medium text-[#37352F] mb-1">Tidak ada konten yang sesuai filter</p>
-            <p className="mb-3">Ubah kata kunci pencarian atau reset filter untuk menampilkan kembali data.</p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("Semua");
-                setSelectedPlatform("Semua");
-                setActiveTab("all");
-              }}
-              className="notion-btn notion-btn-bordered text-xs"
-            >
-              Tampilkan Semua Konten
-            </button>
-          </div>
-        ) : activeTab === "gallery" ? (
-          /* Notion Gallery View */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {filteredItems.map((item) => (
-              <ContentCard
-                key={item.id || item.no}
-                item={item}
-                onToggleExecuted={handleToggleExecuted}
-                onEdit={handleOpenEdit}
-                onDelete={handleDeleteClick}
-                onPreview={(it) => setPreviewItem(it)}
-              />
-            ))}
-          </div>
-        ) : activeTab === "simulator" ? (
-          /* Instagram Mobile Feed Simulator View */
-          <div className="space-y-6 max-w-sm mx-auto">
-            <div className="bg-[#E8F3FA] text-[#1F6FB6] p-2.5 rounded border border-[#BCD8F0] text-xs text-center font-medium">
-              Simulator Feed Instagram ({filteredItems.length} konten)
-            </div>
-            {filteredItems.slice(0, 20).map((item) => (
-              <div key={item.id || item.no} className="ig-phone-preview">
-                <div className="p-3 flex items-center justify-between border-b border-[#E9E9E7]">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[#1F6FB6] text-white flex items-center justify-center font-bold text-[9px]">
-                      ESC
-                    </div>
-                    <div>
-                      <h4 className="text-[11px] font-bold text-slate-900 leading-none">eldoradosemarangcell</h4>
-                      <span className="text-[9px] text-slate-500">Metro Barat, Kota Metro</span>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-mono text-slate-400">#{item.no}</span>
-                </div>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#FCFBFA] md:rounded-r-[32px] overflow-hidden">
+          
+          {/* Top Header Navigation (Breadcrumb + Search + Filtres + View Mode + Add) */}
+          <header className="px-4 sm:px-6 py-3.5 border-b border-[#EAE9E4] bg-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+            
+            {/* Left: Mobile Toggle + Breadcrumb */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="md:hidden p-1.5 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
 
-                <div className="ig-canvas-post p-4">
-                  <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/20 text-white w-max">
-                    {item.kategori}
-                  </span>
-                  <div className="my-auto py-2">
-                    <h3 className="text-xs font-bold text-amber-300 mb-1 uppercase">{item.judul}</h3>
-                    <p className="text-[11px] font-mono text-white/95 whitespace-pre-wrap">{item.copywriting}</p>
-                  </div>
-                  <div className="pt-1.5 border-t border-white/20 flex justify-between text-[9px] text-white/80">
-                    <span>Eldorado Semarang Cell</span>
-                    <span>Swipe ➔</span>
-                  </div>
-                </div>
-
-                <div className="p-3 text-[11px] text-slate-800">
-                  <span className="font-bold mr-1">eldoradosemarangcell</span>
-                  <span className="whitespace-pre-line text-slate-700">{item.caption}</span>
-                </div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 select-none">
+                <button 
+                  onClick={() => setActiveSidebarView("all")}
+                  className="flex items-center gap-1 hover:text-gray-900 transition-colors"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Home</span>
+                </button>
+                <span className="text-gray-300">/</span>
+                <span className="text-gray-900 font-bold">{viewTitle}</span>
               </div>
-            ))}
-          </div>
-        ) : (
-          /* Notion Database Table View (Default for "all", "pending", "executed") */
-          <ContentTable
-            items={filteredItems}
-            onToggleExecuted={handleToggleExecuted}
-            onEdit={handleOpenEdit}
-            onDelete={handleDeleteClick}
-            onPreview={(it) => setPreviewItem(it)}
-          />
-        )}
+            </div>
 
-        {/* Bottom Status Count */}
-        <div className="mt-3 flex items-center justify-between text-xs text-[#9B9A97] px-1">
-          <span>Menampilkan {filteredItems.length} dari {items.length} konten</span>
-          <span>Eldorado Semarang Cell • Metro Barat</span>
+            {/* Center: Search Bar */}
+            <div className="relative flex-1 max-w-sm sm:mx-2">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search a note..."
+                className="w-full pl-9 pr-7 py-1.5 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-gray-200 focus:bg-white text-gray-800 placeholder-gray-400 outline-none transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2 justify-end relative">
+              
+              {/* Filtres Button */}
+              <button
+                onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors select-none ${
+                  selectedCategory !== "Semua" || selectedPlatform !== "Semua"
+                    ? "bg-[#1F6FB6]/10 border-[#1F6FB6] text-[#1F6FB6] font-semibold"
+                    : "bg-white border-[#E0DED9] text-gray-700 hover:bg-gray-50 shadow-2xs"
+                }`}
+              >
+                <Filter className="w-3.5 h-3.5 text-gray-500" />
+                <span>Filtres</span>
+                {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1F6FB6]" />
+                )}
+              </button>
+
+              {/* View Mode Toggle (||| vs ▦) */}
+              <div className="flex items-center p-0.5 bg-[#F0EFEA] rounded-xl border border-[#E0DED9]">
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`p-1.5 rounded-lg text-xs transition-colors ${
+                    viewMode === "table" ? "bg-white text-gray-900 shadow-2xs font-semibold" : "text-gray-500 hover:text-gray-900"
+                  }`}
+                  title="List / Table View (|||)"
+                >
+                  <AlignJustify className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 rounded-lg text-xs transition-colors ${
+                    viewMode === "grid" ? "bg-white text-gray-900 shadow-2xs font-semibold" : "text-gray-500 hover:text-gray-900"
+                  }`}
+                  title="Grid / Cards View (▦)"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setViewMode("simulator")}
+                  className={`p-1.5 rounded-lg text-xs transition-colors hidden sm:block ${
+                    viewMode === "simulator" ? "bg-white text-gray-900 shadow-2xs font-semibold" : "text-gray-500 hover:text-gray-900"
+                  }`}
+                  title="Instagram Feed Simulator"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Add Content Button */}
+              <button
+                onClick={handleOpenCreate}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] text-white shadow-xs transition-colors select-none"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Tambah</span>
+              </button>
+
+              {/* Export Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                  className="p-1.5 rounded-xl border border-[#E0DED9] bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-2xs"
+                  title="Ekspor Data"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+
+                {isExportMenuOpen && (
+                  <div className="absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-30">
+                    <button
+                      onClick={handleExportCSV}
+                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                    >
+                      <span>Format CSV</span>
+                      <span className="text-[10px] text-gray-400">.csv</span>
+                    </button>
+                    <button
+                      onClick={handleExportJSON}
+                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                    >
+                      <span>Format JSON</span>
+                      <span className="text-[10px] text-gray-400">.json</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+
+          {/* Filter Popover Panel (when Filtres is active) */}
+          {isFilterPopoverOpen && (
+            <div className="px-6 py-3 bg-[#F7F6F3] border-b border-[#EAE9E4] flex flex-wrap items-center gap-3 text-xs">
+              <span className="font-semibold text-gray-500">Kategori:</span>
+              <div className="flex flex-wrap gap-1">
+                <button
+                  onClick={() => setSelectedCategory("Semua")}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    selectedCategory === "Semua" ? "bg-gray-900 text-white font-semibold" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  Semua ({items.length})
+                </button>
+                {categoriesWithCounts.map(c => (
+                  <button
+                    key={c.name}
+                    onClick={() => setSelectedCategory(c.name)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      selectedCategory === c.name ? "bg-gray-900 text-white font-semibold" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                    }`}
+                  >
+                    {c.name} ({c.count})
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-4 w-px bg-gray-300 hidden sm:block mx-1" />
+
+              <span className="font-semibold text-gray-500">Format:</span>
+              <select
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                className="bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-700 focus:outline-none"
+              >
+                <option value="Semua">Semua Format</option>
+                <option value="Instagram Carousel">Instagram Carousel</option>
+                <option value="Instagram Feed">Instagram Feed</option>
+                <option value="Instagram Reels">Instagram Reels</option>
+                <option value="Instagram Story">Instagram Story</option>
+              </select>
+
+              {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory("Semua");
+                    setSelectedPlatform("Semua");
+                  }}
+                  className="text-rose-600 hover:underline ml-auto font-medium"
+                >
+                  Reset Filter
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Main Body: Scrollable Content List */}
+          <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
+            {filteredItems.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400">
+                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-2xl mb-3">
+                  🔍
+                </div>
+                <h3 className="text-sm font-bold text-gray-700 mb-1">
+                  Tidak ada konten ditemukan
+                </h3>
+                <p className="text-xs max-w-sm text-gray-500 mb-4">
+                  Cobalah ubah kata kunci pencarian atau reset filter untuk menampilkan catatan brief kembali.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("Semua");
+                    setSelectedPlatform("Semua");
+                    setActiveSidebarView("all");
+                  }}
+                  className="px-4 py-1.5 rounded-xl bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800"
+                >
+                  Tampilkan Semua Catatan
+                </button>
+              </div>
+            ) : viewMode === "grid" ? (
+              /* Pastel Cards Grid matching the Reference Screenshot */
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-12">
+                {filteredItems.map((item) => (
+                  <ContentCard
+                    key={item.id || item.no}
+                    item={item}
+                    onToggleExecuted={handleToggleExecuted}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDeleteClick}
+                    onPreview={(it) => setPreviewItem(it)}
+                  />
+                ))}
+              </div>
+            ) : viewMode === "table" ? (
+              /* Notion Table View */
+              <div className="pb-12">
+                <ContentTable
+                  items={filteredItems}
+                  onToggleExecuted={handleToggleExecuted}
+                  onEdit={handleOpenEdit}
+                  onDelete={handleDeleteClick}
+                  onPreview={(it) => setPreviewItem(it)}
+                />
+              </div>
+            ) : (
+              /* Instagram Simulator */
+              <div className="max-w-md mx-auto space-y-6 pb-12">
+                <div className="bg-[#EEF4FF] text-[#1F6FB6] p-3 rounded-2xl border border-[#D8E6FD] text-xs text-center font-semibold">
+                  📱 Instagram Feed Mockup ({filteredItems.length} konten)
+                </div>
+                {filteredItems.slice(0, 15).map((item) => (
+                  <div key={item.id || item.no} className="ig-phone-preview bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="p-3 flex items-center justify-between border-b border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-[#1F6FB6] text-white flex items-center justify-center font-bold text-[10px]">
+                          ESC
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-gray-900 leading-none">eldoradosemarangcell</h4>
+                          <span className="text-[10px] text-gray-400">Metro Barat, Kota Metro</span>
+                        </div>
+                      </div>
+                      <span className="text-xs font-mono text-gray-400">#{item.no}</span>
+                    </div>
+
+                    <div className="ig-canvas-post p-5">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-white/20 text-white w-max">
+                        {item.kategori}
+                      </span>
+                      <h3 className="text-lg font-black text-white leading-tight">
+                        {item.judul}
+                      </h3>
+                      <div className="text-xs text-white/90 font-mono whitespace-pre-line leading-relaxed max-h-36 overflow-hidden">
+                        {item.copywriting}
+                      </div>
+                      <div className="text-[11px] text-white/70 italic mt-2">
+                        💡 {item.ambience}
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-white text-xs">
+                      <p className="text-gray-800 line-clamp-3 leading-relaxed">
+                        <strong className="mr-1 text-gray-900">eldoradosemarangcell</strong>
+                        {item.caption}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </main>
         </div>
-      </main>
+      </div>
 
       {/* Modals */}
-      <InstagramPreviewModal
-        item={previewItem}
-        onClose={() => setPreviewItem(null)}
-        onToggleExecuted={handleToggleExecuted}
-      />
+      {isContentModalOpen && (
+        <ContentModal
+          isOpen={isContentModalOpen}
+          item={editingItem}
+          onClose={() => setIsContentModalOpen(false)}
+          onSaveSingle={handleSaveSingle}
+          onSaveBatch={handleSaveBatch}
+          existingCategories={categoriesWithCounts.map(c => c.name)}
+          nextSuggestedNo={nextSuggestedNo}
+        />
+      )}
 
-      <ContentModal
-        isOpen={isContentModalOpen}
-        item={editingItem}
-        onClose={() => {
-          setIsContentModalOpen(false);
-          setEditingItem(null);
-        }}
-        onSaveSingle={handleSaveSingle}
-        onSaveBatch={handleSaveBatch}
-        existingCategories={uniqueCategoryNames}
-        nextSuggestedNo={nextSuggestedNo}
-      />
+      {previewItem && (
+        <InstagramPreviewModal
+          item={previewItem}
+          onClose={() => setPreviewItem(null)}
+          onToggleExecuted={handleToggleExecuted}
+        />
+      )}
 
-      <DeleteConfirmModal
-        isOpen={Boolean(deletingItem)}
-        item={deletingItem}
-        onClose={() => setDeletingItem(null)}
-        onConfirm={handleConfirmDelete}
-        isDeleting={isDeleting}
-      />
+      {deletingItem && (
+        <DeleteConfirmModal
+          isOpen={Boolean(deletingItem)}
+          item={deletingItem}
+          isDeleting={isDeleting}
+          onConfirm={handleConfirmDelete}
+          onClose={() => setDeletingItem(null)}
+        />
+      )}
 
-      <FirebaseSyncModal
-        isOpen={isSyncModalOpen}
-        onClose={() => setIsSyncModalOpen(false)}
-        firebaseStatus={firebaseStatus}
-        onPushToFirebase={handlePushToFirebase}
-        onPullFromFirebase={handlePullFromFirebase}
-        onResetToDefault={handleResetToDefault}
-        localCount={items.length}
-      />
+      {isSyncModalOpen && (
+        <FirebaseSyncModal
+          isOpen={isSyncModalOpen}
+          onClose={() => setIsSyncModalOpen(false)}
+          firebaseStatus={firebaseStatus}
+          localCount={items.length}
+          onPushToFirebase={handlePushToFirebase}
+          onPullFromFirebase={handlePullFromFirebase}
+          onResetToDefault={handleResetToDefault}
+        />
+      )}
     </div>
   );
 }
+
