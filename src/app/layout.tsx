@@ -1,9 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Semarang Cell - Konten Hub & Manajemen Brief",
-  description: "Dashboard manajemen konten media sosial, brief promosi, dan edukasi gadget Eldorado Semarang Cell",
+  title: "Semarang Cell - Konten Hub",
+  description: "Dashboard manajemen konten media sosial Eldorado Semarang Cell",
   icons: {
     icon: "/favicon.ico",
   },
@@ -22,8 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
-      <body className="min-h-screen antialiased bg-slate-50 text-slate-900">
+    <html lang="id" className={jakarta.variable}>
+      <body className="min-h-screen antialiased bg-[#FAF9F6] text-[#18181B] font-sans selection:bg-[#1F6FB6]/15 selection:text-[#1F6FB6]">
         {children}
       </body>
     </html>

@@ -28,7 +28,6 @@ import {
   Download, 
   Menu, 
   X,
-  Sparkles,
   Smartphone
 } from "lucide-react";
 
@@ -39,12 +38,12 @@ export default function DashboardPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
 
-  // Navigation & View Mode
+  // View & Nav State
   const [activeSidebarView, setActiveSidebarView] = useState("all");
-  const [viewMode, setViewMode] = useState<"grid" | "table" | "simulator">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Search & Filters
+  // Filter & Search
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedPlatform, setSelectedPlatform] = useState("Semua");
@@ -59,7 +58,7 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
-  // 1. Initial Load from LocalStorage + Firestore check
+  // 1. Initial Load
   useEffect(() => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
@@ -124,19 +123,19 @@ export default function DashboardPage() {
 
   const pendingCount = items.length - executedCount;
 
-  // Filter & Search Logic
+  // Filtering
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      // Sidebar Navigation filter
+      // Sidebar filter
       if (activeSidebarView === "pending" && item.executed) return false;
-      if (activeSidebarView === "executed" && !item.executed) return false;
+      if (activeSidebarView === "shared" && !item.executed) return false;
       if (activeSidebarView === "favorites" && !item.judul.toLowerCase().includes("promo") && !item.kategori.toLowerCase().includes("promo")) {
         return false;
       }
-      if (activeSidebarView === "feed" && (item.platform || "").includes("Reels")) {
+      if (activeSidebarView === "notebooks" && (item.platform || "").includes("Reels")) {
         return false;
       }
-      if (activeSidebarView === "reels" && !(item.platform || "").includes("Reels") && !(item.platform || "").includes("Carousel")) {
+      if (activeSidebarView === "projects" && !(item.platform || "").includes("Reels") && !(item.platform || "").includes("Carousel")) {
         return false;
       }
 
@@ -168,7 +167,7 @@ export default function DashboardPage() {
     }).sort((a, b) => a.no - b.no);
   }, [items, activeSidebarView, searchQuery, selectedCategory, selectedPlatform]);
 
-  // Handlers
+  // Toggle execution checkbox
   const handleToggleExecuted = async (item: ContentItem) => {
     const newExecuted = !Boolean(item.executed);
     const updated = { ...item, executed: newExecuted, updatedAt: new Date().toISOString() };
@@ -178,7 +177,7 @@ export default function DashboardPage() {
     try {
       await saveContentToDb(updated);
     } catch (e) {
-      // Local first fallback
+      // local first fallback
     }
   };
 
@@ -258,7 +257,7 @@ export default function DashboardPage() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.json`);
+    downloadAnchor.setAttribute("download", `brief_konten_${new Date().toISOString().split("T")[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -271,7 +270,7 @@ export default function DashboardPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", url);
-    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.csv`);
+    downloadAnchor.setAttribute("download", `brief_konten_${new Date().toISOString().split("T")[0]}.csv`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -305,338 +304,275 @@ export default function DashboardPage() {
 
   const viewTitle = useMemo(() => {
     switch (activeSidebarView) {
-      case "pending": return "Recent notes (Belum Eksekusi)";
-      case "executed": return "Shared (Sudah Eksekusi)";
-      case "favorites": return "Favorites (Prioritas Promo)";
-      case "tags": return "Tags (Kategori Produk)";
-      case "feed": return "Notebooks (Instagram Feed)";
-      case "reels": return "Projects (Reels & Carousel)";
+      case "pending": return "Recent notes";
+      case "shared": return "Shared";
+      case "favorites": return "Favorites";
+      case "tags": return "Tags";
+      case "notebooks": return "Notebooks";
+      case "projects": return "Projects";
       default: return "All notes";
     }
   }, [activeSidebarView]);
 
   return (
-    <div className="min-h-screen p-2 sm:p-5 lg:p-7 flex items-center justify-center">
+    <div className="w-screen h-screen overflow-hidden flex bg-[#FAF9F6] text-[#18181B] font-sans">
       
-      {/* Floating macOS Window Container */}
-      <div className="
-        w-full max-w-[1460px] min-h-[92vh] max-h-[96vh]
-        bg-white/95 backdrop-blur-xl rounded-[28px] sm:rounded-[32px]
-        border border-white/80 shadow-[0_25px_70px_rgba(0,0,0,0.14)]
-        flex flex-col md:flex-row overflow-hidden
-      ">
-        
-        {/* Left Sidebar */}
-        <Sidebar
-          activeView={activeSidebarView}
-          onSelectView={(v) => {
-            setActiveSidebarView(v);
-            if (v === "tags") {
-              setIsFilterPopoverOpen(true);
-            }
-          }}
-          totalCount={items.length}
-          pendingCount={pendingCount}
-          executedCount={executedCount}
-          firebaseStatus={firebaseStatus}
-          onOpenSyncModal={() => setIsSyncModalOpen(true)}
-          isOpenMobile={isMobileSidebarOpen}
-          onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        />
+      {/* Left Sidebar matching reference image */}
+      <Sidebar
+        activeView={activeSidebarView}
+        onSelectView={(v) => {
+          setActiveSidebarView(v);
+          if (v === "tags") {
+            setIsFilterPopoverOpen(true);
+          }
+        }}
+        totalCount={items.length}
+        pendingCount={pendingCount}
+        executedCount={executedCount}
+        firebaseStatus={firebaseStatus}
+        onOpenSyncModal={() => setIsSyncModalOpen(true)}
+        isOpenMobile={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+      />
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#FCFBFA] md:rounded-r-[32px] overflow-hidden">
+      {/* Right Main Content View */}
+      <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF9F6]">
+        
+        {/* Top Header Navigation matching reference image */}
+        <header className="px-6 py-4 bg-white border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0">
           
-          {/* Top Header Navigation (Breadcrumb + Search + Filtres + View Mode + Add) */}
-          <header className="px-4 sm:px-6 py-3.5 border-b border-[#EAE9E4] bg-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
-            
-            {/* Left: Mobile Toggle + Breadcrumb */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsMobileSidebarOpen(true)}
-                className="md:hidden p-1.5 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+          {/* Left: Breadcrumbs (< Home / All notes) */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="md:hidden p-1.5 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-1.5 text-sm select-none">
+              <button 
+                onClick={() => setActiveSidebarView("all")}
+                className="flex items-center gap-1 text-[#71717A] hover:text-[#18181B] transition-colors font-medium cursor-pointer"
               >
-                <Menu className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4" />
+                <span>Home</span>
+              </button>
+              <span className="text-[#D4D4D8]">/</span>
+              <span className="text-[#18181B] font-bold">{viewTitle}</span>
+            </div>
+          </div>
+
+          {/* Center: Search input (Search a note) */}
+          <div className="relative flex-1 max-w-md mx-2 hidden sm:block">
+            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search a note"
+              className="w-full pl-10 pr-8 py-2 rounded-xl text-[13px] bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A1A1AA] hover:text-[#18181B]"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Right Tools: Filtres + [|||] [▦] + + Tambah */}
+          <div className="flex items-center gap-2.5">
+            
+            {/* Filtres Button */}
+            <button
+              onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors select-none cursor-pointer ${
+                selectedCategory !== "Semua" || selectedPlatform !== "Semua"
+                  ? "bg-[#1F6FB6]/10 border-[#1F6FB6] text-[#1F6FB6]"
+                  : "bg-white border-[#E4E4E7] text-[#18181B] hover:bg-[#F4F4F5] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+              }`}
+            >
+              <Filter className="w-3.5 h-3.5 text-[#71717A]" />
+              <span>Filtres</span>
+              {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1F6FB6]" />
+              )}
+            </button>
+
+            {/* View Mode Toggle Capsule ([|||] and [▦]) */}
+            <div className="flex items-center p-0.5 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                  viewMode === "table" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
+                }`}
+                title="Tampilan Tabel (|||)"
+              >
+                <AlignJustify className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                  viewMode === "grid" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
+                }`}
+                title="Tampilan Kartu Pastel (▦)"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Add Content Button */}
+            <button
+              onClick={handleOpenCreate}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#18181B] hover:bg-black text-white shadow-xs transition-colors select-none cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Tambah</span>
+            </button>
+
+            {/* Export Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                className="p-1.5 rounded-xl border border-[#E4E4E7] bg-white text-[#71717A] hover:text-[#18181B] hover:bg-[#F4F4F5] shadow-2xs cursor-pointer"
+                title="Ekspor CSV / JSON"
+              >
+                <Download className="w-3.5 h-3.5" />
               </button>
 
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 select-none">
-                <button 
-                  onClick={() => setActiveSidebarView("all")}
-                  className="flex items-center gap-1 hover:text-gray-900 transition-colors"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  <span>Home</span>
-                </button>
-                <span className="text-gray-300">/</span>
-                <span className="text-gray-900 font-bold">{viewTitle}</span>
-              </div>
-            </div>
-
-            {/* Center: Search Bar */}
-            <div className="relative flex-1 max-w-sm sm:mx-2">
-              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search a note..."
-                className="w-full pl-9 pr-7 py-1.5 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-gray-200 focus:bg-white text-gray-800 placeholder-gray-400 outline-none transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
-                >
-                  <X className="w-3 h-3" />
-                </button>
+              {isExportMenuOpen && (
+                <div className="absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-lg border border-gray-150 py-1 z-30">
+                  <button
+                    onClick={handleExportCSV}
+                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                  >
+                    <span>Format CSV</span>
+                    <span className="text-[10px] text-gray-400">.csv</span>
+                  </button>
+                  <button
+                    onClick={handleExportJSON}
+                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                  >
+                    <span>Format JSON</span>
+                    <span className="text-[10px] text-gray-400">.json</span>
+                  </button>
+                </div>
               )}
             </div>
+          </div>
+        </header>
 
-            {/* Right: Actions */}
-            <div className="flex items-center gap-2 justify-end relative">
-              
-              {/* Filtres Button */}
+        {/* Filter Popover Toolbar */}
+        {isFilterPopoverOpen && (
+          <div className="px-6 py-3 bg-white border-b border-[#ECEBE8] flex flex-wrap items-center gap-2.5 text-xs">
+            <span className="font-semibold text-[#71717A]">Kategori:</span>
+            <div className="flex flex-wrap gap-1">
               <button
-                onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors select-none ${
-                  selectedCategory !== "Semua" || selectedPlatform !== "Semua"
-                    ? "bg-[#1F6FB6]/10 border-[#1F6FB6] text-[#1F6FB6] font-semibold"
-                    : "bg-white border-[#E0DED9] text-gray-700 hover:bg-gray-50 shadow-2xs"
+                onClick={() => setSelectedCategory("Semua")}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  selectedCategory === "Semua" ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
                 }`}
               >
-                <Filter className="w-3.5 h-3.5 text-gray-500" />
-                <span>Filtres</span>
-                {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#1F6FB6]" />
-                )}
+                Semua ({items.length})
               </button>
-
-              {/* View Mode Toggle (||| vs ▦) */}
-              <div className="flex items-center p-0.5 bg-[#F0EFEA] rounded-xl border border-[#E0DED9]">
+              {categoriesWithCounts.map(c => (
                 <button
-                  onClick={() => setViewMode("table")}
-                  className={`p-1.5 rounded-lg text-xs transition-colors ${
-                    viewMode === "table" ? "bg-white text-gray-900 shadow-2xs font-semibold" : "text-gray-500 hover:text-gray-900"
-                  }`}
-                  title="List / Table View (|||)"
-                >
-                  <AlignJustify className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded-lg text-xs transition-colors ${
-                    viewMode === "grid" ? "bg-white text-gray-900 shadow-2xs font-semibold" : "text-gray-500 hover:text-gray-900"
-                  }`}
-                  title="Grid / Cards View (▦)"
-                >
-                  <LayoutGrid className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setViewMode("simulator")}
-                  className={`p-1.5 rounded-lg text-xs transition-colors hidden sm:block ${
-                    viewMode === "simulator" ? "bg-white text-gray-900 shadow-2xs font-semibold" : "text-gray-500 hover:text-gray-900"
-                  }`}
-                  title="Instagram Feed Simulator"
-                >
-                  <Smartphone className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Add Content Button */}
-              <button
-                onClick={handleOpenCreate}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] text-white shadow-xs transition-colors select-none"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Tambah</span>
-              </button>
-
-              {/* Export Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                  className="p-1.5 rounded-xl border border-[#E0DED9] bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-2xs"
-                  title="Ekspor Data"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                </button>
-
-                {isExportMenuOpen && (
-                  <div className="absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-30">
-                    <button
-                      onClick={handleExportCSV}
-                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
-                    >
-                      <span>Format CSV</span>
-                      <span className="text-[10px] text-gray-400">.csv</span>
-                    </button>
-                    <button
-                      onClick={handleExportJSON}
-                      className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
-                    >
-                      <span>Format JSON</span>
-                      <span className="text-[10px] text-gray-400">.json</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </header>
-
-          {/* Filter Popover Panel (when Filtres is active) */}
-          {isFilterPopoverOpen && (
-            <div className="px-6 py-3 bg-[#F7F6F3] border-b border-[#EAE9E4] flex flex-wrap items-center gap-3 text-xs">
-              <span className="font-semibold text-gray-500">Kategori:</span>
-              <div className="flex flex-wrap gap-1">
-                <button
-                  onClick={() => setSelectedCategory("Semua")}
+                  key={c.name}
+                  onClick={() => setSelectedCategory(c.name)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    selectedCategory === "Semua" ? "bg-gray-900 text-white font-semibold" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                    selectedCategory === c.name ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
                   }`}
                 >
-                  Semua ({items.length})
+                  {c.name} ({c.count})
                 </button>
-                {categoriesWithCounts.map(c => (
-                  <button
-                    key={c.name}
-                    onClick={() => setSelectedCategory(c.name)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                      selectedCategory === c.name ? "bg-gray-900 text-white font-semibold" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
-                    }`}
-                  >
-                    {c.name} ({c.count})
-                  </button>
-                ))}
-              </div>
-
-              <div className="h-4 w-px bg-gray-300 hidden sm:block mx-1" />
-
-              <span className="font-semibold text-gray-500">Format:</span>
-              <select
-                value={selectedPlatform}
-                onChange={(e) => setSelectedPlatform(e.target.value)}
-                className="bg-white border border-gray-200 rounded-lg px-2.5 py-1 text-xs text-gray-700 focus:outline-none"
-              >
-                <option value="Semua">Semua Format</option>
-                <option value="Instagram Carousel">Instagram Carousel</option>
-                <option value="Instagram Feed">Instagram Feed</option>
-                <option value="Instagram Reels">Instagram Reels</option>
-                <option value="Instagram Story">Instagram Story</option>
-              </select>
-
-              {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
-                <button
-                  onClick={() => {
-                    setSelectedCategory("Semua");
-                    setSelectedPlatform("Semua");
-                  }}
-                  className="text-rose-600 hover:underline ml-auto font-medium"
-                >
-                  Reset Filter
-                </button>
-              )}
+              ))}
             </div>
-          )}
 
-          {/* Main Body: Scrollable Content List */}
-          <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-            {filteredItems.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400">
-                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center text-2xl mb-3">
-                  🔍
-                </div>
-                <h3 className="text-sm font-bold text-gray-700 mb-1">
-                  Tidak ada konten ditemukan
-                </h3>
-                <p className="text-xs max-w-sm text-gray-500 mb-4">
-                  Cobalah ubah kata kunci pencarian atau reset filter untuk menampilkan catatan brief kembali.
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("Semua");
-                    setSelectedPlatform("Semua");
-                    setActiveSidebarView("all");
-                  }}
-                  className="px-4 py-1.5 rounded-xl bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800"
-                >
-                  Tampilkan Semua Catatan
-                </button>
+            <div className="h-4 w-px bg-gray-200 hidden sm:block mx-1" />
+
+            <span className="font-semibold text-[#71717A]">Format:</span>
+            <select
+              value={selectedPlatform}
+              onChange={(e) => setSelectedPlatform(e.target.value)}
+              className="bg-[#F4F4F6] border border-transparent rounded-lg px-2.5 py-1 text-xs text-[#18181B] focus:bg-white focus:outline-none"
+            >
+              <option value="Semua">Semua Format</option>
+              <option value="Instagram Carousel">Instagram Carousel</option>
+              <option value="Instagram Feed">Instagram Feed</option>
+              <option value="Instagram Reels">Instagram Reels</option>
+              <option value="Instagram Story">Instagram Story</option>
+            </select>
+
+            {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
+              <button
+                onClick={() => {
+                  setSelectedCategory("Semua");
+                  setSelectedPlatform("Semua");
+                }}
+                className="text-rose-600 hover:underline ml-auto font-medium"
+              >
+                Reset Filter
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Scrollable Content Body */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          {filteredItems.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400">
+              <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-2xl mb-3 shadow-xs">
+                🔍
               </div>
-            ) : viewMode === "grid" ? (
-              /* Pastel Cards Grid matching the Reference Screenshot */
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pb-12">
-                {filteredItems.map((item) => (
-                  <ContentCard
-                    key={item.id || item.no}
-                    item={item}
-                    onToggleExecuted={handleToggleExecuted}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleDeleteClick}
-                    onPreview={(it) => setPreviewItem(it)}
-                  />
-                ))}
-              </div>
-            ) : viewMode === "table" ? (
-              /* Notion Table View */
-              <div className="pb-12">
-                <ContentTable
-                  items={filteredItems}
+              <h3 className="text-sm font-bold text-[#18181B] mb-1">
+                Tidak ada catatan ditemukan
+              </h3>
+              <p className="text-xs max-w-sm text-[#71717A] mb-4">
+                Ubah kata kunci pencarian atau reset filter untuk menampilkan catatan brief kembali.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("Semua");
+                  setSelectedPlatform("Semua");
+                  setActiveSidebarView("all");
+                }}
+                className="px-4 py-1.5 rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black"
+              >
+                Tampilkan Semua Catatan
+              </button>
+            </div>
+          ) : viewMode === "grid" ? (
+            /* 2 or 3 Columns Pastel Cards Grid matching the Reference Screenshot */
+            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-7xl mx-auto pb-16">
+              {filteredItems.map((item) => (
+                <ContentCard
+                  key={item.id || item.no}
+                  item={item}
                   onToggleExecuted={handleToggleExecuted}
                   onEdit={handleOpenEdit}
                   onDelete={handleDeleteClick}
                   onPreview={(it) => setPreviewItem(it)}
                 />
-              </div>
-            ) : (
-              /* Instagram Simulator */
-              <div className="max-w-md mx-auto space-y-6 pb-12">
-                <div className="bg-[#EEF4FF] text-[#1F6FB6] p-3 rounded-2xl border border-[#D8E6FD] text-xs text-center font-semibold">
-                  📱 Instagram Feed Mockup ({filteredItems.length} konten)
-                </div>
-                {filteredItems.slice(0, 15).map((item) => (
-                  <div key={item.id || item.no} className="ig-phone-preview bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-3 flex items-center justify-between border-b border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-[#1F6FB6] text-white flex items-center justify-center font-bold text-[10px]">
-                          ESC
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold text-gray-900 leading-none">eldoradosemarangcell</h4>
-                          <span className="text-[10px] text-gray-400">Metro Barat, Kota Metro</span>
-                        </div>
-                      </div>
-                      <span className="text-xs font-mono text-gray-400">#{item.no}</span>
-                    </div>
-
-                    <div className="ig-canvas-post p-5">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-white/20 text-white w-max">
-                        {item.kategori}
-                      </span>
-                      <h3 className="text-lg font-black text-white leading-tight">
-                        {item.judul}
-                      </h3>
-                      <div className="text-xs text-white/90 font-mono whitespace-pre-line leading-relaxed max-h-36 overflow-hidden">
-                        {item.copywriting}
-                      </div>
-                      <div className="text-[11px] text-white/70 italic mt-2">
-                        💡 {item.ambience}
-                      </div>
-                    </div>
-
-                    <div className="p-3 bg-white text-xs">
-                      <p className="text-gray-800 line-clamp-3 leading-relaxed">
-                        <strong className="mr-1 text-gray-900">eldoradosemarangcell</strong>
-                        {item.caption}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </main>
+              ))}
+            </div>
+          ) : (
+            /* Table View */
+            <div className="max-w-7xl mx-auto pb-16">
+              <ContentTable
+                items={filteredItems}
+                onToggleExecuted={handleToggleExecuted}
+                onEdit={handleOpenEdit}
+                onDelete={handleDeleteClick}
+                onPreview={(it) => setPreviewItem(it)}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      </main>
 
       {/* Modals */}
       {isContentModalOpen && (
@@ -683,4 +619,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

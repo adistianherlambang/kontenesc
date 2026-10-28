@@ -1,45 +1,19 @@
 @import "tailwindcss";
 
-/* ==========================================================================
-   macOS Window + Pastel Notes Aesthetic Tokens
-   ========================================================================== */
 :root {
-  --app-bg: #FFFFFF;
-  --app-subtle-bg: #F7F6F3;
-  --app-border: #EAE9E4;
-  --app-text: #201F1D;
-  --app-text-muted: #7E7C77;
-  --app-text-light: #A3A19C;
-
-  /* Primary Blue Theme */
+  --font-sans: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  
   --primary: #1F6FB6;
   --primary-hover: #185A94;
   --primary-light: #EEF4FF;
 
-  /* Pastel Card Themes (From Reference Image) */
-  --theme-pink-bg: #FFF0F3;
-  --theme-pink-border: #FDE0E6;
-  --theme-pink-text: #D6336C;
-
-  --theme-blue-bg: #EFF5FF;
-  --theme-blue-border: #D8E6FD;
-  --theme-blue-text: #285BC7;
-
-  --theme-beige-bg: #F7F6F3;
-  --theme-beige-border: #EAE8E1;
-  --theme-beige-text: #4D4B46;
-
-  --theme-green-bg: #F0F8EE;
-  --theme-green-border: #DBECD7;
-  --theme-green-text: #3B7A38;
-
-  --theme-purple-bg: #F7F0FE;
-  --theme-purple-border: #EADBFC;
-  --theme-purple-text: #7A45C2;
-
-  --theme-amber-bg: #FFF5EB;
-  --theme-amber-border: #FDE2CA;
-  --theme-amber-text: #C2621C;
+  --app-bg: #FAF9F6;
+  --card-bg: #FFFFFF;
+  --sidebar-bg: #FFFFFF;
+  --border-subtle: #ECEBE8;
+  --text-main: #18181B;
+  --text-muted: #71717A;
+  --text-dim: #A1A1AA;
 }
 
 * {
@@ -48,193 +22,104 @@
   padding: 0;
 }
 
-body {
-  color: var(--app-text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  min-height: 100vh;
+html, body {
+  font-family: var(--font-sans);
+  background-color: var(--app-bg);
+  color: var(--text-main);
+  height: 100%;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
-  background: 
-    radial-gradient(ellipse 90% 80% at 50% -20%, rgba(200, 225, 255, 0.45), transparent 70%),
-    radial-gradient(ellipse 70% 60% at 100% 100%, rgba(255, 235, 215, 0.5), transparent 70%),
-    linear-gradient(145deg, #d8e5f3 0%, #e8e3d9 50%, #d5dfd7 100%);
-  background-attachment: fixed;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-
-/* Notion Scrollbar */
+/* Subtle Modern Mac Scrollbar */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #D3D1CB;
+  background: #D4D4D8;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9B9A97;
+  background: #A1A1AA;
 }
 
-/* Notion Buttons */
-.notion-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: background-color 0.15s ease, color 0.15s ease;
-  cursor: pointer;
-  border: 1px solid transparent;
-  user-select: none;
-}
-.notion-btn-default {
-  color: var(--notion-text);
-  background: transparent;
-}
-.notion-btn-default:hover {
-  background: var(--notion-hover);
-}
-
-.notion-btn-bordered {
-  color: var(--notion-text);
-  background: #FFFFFF;
-  border-color: var(--notion-border);
-  box-shadow: var(--notion-shadow-xs);
-}
-.notion-btn-bordered:hover {
-  background: var(--notion-subtle-bg);
-  border-color: var(--notion-border-dark);
-}
-
-.notion-btn-primary {
-  color: #FFFFFF;
-  background: var(--primary);
-  box-shadow: 0 1px 2px rgba(31, 111, 182, 0.3);
-}
-.notion-btn-primary:hover {
-  background: var(--primary-hover);
-}
-
-/* Notion Checkbox */
+/* Checkbox Style */
 .notion-checkbox {
   appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid var(--notion-border-dark);
-  border-radius: 3.5px;
-  background: #FFFFFF;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid #D4D4D8;
+  border-radius: 5px;
+  outline: none;
   cursor: pointer;
-  display: inline-grid;
-  place-content: center;
-  transition: all 0.12s ease-in-out;
+  background-color: #FFFFFF;
+  position: relative;
+  transition: all 0.15s ease;
+  vertical-align: middle;
   flex-shrink: 0;
 }
 .notion-checkbox:hover {
-  border-color: var(--primary);
-  background: var(--primary-light);
+  border-color: #A1A1AA;
 }
 .notion-checkbox:checked {
-  background: var(--primary);
-  border-color: var(--primary);
+  background-color: #2F7E41;
+  border-color: #2F7E41;
 }
-.notion-checkbox:checked::before {
+.notion-checkbox:checked::after {
   content: "";
-  width: 8px;
-  height: 5px;
-  border-left: 2px solid #FFFFFF;
-  border-bottom: 2px solid #FFFFFF;
-  transform: rotate(-45deg) translate(1px, -1px);
+  position: absolute;
+  left: 5px;
+  top: 1.5px;
+  width: 4.5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-/* Notion Tag Pill */
-.notion-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11.5px;
-  font-weight: 500;
-  padding: 1.5px 7px;
-  border-radius: 4px;
-  line-height: 1.4;
-  white-space: nowrap;
+/* Modals */
+.notion-modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+.notion-modal {
+  background: #FFFFFF;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
 }
 
-/* Notion Table Cell & Header */
+/* Table */
 .notion-th {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--notion-text-muted);
-  border-bottom: 1px solid var(--notion-border);
-  border-right: 1px solid var(--notion-border);
-  padding: 6px 10px;
-  text-align: left;
-  background: var(--notion-subtle-bg);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #F7F6F3;
 }
-
 .notion-td {
-  font-size: 13px;
-  color: var(--notion-text);
-  border-bottom: 1px solid var(--notion-border);
-  border-right: 1px solid var(--notion-border);
-  padding: 8px 10px;
-  vertical-align: middle;
+  font-size: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  vertical-align: top;
 }
-
-.notion-row {
-  transition: background-color 0.1s ease;
+.notion-row:hover td {
+  background: #F7F6F3;
 }
-.notion-row:hover {
-  background-color: var(--notion-subtle-bg);
-}
-.notion-row.is-executed {
-  background-color: #FAFAFA;
+.notion-row.is-executed td {
+  background: #FAFAFA;
+  opacity: 0.75;
 }
 .notion-row.is-executed .notion-title-text {
   text-decoration: line-through;
-  color: var(--notion-text-muted);
-}
-
-/* Notion Tabs */
-.notion-tab-active {
-  color: var(--notion-text);
-  border-bottom: 2px solid var(--notion-text);
-  font-weight: 600;
-}
-
-/* Modal Backdrop & Dialog */
-.notion-modal-overlay {
-  background: rgba(15, 15, 15, 0.5);
-  backdrop-filter: blur(2px);
-}
-
-.notion-modal {
-  background: #FFFFFF;
-  border-radius: 12px;
-  border: 1px solid var(--notion-border);
-  box-shadow: var(--notion-shadow-lg);
-}
-
-/* Copywriting & Ambience callout blocks */
-.notion-callout {
-  background: var(--notion-subtle-bg);
-  border-radius: 6px;
-  padding: 10px 14px;
-  border: 1px solid var(--notion-border);
-  font-size: 12.5px;
-}
-
-/* Mobile Screen Mockup */
-.ig-phone-preview {
-  max-width: 330px;
-  margin: 0 auto;
-  border: 7px solid #1E293B;
-  border-radius: 28px;
-  overflow: hidden;
-  background: #FFFFFF;
-  box-shadow: var(--notion-shadow-lg);
+  color: var(--text-muted);
 }
