@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Copy, 
-  Check, 
-  Eye, 
-  Edit2, 
-  Trash2, 
+import {
+  Copy,
+  Check,
+  Eye,
+  Edit2,
+  Trash2,
   FileText,
   Loader2
 } from "lucide-react";
@@ -20,6 +20,13 @@ interface ContentTableProps {
   onDelete: (item: ContentItem) => void;
   onPreview: (item: ContentItem) => void;
 }
+
+const truncateWords = (text: string, maxWords = 4): string => {
+  if (!text) return "";
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(" ")}...`;
+};
 
 export default function ContentTable({
   items,
@@ -82,8 +89,8 @@ export default function ContentTable({
           <thead>
             <tr>
               <th className="th w-12 text-center">Status</th>
-              <th className="th min-w-[220px]">Judul Konten</th>
-              <th className="th min-w-[150px]">Kategori</th>
+              <th className="th min-w-[180px]">Judul Konten</th>
+              <th className="th whitespace-nowrap">Kategori</th>
               <th className="th min-w-[280px]">Teks Visual (Copywriting)</th>
               <th className="th min-w-[200px]">Arahan Visual</th>
               <th className="th min-w-[130px]">Format</th>
@@ -97,12 +104,11 @@ export default function ContentTable({
               const isExiting = exitingNos.has(item.no);
 
               return (
-                <tr 
+                <tr
                   key={item.id || item.no}
                   style={{ viewTransitionName: `table-row-${isDone ? "done" : "active"}-${item.no}` }}
-                  className={`content-card-vt hover:bg-subtle/50 transition-all duration-250 ${
-                    isDone ? "bg-subtle/20" : ""
-                  } ${isExiting ? "-translate-x-20 opacity-0 pointer-events-none" : ""}`}
+                  className={`content-card-vt hover:bg-subtle/50 transition-all duration-250 ${isDone ? "bg-subtle/20" : ""
+                    } ${isExiting ? "-translate-x-20 opacity-0 pointer-events-none" : ""}`}
                 >
                   {/* Execution Status Button */}
                   <td className="td text-center align-middle p-0">
@@ -114,11 +120,10 @@ export default function ContentTable({
                       aria-label="Tandai status eksekusi konten"
                     >
                       <span
-                        className={`flex size-5 items-center justify-center rounded-md border-[1.5px] transition-colors ${
-                          isDone
+                        className={`flex size-5 items-center justify-center rounded-md border-[1.5px] transition-colors ${isDone
                             ? "border-success bg-success text-white"
                             : "border-line-strong bg-white text-transparent hover:border-brand"
-                        }`}
+                          }`}
                       >
                         <Check className="size-3.5 stroke-[2.75]" />
                       </span>
@@ -130,22 +135,22 @@ export default function ContentTable({
                     <button
                       type="button"
                       onClick={() => onPreview(item)}
+                      title={item.judul}
                       className="flex items-center gap-2 py-1.5 cursor-pointer text-left group/title w-full min-h-[38px]"
                     >
-                      <FileText className="size-4 text-muted shrink-0 group-hover/title:text-brand transition-colors" />
-                      <span className={`font-medium text-xs leading-snug group-hover/title:text-brand transition-colors ${
-                        isDone ? "text-faint line-through" : "text-ink"
-                      }`}>
-                        {item.judul}
+                      {/* <FileText className="size-4 text-muted shrink-0 group-hover/title:text-brand transition-colors" /> */}
+                      <span className={`font-medium text-xs leading-snug group-hover/title:text-brand transition-colors ${isDone ? "text-faint line-through" : "text-ink"
+                        }`}>
+                        {truncateWords(item.judul, 4)}
                       </span>
                     </button>
                   </td>
 
                   {/* Kategori Pill */}
-                  <td className="td align-middle">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border ${tone.card} ${tone.title}`}>
-                      <span className={`size-1.5 rounded-full ${tone.dot}`} />
-                      <span>{item.kategori}</span>
+                  <td className="td align-middle whitespace-nowrap">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border whitespace-nowrap ${tone.card} ${tone.title}`}>
+                      <span className={`size-1.5 rounded-full shrink-0 ${tone.dot}`} />
+                      <span className="whitespace-nowrap">{item.kategori}</span>
                     </span>
                   </td>
 
