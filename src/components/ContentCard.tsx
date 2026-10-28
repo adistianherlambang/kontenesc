@@ -20,67 +20,76 @@ interface ContentCardProps {
   onAddContent?: () => void;
 }
 
-// 6 Color Themes Matching Reference Image Exactly
-function getCardTheme(category: string = "", no: number = 1) {
-  const cat = category.toLowerCase();
-
-  // 1. Pink Theme ("Psychology" style)
-  if (cat.includes("edukasi") || cat.includes("spesifikasi") || no % 5 === 1) {
-    return {
-      outerBg: "bg-[#FDECEF]",
-      outerBorder: "border-[#FAD2DA]",
-      headerText: "text-[#D13B63]",
-      tag1: { label: "Studies 🌿", bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
-      tag2: { label: "Edukasi 💡", bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
-      boldHook: "Poin Edukasi:"
-    };
+// 6 Color Themes Matching Reference Image (Cyclic by item.no for rich visual variety)
+const THEMES = [
+  {
+    outerBg: "bg-[#FDF0F3]",
+    outerBorder: "border-[#FAD4DC]",
+    headerText: "text-[#D13B63]",
+    tag1: { bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
+    tag2: { bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
+  },
+  {
+    outerBg: "bg-[#EFF5FE]",
+    outerBorder: "border-[#D6E5FD]",
+    headerText: "text-[#2463EB]",
+    tag1: { bg: "bg-[#EBF2FE]", text: "text-[#2965CC]", border: "border-[#D0E1FD]" },
+    tag2: { bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
+  },
+  {
+    outerBg: "bg-[#F7F5F0]",
+    outerBorder: "border-[#E9E6DC]",
+    headerText: "text-[#4A473F]",
+    tag1: { bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
+    tag2: { bg: "bg-[#F4F3EF]", text: "text-[#4D4B46]", border: "border-[#E5E3DD]" },
+  },
+  {
+    outerBg: "bg-[#EFF7EE]",
+    outerBorder: "border-[#D7EED5]",
+    headerText: "text-[#2E7D32]",
+    tag1: { bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
+    tag2: { bg: "bg-[#EBF2FE]", text: "text-[#2965CC]", border: "border-[#D0E1FD]" },
+  },
+  {
+    outerBg: "bg-[#FEF5EB]",
+    outerBorder: "border-[#FCE4CD]",
+    headerText: "text-[#C2621C]",
+    tag1: { bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
+    tag2: { bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
+  },
+  {
+    outerBg: "bg-[#F8F2FE]",
+    outerBorder: "border-[#EBDCFC]",
+    headerText: "text-[#7C3AED]",
+    tag1: { bg: "bg-[#F8F2FE]", text: "text-[#7C3AED]", border: "border-[#EBDCFC]" },
+    tag2: { bg: "bg-[#EBF2FE]", text: "text-[#2965CC]", border: "border-[#D0E1FD]" },
   }
+];
 
-  // 2. Blue Theme ("Groceries" style)
-  if (cat.includes("iphone") || cat.includes("promo") || no % 5 === 2) {
-    return {
-      outerBg: "bg-[#EAF1FD]",
-      outerBorder: "border-[#D1E1FC]",
-      headerText: "text-[#2B66CC]",
-      tag1: { label: "Food 🍱", bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
-      tag2: { label: "iPhone 📱", bg: "bg-[#EBF2FE]", text: "text-[#2965CC]", border: "border-[#D0E1FD]" },
-      boldHook: "Detail Promo:"
-    };
-  }
+// Smart, relevant tags for smartphone store content
+function getSmartphoneTags(title: string = "", category: string = "") {
+  const t = title.toLowerCase();
+  const c = category.toLowerCase();
 
-  // 3. Warm Stone/Gray Theme ("Thai Chicken" style)
-  if (cat.includes("ipad") || cat.includes("macbook") || cat.includes("gadget") || no % 5 === 3) {
-    return {
-      outerBg: "bg-[#F4F3EF]",
-      outerBorder: "border-[#E5E3DD]",
-      headerText: "text-[#4D4B46]",
-      tag1: { label: "Food 🍱", bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
-      tag2: { label: "Gadget 💻", bg: "bg-[#F4F3EF]", text: "text-[#4D4B46]", border: "border-[#E5E3DD]" },
-      boldHook: "Spesifikasi:"
-    };
-  }
+  if (t.includes("ram")) return [{ label: "RAM ⚡" }, { label: "Hardware ⚙️" }];
+  if (t.includes("storage") || t.includes("emmc") || t.includes("ufs")) return [{ label: "Storage 💾" }, { label: "Performa 🚀" }];
+  if (t.includes("layar") || t.includes("refresh rate") || t.includes("hz")) return [{ label: "Layar 📱" }, { label: "Refresh Rate 👁️" }];
+  if (t.includes("amoled") || t.includes("ips lcd") || t.includes("panel")) return [{ label: "Display 📱" }, { label: "AMOLED ✨" }];
+  if (t.includes("kamera") || t.includes("ois") || t.includes("mp")) return [{ label: "Kamera 📸" }, { label: "OIS Stabilizer 🎯" }];
+  if (t.includes("charger") || t.includes("ngecas") || t.includes("watt") || t.includes("baterai")) return [{ label: "Baterai 🔋" }, { label: "Fast Charging ⚡" }];
+  if (t.includes("nfc")) return [{ label: "NFC 💳" }, { label: "Fitur Pintar 📡" }];
+  if (t.includes("iphone") || t.includes("apple") || t.includes("ios")) return [{ label: "iPhone 📱" }, { label: "Apple 🍎" }];
+  if (t.includes("samsung")) return [{ label: "Samsung 📱" }, { label: "Galaxy ✨" }];
+  if (t.includes("xiaomi") || t.includes("redmi") || t.includes("poco")) return [{ label: "Xiaomi 📱" }, { label: "Value King 🔥" }];
+  if (t.includes("vivo")) return [{ label: "Vivo 📱" }, { label: "Portrait 📸" }];
+  if (t.includes("oppo")) return [{ label: "Oppo 📱" }, { label: "Desain 💎" }];
+  if (t.includes("infinix") || t.includes("tecno")) return [{ label: "Gaming 🎮" }, { label: "Budget 💰" }];
+  if (t.includes("tips") || t.includes("rawat") || t.includes("awet")) return [{ label: "Tips 💡" }, { label: "Perawatan 🛠️" }];
+  if (t.includes("second") || t.includes("bekas")) return [{ label: "Like New ✨" }, { label: "Garansi Toko 🛡️" }];
+  if (c.includes("edukasi")) return [{ label: "Edukasi 💡" }, { label: "Gadget Guide 📱" }];
+  if (c.includes("promo")) return [{ label: "Promo Spesial 🔥" }, { label: "Best Deal 🏷️" }];
 
-  // 4. Sage Green Theme ("Autumn is coming" style)
-  if (cat.includes("watch") || cat.includes("lifestyle") || no % 5 === 4) {
-    return {
-      outerBg: "bg-[#EEF6ED]",
-      outerBorder: "border-[#D5EAD3]",
-      headerText: "text-[#3B7A38]",
-      tag1: { label: "Diary 📓", bg: "bg-[#EBF2FE]", text: "text-[#2965CC]", border: "border-[#D0E1FD]" },
-      tag2: { label: "Thoughts 💭", bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
-      boldHook: "Fitur Unggulan:"
-    };
-  }
-
-  // 5. Peach/Amber Theme (Tips & Trik)
-  return {
-    outerBg: "bg-[#FDF3EA]",
-    outerBorder: "border-[#F9DFC8]",
-    headerText: "text-[#C76722]",
-    tag1: { label: "Tips ⚡", bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
-    tag2: { label: "Hacks 💡", bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
-    boldHook: "Tips Kunci:"
-  };
+  return [{ label: "Gadget 📱" }, { label: "Semarang Cell ✨" }];
 }
 
 export default function ContentCard({
@@ -94,7 +103,12 @@ export default function ContentCard({
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const isDone = Boolean(item.executed);
-  const theme = getCardTheme(item.kategori, item.no);
+
+  // Cycle themes by item number (1 to 6)
+  const themeIndex = (item.no - 1) % THEMES.length;
+  const theme = THEMES[themeIndex >= 0 ? themeIndex : 0];
+
+  const tags = getSmartphoneTags(item.judul, item.kategori);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,12 +125,12 @@ export default function ContentCard({
     <div className={`
       rounded-[28px] ${theme.outerBg} border ${theme.outerBorder}
       pt-3.5 pb-4 px-3.5 flex flex-col justify-between transition-all duration-200
-      hover:shadow-[0_10px_28px_rgba(0,0,0,0.06)] relative group
+      hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] relative group
     `}>
       {/* Outer Header: Category Title + Checkbox + Plus + Menu */}
-      <div className="flex items-center justify-between px-2 mb-3">
+      <div className="flex items-center justify-between px-2.5 mb-3">
         <h4 className={`font-bold text-[17px] tracking-tight truncate ${theme.headerText}`}>
-          {item.kategori || "Notes"}
+          {item.kategori || "Konten Hub"}
         </h4>
 
         {/* Right Tools: Checkbox, Plus, Menu */}
@@ -144,7 +158,7 @@ export default function ContentCard({
               }
             }}
             className={`p-1 rounded-md hover:bg-black/5 transition-colors cursor-pointer ${theme.headerText}`}
-            title="Tambah Konten"
+            title="Tambah Konten Baru"
           >
             <Plus className="w-4 h-4" />
           </button>
@@ -204,19 +218,19 @@ export default function ContentCard({
         </div>
       </div>
 
-      {/* Inner White Card: 100% Clean, matches reference image without noisy footer buttons */}
+      {/* Inner White Card: Pristine, clean, matching reference image */}
       <div 
         onClick={() => onPreview(item)}
-        className="bg-white rounded-[22px] p-6 sm:p-6.5 shadow-[0_2px_14px_rgba(0,0,0,0.03)] border border-white cursor-pointer flex flex-col justify-between flex-1 transition-all group/inner hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] min-h-[320px]"
+        className="bg-white rounded-[22px] p-6 sm:p-6.5 shadow-[0_2px_14px_rgba(0,0,0,0.03)] border border-white cursor-pointer flex flex-col justify-between flex-1 transition-all group/inner hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] min-h-[330px]"
       >
         <div>
           {/* Tag Badges with Emoji */}
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide border ${theme.tag1.bg} ${theme.tag1.text} ${theme.tag1.border}`}>
-              {theme.tag1.label}
+              {tags[0].label}
             </span>
             <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide border ${theme.tag2.bg} ${theme.tag2.text} ${theme.tag2.border}`}>
-              {theme.tag2.label}
+              {tags[1].label}
             </span>
             <span className="ml-auto font-mono text-[11px] text-[#A1A1AA] font-medium">
               #{item.no}
@@ -232,20 +246,15 @@ export default function ContentCard({
 
           {/* Subtitle */}
           <p className="text-[13px] text-[#A1A1AA] font-normal mb-5">
-            Week {item.no}, brief notes • {item.platform || "Instagram Feed"}
+            Brief #{item.no} • {item.platform || "Instagram Feed"}
           </p>
 
-          {/* Body Content */}
-          <div className="mb-3">
-            <p className="font-bold text-[13.5px] text-[#18181B] mb-1.5">
-              {theme.boldHook}
-            </p>
-            <p className="text-[13px] text-[#4B4B52] leading-[1.65] line-clamp-5 whitespace-pre-line font-normal">
-              {item.copywriting || item.caption}
-            </p>
+          {/* Body Content / Copywriting */}
+          <div className="text-[13px] text-[#4B4B52] leading-[1.65] line-clamp-5 whitespace-pre-line font-normal mb-3">
+            {item.copywriting || item.caption}
           </div>
 
-          {/* Ambience note */}
+          {/* Ambience visual note */}
           {item.ambience && (
             <p className="text-[12px] text-[#71717A] italic line-clamp-2 mt-3 pt-3 border-t border-[#F4F4F5] leading-relaxed">
               💡 {item.ambience}

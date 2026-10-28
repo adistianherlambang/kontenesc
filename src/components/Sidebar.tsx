@@ -118,17 +118,17 @@ export default function Sidebar({
             </button>
           </div>
 
-          {/* User Profile matching reference */}
+          {/* User Profile matching Semarang Cell branding */}
           <div className="flex items-center gap-3.5 px-1 mb-8 select-none">
-            <div className="w-11 h-11 rounded-2xl bg-[#F4F4F5] border border-black/5 flex items-center justify-center text-xl shadow-2xs shrink-0">
-              🐼
+            <div className="w-11 h-11 rounded-2xl bg-[#EFF5FE] border border-[#D6E5FD] flex items-center justify-center text-xl shadow-2xs shrink-0 text-[#1F6FB6]">
+              📱
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-[15px] font-bold text-[#18181B] truncate tracking-tight leading-snug">
-                Anastasia
+                Semarang Cell
               </h2>
               <p className="text-[12px] text-[#A1A1AA] truncate font-normal">
-                anastasia@icylab.co
+                konten@semarangcell.id
               </p>
             </div>
           </div>
