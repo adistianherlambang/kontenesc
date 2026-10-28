@@ -130,7 +130,7 @@ label {
 @layer components {
   /* ---------- Buttons (mobile-friendly 42px, desktop 36px) ---------- */
   .btn {
-    @apply inline-flex min-h-10.5 sm:min-h-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2
+    @apply inline-flex min-h-[42px] sm:min-h-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2
       whitespace-nowrap rounded-xl px-4 py-2 sm:px-3.5 sm:py-1.5 text-[13px] font-medium transition-colors
       outline-none focus-visible:ring-3 focus-visible:ring-brand/25
       disabled:pointer-events-none disabled:opacity-50;
@@ -140,11 +140,11 @@ label {
   .btn-ghost { @apply text-muted hover:bg-subtle hover:text-ink active:bg-line/60; }
   .btn-danger { @apply bg-danger text-white hover:bg-danger-hover active:bg-danger-hover; }
   .btn-danger-ghost { @apply text-danger hover:bg-danger-soft active:bg-danger-soft; }
-  .btn-icon { @apply min-w-10.5 min-h-10.5 sm:min-w-9 sm:min-h-9 p-2 sm:p-1.5; }
+  .btn-icon { @apply min-w-[42px] min-h-[42px] sm:min-w-9 sm:min-h-9 p-2 sm:p-1.5; }
 
   /* ---------- Notion-style buttons (used in Navbar) ---------- */
   .notion-btn {
-    @apply inline-flex min-h-10.5 sm:min-h-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2
+    @apply inline-flex min-h-[42px] sm:min-h-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2
       whitespace-nowrap rounded-xl px-3.5 py-2 sm:px-3 sm:py-1.5 text-xs font-medium transition-colors
       outline-none;
   }
@@ -167,7 +167,7 @@ label {
 
   /* ---------- Checkbox ---------- */
   .checkbox {
-    @apply relative size-5 sm:size-4.5 shrink-0 cursor-pointer appearance-none rounded-md border-[1.5px]
+    @apply relative size-5 sm:size-4 shrink-0 cursor-pointer appearance-none rounded-md border-[1.5px]
       border-line-strong bg-canvas transition-colors hover:border-faint
       focus-visible:ring-3 focus-visible:ring-brand/25 outline-none
       checked:border-brand checked:bg-brand;
