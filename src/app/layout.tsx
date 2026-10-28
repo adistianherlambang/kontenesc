@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={jakarta.variable}>
-      <body className="min-h-screen antialiased bg-[#FAF9F6] text-[#18181B] font-sans selection:bg-[#1F6FB6]/15 selection:text-[#1F6FB6]">
+      <body className="min-h-screen antialiased text-[#18181B] font-sans selection:bg-[#1F6FB6]/15 selection:text-[#1F6FB6]">
         {children}
       </body>
     </html>

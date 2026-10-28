@@ -20,11 +20,11 @@ interface ContentCardProps {
   onAddContent?: () => void;
 }
 
-// 6 Color Themes Matching Reference Image (Cyclic by item.no for rich visual variety)
+// 6 Color Themes Matching Reference Image (Cyclic by item.no for balanced variety)
 const THEMES = [
   {
     outerBg: "bg-[#FDF0F3]",
-    outerBorder: "border-[#FAD4DC]",
+    outerBorder: "border-[#FBD4DC]",
     headerText: "text-[#D13B63]",
     tag1: { bg: "bg-[#EAF6ED]", text: "text-[#2F7E41]", border: "border-[#D0ECD7]" },
     tag2: { bg: "bg-[#FAF0E4]", text: "text-[#A66827]", border: "border-[#F2DECE]" },
@@ -66,7 +66,6 @@ const THEMES = [
   }
 ];
 
-// Smart, relevant tags for smartphone store content
 function getSmartphoneTags(title: string = "", category: string = "") {
   const t = title.toLowerCase();
   const c = category.toLowerCase();
@@ -104,10 +103,8 @@ export default function ContentCard({
   const [showMenu, setShowMenu] = useState(false);
   const isDone = Boolean(item.executed);
 
-  // Cycle themes by item number (1 to 6)
   const themeIndex = (item.no - 1) % THEMES.length;
   const theme = THEMES[themeIndex >= 0 ? themeIndex : 0];
-
   const tags = getSmartphoneTags(item.judul, item.kategori);
 
   const handleCopy = async (e: React.MouseEvent) => {
@@ -123,18 +120,18 @@ export default function ContentCard({
 
   return (
     <div className={`
-      rounded-[28px] ${theme.outerBg} border ${theme.outerBorder}
-      pt-3.5 pb-4 px-3.5 flex flex-col justify-between transition-all duration-200
-      hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] relative group
+      rounded-[24px] ${theme.outerBg} border ${theme.outerBorder}
+      p-3 pb-3.5 flex flex-col justify-between transition-all duration-200
+      hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] relative group w-full
     `}>
       {/* Outer Header: Category Title + Checkbox + Plus + Menu */}
-      <div className="flex items-center justify-between px-2.5 mb-3">
-        <h4 className={`font-bold text-[17px] tracking-tight truncate ${theme.headerText}`}>
-          {item.kategori || "Konten Hub"}
+      <div className="flex items-center justify-between px-2 mb-2.5">
+        <h4 className={`font-bold text-[15.5px] tracking-tight truncate ${theme.headerText}`}>
+          {item.kategori || "Konten"}
         </h4>
 
         {/* Right Tools: Checkbox, Plus, Menu */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           {/* Checkbox Centang Eksekusi */}
           <label 
             className="flex items-center cursor-pointer select-none"
@@ -160,7 +157,7 @@ export default function ContentCard({
             className={`p-1 rounded-md hover:bg-black/5 transition-colors cursor-pointer ${theme.headerText}`}
             title="Tambah Konten Baru"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
           </button>
 
           {/* More Horizontal (...) button */}
@@ -173,12 +170,12 @@ export default function ContentCard({
               className={`p-1 rounded-md hover:bg-black/5 transition-colors cursor-pointer ${theme.headerText}`}
               title="Menu Opsi"
             >
-              <MoreHorizontal className="w-4 h-4" />
+              <MoreHorizontal className="w-3.5 h-3.5" />
             </button>
 
             {showMenu && (
               <div 
-                className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-xl border border-gray-150 py-1.5 z-20 text-xs text-gray-700"
+                className="absolute right-0 mt-2 w-36 bg-white rounded-xl shadow-xl border border-gray-150 py-1 z-20 text-xs text-gray-700"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
@@ -186,7 +183,7 @@ export default function ContentCard({
                     setShowMenu(false);
                     onEdit(item);
                   }}
-                  className="w-full text-left px-3.5 py-2 hover:bg-gray-100 flex items-center gap-2 font-medium"
+                  className="w-full text-left px-3 py-1.5 hover:bg-gray-100 flex items-center gap-2 font-medium"
                 >
                   <Edit2 className="w-3.5 h-3.5 text-gray-500" />
                   <span>Edit Konten</span>
@@ -196,7 +193,7 @@ export default function ContentCard({
                     setShowMenu(false);
                     handleCopy(e);
                   }}
-                  className="w-full text-left px-3.5 py-2 hover:bg-gray-100 flex items-center gap-2 font-medium"
+                  className="w-full text-left px-3 py-1.5 hover:bg-gray-100 flex items-center gap-2 font-medium"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-[#2F7E41]" /> : <Copy className="w-3.5 h-3.5 text-gray-500" />}
                   <span>{copied ? "Tersalin!" : "Salin Teks"}</span>
@@ -207,7 +204,7 @@ export default function ContentCard({
                     setShowMenu(false);
                     onDelete(item);
                   }}
-                  className="w-full text-left px-3.5 py-2 hover:bg-rose-50 text-rose-600 flex items-center gap-2 font-medium"
+                  className="w-full text-left px-3 py-1.5 hover:bg-rose-50 text-rose-600 flex items-center gap-2 font-medium"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Hapus</span>
@@ -218,45 +215,45 @@ export default function ContentCard({
         </div>
       </div>
 
-      {/* Inner White Card: Pristine, clean, matching reference image */}
+      {/* Inner White Card: Matches reference screenshot proportions */}
       <div 
         onClick={() => onPreview(item)}
-        className="bg-white rounded-[22px] p-6 sm:p-6.5 shadow-[0_2px_14px_rgba(0,0,0,0.03)] border border-white cursor-pointer flex flex-col justify-between flex-1 transition-all group/inner hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] min-h-[330px]"
+        className="bg-white rounded-[18px] p-4.5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-white cursor-pointer flex flex-col justify-between flex-1 transition-all group/inner hover:shadow-[0_4px_16px_rgba(0,0,0,0.05)] min-h-[290px]"
       >
         <div>
           {/* Tag Badges with Emoji */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide border ${theme.tag1.bg} ${theme.tag1.text} ${theme.tag1.border}`}>
+          <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+            <span className={`px-2 py-0.5 rounded text-[10.5px] font-semibold tracking-wide border ${theme.tag1.bg} ${theme.tag1.text} ${theme.tag1.border}`}>
               {tags[0].label}
             </span>
-            <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide border ${theme.tag2.bg} ${theme.tag2.text} ${theme.tag2.border}`}>
+            <span className={`px-2 py-0.5 rounded text-[10.5px] font-semibold tracking-wide border ${theme.tag2.bg} ${theme.tag2.text} ${theme.tag2.border}`}>
               {tags[1].label}
             </span>
-            <span className="ml-auto font-mono text-[11px] text-[#A1A1AA] font-medium">
+            <span className="ml-auto font-mono text-[10.5px] text-[#A1A1AA] font-medium">
               #{item.no}
             </span>
           </div>
 
           {/* Big Bold Title */}
-          <h3 className={`text-[21px] sm:text-[23px] font-extrabold text-[#18181B] leading-[1.25] tracking-tight mb-1.5 transition-colors group-hover/inner:text-[#1F6FB6] ${
+          <h3 className={`text-[17px] sm:text-[18px] font-extrabold text-[#111111] leading-[1.3] tracking-tight mb-1 transition-colors group-hover/inner:text-[#1F6FB6] ${
             isDone ? "line-through text-[#A1A1AA]" : ""
           }`}>
             {item.judul}
           </h3>
 
           {/* Subtitle */}
-          <p className="text-[13px] text-[#A1A1AA] font-normal mb-5">
+          <p className="text-[12px] text-[#8E8E93] font-normal mb-3">
             Brief #{item.no} • {item.platform || "Instagram Feed"}
           </p>
 
           {/* Body Content / Copywriting */}
-          <div className="text-[13px] text-[#4B4B52] leading-[1.65] line-clamp-5 whitespace-pre-line font-normal mb-3">
+          <div className="text-[12px] text-[#48484A] leading-[1.6] line-clamp-4 font-normal mb-2">
             {item.copywriting || item.caption}
           </div>
 
           {/* Ambience visual note */}
           {item.ambience && (
-            <p className="text-[12px] text-[#71717A] italic line-clamp-2 mt-3 pt-3 border-t border-[#F4F4F5] leading-relaxed">
+            <p className="text-[11px] text-[#8E8E93] italic line-clamp-2 mt-2 pt-2 border-t border-[#F2F2F7] leading-relaxed">
               💡 {item.ambience}
             </p>
           )}
