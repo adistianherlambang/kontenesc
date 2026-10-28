@@ -416,10 +416,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Actions: Cloud Sync (Mobile), View switch & Tambah Konten */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 w-full">
 
             {/* Cloud Sync Status Button (Mobile shortcut) */}
-            <button
+            {/* <button
               type="button"
               onClick={() => setIsSyncModalOpen(true)}
               className="md:hidden p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl bg-[#F0F0F2] border border-[#E4E4E7] text-[#18181B] active:bg-[#E4E4E7] cursor-pointer"
@@ -431,7 +431,7 @@ export default function DashboardPage() {
               ) : (
                 <CloudOff className="w-4 h-4 text-[#71717A]" />
               )}
-            </button>
+            </button> */}
 
             {/* View Mode Toggle ([|||] and [▦]) */}
             <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
@@ -461,7 +461,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={handleOpenCreate}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer w-full"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span>Tambah Konten</span>
@@ -497,8 +497,8 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setActiveSidebarView("all")}
               className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "all"
-                  ? "bg-[#18181B] text-white"
-                  : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+                ? "bg-[#18181B] text-white"
+                : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
                 }`}
             >
               Semua ({items.length})
@@ -507,8 +507,8 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setActiveSidebarView("pending")}
               className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "pending"
-                  ? "bg-[#1F6FB6] text-white"
-                  : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+                ? "bg-[#1F6FB6] text-white"
+                : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
                 }`}
             >
               Belum ({pendingCount})
@@ -517,8 +517,8 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setActiveSidebarView("executed")}
               className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "executed"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+                ? "bg-emerald-600 text-white"
+                : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
                 }`}
             >
               Selesai ({executedCount})
