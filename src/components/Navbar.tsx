@@ -69,27 +69,28 @@ export default function Navbar({
         </div>
 
         {/* Right: Actions (Notion Minimalist Buttons) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-between sm:justify-end">
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-between sm:justify-end">
           
           {/* Cloud Sync Status Pill */}
           <button
+            type="button"
             onClick={onOpenSync}
             className="notion-btn notion-btn-default text-xs"
             title="Pengaturan koneksi Firebase Firestore"
           >
             {firebaseStatus === "connected" ? (
               <>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[#2B7830] font-medium">Cloud Aktif</span>
               </>
             ) : firebaseStatus === "syncing" ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                <RefreshCw className="w-4 h-4 animate-spin text-amber-500" />
                 <span className="text-amber-600 font-medium">Sinkron...</span>
               </>
             ) : (
               <>
-                <Database className="w-3.5 h-3.5 text-[#787774]" />
+                <Database className="w-4 h-4 text-[#787774]" />
                 <span className="text-[#787774]">Lokal (Firestore)</span>
               </>
             )}
@@ -98,12 +99,13 @@ export default function Navbar({
           {/* Export Dropdown (JSON / CSV) */}
           <div className="relative">
             <button
+              type="button"
               onClick={() => setShowExportMenu(!showExportMenu)}
               className="notion-btn notion-btn-bordered text-xs"
             >
-              <Download className="w-3.5 h-3.5 text-[#787774]" />
+              <Download className="w-4 h-4 text-[#787774]" />
               <span>Export</span>
-              <ChevronDown className="w-3 h-3 text-[#9B9A97]" />
+              <ChevronDown className="w-3.5 h-3.5 text-[#9B9A97]" />
             </button>
 
             {showExportMenu && (
@@ -112,25 +114,27 @@ export default function Navbar({
                   className="fixed inset-0 z-40" 
                   onClick={() => setShowExportMenu(false)} 
                 />
-                <div className="absolute right-0 mt-1 w-44 bg-white border border-[#E9E9E7] rounded-lg shadow-lg z-50 py-1 text-xs">
+                <div className="absolute right-0 mt-1.5 w-48 bg-white border border-[#E9E9E7] rounded-xl shadow-lg z-50 py-1.5 text-xs">
                   <button
+                    type="button"
                     onClick={() => {
                       onExportJSON();
                       setShowExportMenu(false);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-[#F7F6F3] flex items-center gap-2 text-[#37352F]"
+                    className="w-full px-3.5 py-2.5 min-h-[40px] text-left hover:bg-[#F7F6F3] active:bg-[#EFEFED] flex items-center gap-2.5 text-[#37352F] cursor-pointer"
                   >
-                    <FileCode className="w-3.5 h-3.5 text-[#1F6FB6]" />
+                    <FileCode className="w-4 h-4 text-[#1F6FB6]" />
                     <span>Download JSON (.json)</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => {
                       onExportCSV();
                       setShowExportMenu(false);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-[#F7F6F3] flex items-center gap-2 text-[#37352F]"
+                    className="w-full px-3.5 py-2.5 min-h-[40px] text-left hover:bg-[#F7F6F3] active:bg-[#EFEFED] flex items-center gap-2.5 text-[#37352F] cursor-pointer"
                   >
-                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                    <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
                     <span>Download CSV (.csv)</span>
                   </button>
                 </div>
@@ -140,10 +144,11 @@ export default function Navbar({
 
           {/* New / Batch Add Content Button */}
           <button
+            type="button"
             onClick={onOpenCreate}
             className="notion-btn notion-btn-primary text-xs"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4" />
             <span>Tambah Konten</span>
           </button>
         </div>

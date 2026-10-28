@@ -61,23 +61,29 @@ export default function Sidebar({
           transition-transform duration-200 md:static md:translate-x-0
           ${isOpenMobile ? "translate-x-0" : "-translate-x-full"}`}
       >
-        {/* Brand — same 56px height as the main header so the borders line up */}
-        <div className="flex h-14 shrink-0 items-center justify-between border-b border-line px-5">
+        {/* Brand — same height as the main header so the borders line up */}
+        <div className="flex min-h-14 shrink-0 items-center justify-between border-b border-line px-4 sm:px-5">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-ink">Semarang Cell</p>
             <p className="truncate text-xs text-muted">Konten Instagram</p>
           </div>
-          <button onClick={onCloseMobile} className="btn btn-ghost btn-icon md:hidden" aria-label="Tutup menu">
-            <X className="size-4" />
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="btn btn-ghost btn-icon md:hidden"
+            aria-label="Tutup menu"
+          >
+            <X className="size-5" />
           </button>
         </div>
 
         <div className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
           <nav>
             <p className="section-label">Status</p>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {views.map(({ id, label, icon: Icon, count }) => (
                 <button
+                  type="button"
                   key={id}
                   data-active={activeView === id}
                   onClick={pick(() => onSelectView(id))}
@@ -93,25 +99,27 @@ export default function Sidebar({
 
           <nav>
             <p className="section-label">Kategori</p>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               <button
+                type="button"
                 data-active={selectedCategory === "Semua"}
                 onClick={pick(() => onSelectCategory("Semua"))}
                 className="nav-item"
               >
-                <span className="size-2 shrink-0 rounded-full bg-line-strong" />
+                <span className="size-2.5 shrink-0 rounded-full bg-line-strong" />
                 <span className="truncate">Semua kategori</span>
                 <span className="nav-count">{totalCount}</span>
               </button>
               {categories.map((c) => (
                 <button
+                  type="button"
                   key={c.name}
                   data-active={selectedCategory === c.name}
                   onClick={pick(() => onSelectCategory(c.name))}
                   className="nav-item"
                   title={c.name}
                 >
-                  <span className={`size-2 shrink-0 rounded-full ${getCategoryTone(c.name).dot}`} />
+                  <span className={`size-2.5 shrink-0 rounded-full ${getCategoryTone(c.name).dot}`} />
                   <span className="truncate">{c.name}</span>
                   <span className="nav-count">{c.count}</span>
                 </button>
@@ -134,7 +142,11 @@ export default function Sidebar({
             </div>
           </div>
 
-          <button onClick={onOpenDataModal ?? onOpenSyncModal} className="nav-item">
+          <button
+            type="button"
+            onClick={pick(() => (onOpenDataModal ?? onOpenSyncModal)?.())}
+            className="nav-item"
+          >
             {firebaseStatus === "connected" ? (
               <Cloud className="size-4 shrink-0 text-success" />
             ) : (

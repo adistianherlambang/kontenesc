@@ -47,16 +47,24 @@ export default function ContentCard({
   };
 
   return (
-    <article className={`flex flex-col rounded-2xl border p-1.5 transition-shadow hover:shadow-sm ${tone.card}`}>
+    <article className={`flex flex-col rounded-2xl border p-2 sm:p-1.5 transition-shadow hover:shadow-sm ${tone.card}`}>
       {/* Category row: title + execution checkbox & saving state */}
-      <header className="flex h-9 items-center justify-between gap-3 px-2.5">
+      <header className="flex min-h-11 sm:min-h-9.5 items-center justify-between gap-2 pl-3 pr-1.5">
         <h3 className={`truncate text-[13px] font-semibold ${tone.title}`}>{item.kategori}</h3>
         
-        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-          {isSavingExec && (
+        <label
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center gap-2 px-2.5 py-2 rounded-xl cursor-pointer select-none hover:bg-black/[0.04] active:bg-black/[0.08] transition-colors min-h-[40px]"
+          title={done ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
+        >
+          {isSavingExec ? (
             <span className="flex items-center gap-1 text-[11px] font-medium text-brand animate-pulse">
-              <Loader2 className="size-3 animate-spin" />
+              <Loader2 className="size-3.5 animate-spin" />
               <span>Menyimpan...</span>
+            </span>
+          ) : (
+            <span className="text-[11px] font-medium text-muted sm:hidden">
+              {done ? "Selesai" : "Tandai"}
             </span>
           )}
           <input
@@ -65,18 +73,17 @@ export default function ContentCard({
             disabled={isSavingExec}
             onChange={handleToggle}
             className="checkbox cursor-pointer"
-            title={done ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
             aria-label={`Tandai #${item.no} sudah dieksekusi`}
           />
-        </div>
+        </label>
       </header>
 
       {/* White sheet */}
       <button
         type="button"
         onClick={handleOpen}
-        className="flex flex-1 cursor-pointer flex-col rounded-xl border border-black/[0.04] bg-canvas p-4 text-left
-          outline-none focus-visible:ring-3 focus-visible:ring-brand/25"
+        className="flex flex-1 cursor-pointer flex-col rounded-xl border border-black/[0.04] bg-canvas p-4 sm:p-4 text-left
+          outline-none transition-transform active:scale-[0.99] focus-visible:ring-3 focus-visible:ring-brand/25"
       >
         <div className="mb-2 flex items-center gap-2 text-xs text-muted">
           <span className="font-mono">#{item.no}</span>

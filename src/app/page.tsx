@@ -432,7 +432,7 @@ export default function DashboardPage() {
   }, [activeSidebarView]);
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex bg-white text-[#18181B] font-sans">
+    <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
       
       {/* Left Sidebar */}
       <Sidebar
@@ -451,88 +451,119 @@ export default function DashboardPage() {
       />
 
       {/* Right Main Content Area */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden bg-white">
+      <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
         
-        {/* Top Header: Clean, purposeful */}
-        <header className="h-[54px] px-8 border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0 bg-white">
+        {/* Top Header: Clean, purposeful, mobile-friendly touch targets */}
+        <header className="min-h-[60px] sm:h-[62px] px-4 sm:px-8 py-2.5 border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 bg-white">
           
           {/* Left Title */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
             <button
+              type="button"
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="md:hidden p-1.5 text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+              aria-label="Buka menu navigasi"
+              className="md:hidden -ml-1 p-2.5 min-w-[42px] min-h-[42px] flex items-center justify-center text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-100 active:bg-gray-200 cursor-pointer transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
 
-            <h2 className="text-sm font-bold text-[#18181B]">
+            <h2 className="text-sm sm:text-base font-bold text-[#18181B] truncate">
               {viewTitle}
             </h2>
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="text-xs text-gray-400 font-mono shrink-0">
               ({filteredItems.length})
             </span>
           </div>
 
-          {/* Center Search Input */}
+          {/* Center Search Input (Desktop) */}
           <div className="relative flex-1 max-w-sm hidden sm:block">
-            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari konten, judul, topik..."
-              className="w-full pl-9 pr-7 py-1.5 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              className="w-full pl-10 pr-9 py-2 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A1A1AA] hover:text-[#18181B]"
+                aria-label="Hapus pencarian"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#A1A1AA] hover:text-[#18181B] hover:bg-black/5 cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
           {/* Right Actions: View switch & Tambah Konten */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
             {/* View Mode Toggle ([|||] and [▦]) */}
-            <div className="flex items-center p-0.5 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
+            <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
               <button
+                type="button"
                 onClick={() => setViewMode("table")}
-                className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
                   viewMode === "table" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
                 }`}
                 title="Tampilan Tabel"
+                aria-label="Tampilan Tabel"
               >
-                <AlignJustify className="w-3.5 h-3.5" />
+                <AlignJustify className="w-4 h-4" />
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode("grid")}
-                className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
                   viewMode === "grid" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
                 }`}
                 title="Tampilan Kartu"
+                aria-label="Tampilan Kartu"
               >
-                <LayoutGrid className="w-3.5 h-3.5" />
+                <LayoutGrid className="w-4 h-4" />
               </button>
             </div>
 
             {/* Tambah Konten (Manual, Batch CSV, Batch JSON) */}
             <button
+              type="button"
               onClick={handleOpenCreate}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] active:scale-[0.98] text-white shadow-xs transition-all select-none cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4 shrink-0" />
               <span>Tambah Konten</span>
             </button>
+          </div>
+
+          {/* Mobile Search Input Row */}
+          <div className="relative w-full sm:hidden">
+            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari konten, judul, topik..."
+              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] active:bg-black/5"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </header>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto px-8 py-6">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6">
           {filteredItems.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-12 text-gray-400">
+            <div className="h-full flex flex-col items-center justify-center text-center p-8 sm:p-12 text-gray-400">
               <div className="w-16 h-16 rounded-2xl bg-[#FAFAFA] border border-gray-200 flex items-center justify-center text-2xl mb-4 shadow-xs">
                 🔍
               </div>
@@ -543,19 +574,20 @@ export default function DashboardPage() {
                 Ubah kata kunci pencarian atau reset filter kategori untuk menampilkan data kembali.
               </p>
               <button
+                type="button"
                 onClick={() => {
                   setSearchQuery("");
                   setSelectedCategory("Semua");
                   setSelectedPlatform("Semua");
                   setActiveSidebarView("all");
                 }}
-                className="px-5 py-2 rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black cursor-pointer"
+                className="px-5 py-2.5 min-h-[42px] rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black active:scale-[0.98] cursor-pointer"
               >
                 Tampilkan Semua Konten
               </button>
             </div>
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
               {filteredItems.map((item) => (
                 <ContentCard
                   key={item.id || item.no}

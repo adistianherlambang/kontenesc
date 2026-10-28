@@ -33,12 +33,23 @@
 html,
 body {
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
   background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation;
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -52,36 +63,46 @@ body {
 ::-webkit-scrollbar-thumb:hover { background-color: var(--color-faint); }
 
 @layer components {
-  /* ---------- Buttons (all 32px tall) ---------- */
+  /* ---------- Buttons (mobile-friendly 40px, desktop 34px) ---------- */
   .btn {
-    @apply inline-flex h-8 shrink-0 cursor-pointer select-none items-center justify-center gap-1.5
-      whitespace-nowrap rounded-lg px-3 text-[13px] font-medium transition-colors
-      outline-none focus-visible:ring-3 focus-visible:ring-brand/25
+    @apply inline-flex min-h-10 sm:min-h-8.5 shrink-0 cursor-pointer select-none items-center justify-center gap-2
+      whitespace-nowrap rounded-xl px-4 py-2 sm:px-3.5 sm:py-1.5 text-[13px] font-medium transition-all
+      outline-none focus-visible:ring-3 focus-visible:ring-brand/25 active:scale-[0.98]
       disabled:pointer-events-none disabled:opacity-50;
   }
-  .btn-primary { @apply bg-brand text-white hover:bg-brand-hover; }
-  .btn-secondary { @apply border border-line bg-canvas text-ink hover:bg-subtle; }
-  .btn-ghost { @apply text-muted hover:bg-subtle hover:text-ink; }
-  .btn-danger { @apply bg-danger text-white hover:bg-danger-hover; }
-  .btn-danger-ghost { @apply text-danger hover:bg-danger-soft; }
-  .btn-icon { @apply w-8 px-0; }
+  .btn-primary { @apply bg-brand text-white hover:bg-brand-hover active:bg-brand-hover; }
+  .btn-secondary { @apply border border-line bg-canvas text-ink hover:bg-subtle active:bg-subtle; }
+  .btn-ghost { @apply text-muted hover:bg-subtle hover:text-ink active:bg-subtle; }
+  .btn-danger { @apply bg-danger text-white hover:bg-danger-hover active:bg-danger-hover; }
+  .btn-danger-ghost { @apply text-danger hover:bg-danger-soft active:bg-danger-soft; }
+  .btn-icon { @apply min-w-10 min-h-10 sm:min-w-8.5 sm:min-h-8.5 p-2 sm:p-1.5; }
+
+  /* ---------- Notion-style buttons (used in Navbar) ---------- */
+  .notion-btn {
+    @apply inline-flex min-h-10 sm:min-h-8.5 shrink-0 cursor-pointer select-none items-center justify-center gap-2
+      whitespace-nowrap rounded-xl px-3.5 py-2 sm:px-3 sm:py-1.5 text-xs font-medium transition-all
+      outline-none active:scale-[0.98];
+  }
+  .notion-btn-default { @apply bg-subtle text-ink hover:bg-line/60 active:bg-line; }
+  .notion-btn-bordered { @apply border border-line bg-canvas text-ink hover:bg-subtle active:bg-subtle; }
+  .notion-btn-primary { @apply bg-brand text-white hover:bg-brand-hover active:bg-brand-hover shadow-2xs; }
 
   /* ---------- Form fields ---------- */
   .field-label { @apply mb-1.5 block text-xs font-medium text-muted; }
   .input {
-    @apply h-8 w-full rounded-lg border border-line bg-canvas px-3 text-[13px] text-ink
+    @apply min-h-10 sm:min-h-9 w-full rounded-xl border border-line bg-canvas px-3.5 py-2 text-base sm:text-[13px] text-ink
       outline-none transition placeholder:text-faint
       focus:border-brand focus:ring-3 focus:ring-brand/15;
   }
   .textarea {
-    @apply w-full resize-y rounded-lg border border-line bg-canvas px-3 py-2 text-[13px] leading-relaxed
+    @apply w-full resize-y rounded-xl border border-line bg-canvas px-3.5 py-2.5 text-base sm:text-[13px] leading-relaxed
       text-ink outline-none transition placeholder:text-faint
       focus:border-brand focus:ring-3 focus:ring-brand/15;
   }
 
   /* ---------- Checkbox ---------- */
   .checkbox {
-    @apply relative size-4 shrink-0 cursor-pointer appearance-none rounded border-[1.5px]
+    @apply relative size-5 sm:size-4.5 shrink-0 cursor-pointer appearance-none rounded-md border-[1.5px]
       border-line-strong bg-canvas transition-colors hover:border-faint
       focus-visible:ring-3 focus-visible:ring-brand/25 outline-none
       checked:border-brand checked:bg-brand;
@@ -89,26 +110,26 @@ body {
   .checkbox:checked::after {
     content: "";
     position: absolute;
-    left: 4.5px;
-    top: 1.5px;
-    width: 4px;
-    height: 8px;
+    left: 50%;
+    top: 45%;
+    width: 5px;
+    height: 9px;
     border: solid white;
     border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg);
   }
 
   /* ---------- Badge ---------- */
-  .badge { @apply inline-flex h-5 items-center rounded-md px-1.5 text-[11px] font-medium whitespace-nowrap; }
+  .badge { @apply inline-flex min-h-5 items-center rounded-md px-2 py-0.5 text-[11px] font-medium whitespace-nowrap; }
 
   /* ---------- Sidebar navigation ---------- */
   .nav-item {
-    @apply flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px]
-      text-muted transition-colors hover:bg-subtle hover:text-ink;
+    @apply flex min-h-11 sm:min-h-9 w-full cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 sm:px-3 sm:py-2 text-sm sm:text-[13px]
+      text-muted transition-colors hover:bg-subtle hover:text-ink active:bg-subtle;
   }
-  .nav-item[data-active="true"] { @apply bg-subtle font-medium text-ink; }
-  .nav-count { @apply ml-auto font-mono text-[11px] text-faint; }
-  .section-label { @apply mb-1 px-2.5 text-[11px] font-medium text-faint; }
+  .nav-item[data-active="true"] { @apply bg-subtle font-semibold text-ink; }
+  .nav-count { @apply ml-auto font-mono text-xs sm:text-[11px] text-faint; }
+  .section-label { @apply mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-faint; }
 
   /* ---------- Modal ---------- */
   .modal-overlay {
@@ -116,13 +137,13 @@ body {
       sm:items-center sm:p-6;
   }
   .modal {
-    @apply flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-line
+    @apply flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-line
       bg-canvas shadow-[0_24px_64px_rgba(28,25,23,0.18)] sm:rounded-2xl;
   }
-  .modal-header { @apply flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line px-5; }
+  .modal-header { @apply flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-line px-4 sm:px-5 py-2.5; }
   .modal-title { @apply truncate text-[15px] font-semibold text-ink; }
-  .modal-body { @apply flex-1 overflow-y-auto p-5; }
-  .modal-footer { @apply flex shrink-0 items-center justify-end gap-2 border-t border-line px-5 py-4; }
+  .modal-body { @apply flex-1 overflow-y-auto p-4 sm:p-5; }
+  .modal-footer { @apply flex shrink-0 items-center justify-end gap-2.5 border-t border-line px-4 sm:px-5 py-3.5 sm:py-4; }
 
   /* ---------- Callout / notice ---------- */
   .notice { @apply flex items-start gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] leading-relaxed; }

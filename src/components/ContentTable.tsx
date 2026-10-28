@@ -83,21 +83,25 @@ export default function ContentTable({
                   className={`hover:bg-subtle/50 transition-colors ${isDone ? "bg-subtle/20" : ""}`}
                 >
                   {/* Execution Status Checkbox with Saving Spinner */}
-                  <td className="td text-center align-middle">
+                  <td className="td text-center align-middle p-0">
                     {isSaving ? (
-                      <div className="flex items-center justify-center" title="Menyimpan status...">
-                        <Loader2 className="size-3.5 animate-spin text-brand" />
+                      <div className="flex items-center justify-center min-h-[44px] min-w-[44px]" title="Menyimpan status...">
+                        <Loader2 className="size-4 animate-spin text-brand" />
                       </div>
                     ) : (
-                      <input
-                        type="checkbox"
-                        checked={isDone}
-                        disabled={isSaving}
-                        onChange={() => handleToggleExecution(item)}
-                        className="checkbox mx-auto cursor-pointer"
+                      <label
+                        className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2.5 cursor-pointer"
                         title={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
-                        aria-label={`Tandai #${item.no} dieksekusi`}
-                      />
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isDone}
+                          disabled={isSaving}
+                          onChange={() => handleToggleExecution(item)}
+                          className="checkbox cursor-pointer"
+                          aria-label={`Tandai #${item.no} dieksekusi`}
+                        />
+                      </label>
                     )}
                   </td>
 
@@ -111,9 +115,9 @@ export default function ContentTable({
                     <button
                       type="button"
                       onClick={() => onPreview(item)}
-                      className="flex items-center gap-2 cursor-pointer text-left group/title w-full"
+                      className="flex items-center gap-2 py-1.5 cursor-pointer text-left group/title w-full min-h-[38px]"
                     >
-                      <FileText className="size-3.5 text-muted shrink-0 group-hover/title:text-brand transition-colors" />
+                      <FileText className="size-4 text-muted shrink-0 group-hover/title:text-brand transition-colors" />
                       <span className={`font-medium text-xs leading-snug group-hover/title:text-brand transition-colors ${
                         isDone ? "text-faint line-through" : "text-ink"
                       }`}>
@@ -124,7 +128,7 @@ export default function ContentTable({
 
                   {/* Kategori Pill */}
                   <td className="td align-middle">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium border ${tone.card} ${tone.title}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border ${tone.card} ${tone.title}`}>
                       <span className={`size-1.5 rounded-full ${tone.dot}`} />
                       <span>{item.kategori}</span>
                     </span>
@@ -132,20 +136,20 @@ export default function ContentTable({
 
                   {/* Copywriting */}
                   <td className="td">
-                    <div className="flex items-start justify-between gap-1 group/copy">
+                    <div className="flex items-start justify-between gap-2 group/copy">
                       <p className="line-clamp-2 text-muted font-mono text-[11px] leading-relaxed">
                         {item.copywriting}
                       </p>
                       <button
                         type="button"
                         onClick={() => copyText(`copy-${item.no}`, item.copywriting)}
-                        className="btn btn-ghost btn-icon size-6 text-faint hover:text-ink shrink-0"
+                        className="btn btn-ghost btn-icon size-9 sm:size-8 text-faint hover:text-ink shrink-0"
                         title="Salin Copywriting"
                       >
                         {copiedId === `copy-${item.no}` ? (
-                          <Check className="size-3 text-success" />
+                          <Check className="size-3.5 text-success" />
                         ) : (
-                          <Copy className="size-3" />
+                          <Copy className="size-3.5" />
                         )}
                       </button>
                     </div>
@@ -167,30 +171,30 @@ export default function ContentTable({
 
                   {/* Actions */}
                   <td className="td text-center align-middle">
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => onPreview(item)}
-                        className="btn btn-ghost btn-icon size-7 text-muted hover:text-brand"
+                        className="btn btn-ghost btn-icon size-9 sm:size-8 text-muted hover:text-brand"
                         title="Lihat Detail & Edit Teks"
                       >
-                        <Eye className="size-3.5" />
+                        <Eye className="size-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => onEdit(item)}
-                        className="btn btn-ghost btn-icon size-7 text-muted hover:text-ink"
+                        className="btn btn-ghost btn-icon size-9 sm:size-8 text-muted hover:text-ink"
                         title="Edit via Form Modal"
                       >
-                        <Edit2 className="size-3.5" />
+                        <Edit2 className="size-4" />
                       </button>
                       <button
                         type="button"
                         onClick={() => onDelete(item)}
-                        className="btn btn-ghost btn-icon size-7 text-muted hover:text-danger"
+                        className="btn btn-ghost btn-icon size-9 sm:size-8 text-muted hover:text-danger"
                         title="Hapus Konten"
                       >
-                        <Trash2 className="size-3.5" />
+                        <Trash2 className="size-4" />
                       </button>
                     </div>
                   </td>

@@ -257,12 +257,12 @@ export default function ContentModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div 
-        className="modal max-w-2xl max-h-[90vh]" 
+        className="modal max-w-2xl max-h-[92dvh]" 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="modal-header">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <h2 className="modal-title">
               {isEditing ? `Edit Konten #${formData.no}` : "Tambah Konten Baru"}
             </h2>
@@ -276,49 +276,49 @@ export default function ContentModal({
             className="btn btn-ghost btn-icon"
             aria-label="Tutup modal"
           >
-            <X className="size-4" />
+            <X className="size-5" />
           </button>
         </div>
 
         {/* Mode Tabs (Only when adding new content) */}
         {!isEditing && (
-          <div className="shrink-0 border-b border-line bg-surface px-5 py-2.5">
-            <div className="flex items-center gap-1 rounded-xl bg-subtle p-1">
+          <div className="shrink-0 border-b border-line bg-surface px-4 sm:px-5 py-2.5">
+            <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-subtle p-1">
               <button
                 type="button"
                 onClick={() => setActiveMode("manual")}
-                className={`btn flex-1 text-xs ${
+                className={`btn px-2.5 py-2 text-xs ${
                   activeMode === "manual"
                     ? "bg-canvas text-ink shadow-xs"
                     : "btn-ghost text-muted hover:text-ink"
                 }`}
               >
-                <PenLine className="size-3.5" />
-                <span>Form Manual (1 Konten)</span>
+                <PenLine className="size-3.5 shrink-0" />
+                <span className="truncate">Manual</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveMode("batch-json")}
-                className={`btn flex-1 text-xs ${
+                className={`btn px-2.5 py-2 text-xs ${
                   activeMode === "batch-json"
                     ? "bg-canvas text-ink shadow-xs"
                     : "btn-ghost text-muted hover:text-ink"
                 }`}
               >
-                <FileCode className="size-3.5 text-brand" />
-                <span>Batch JSON</span>
+                <FileCode className="size-3.5 text-brand shrink-0" />
+                <span className="truncate">Batch JSON</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveMode("batch-csv")}
-                className={`btn flex-1 text-xs ${
+                className={`btn px-2.5 py-2 text-xs ${
                   activeMode === "batch-csv"
                     ? "bg-canvas text-ink shadow-xs"
                     : "btn-ghost text-muted hover:text-ink"
                 }`}
               >
-                <FileSpreadsheet className="size-3.5 text-success" />
-                <span>Batch CSV / Excel</span>
+                <FileSpreadsheet className="size-3.5 text-success shrink-0" />
+                <span className="truncate">Batch CSV</span>
               </button>
             </div>
           </div>

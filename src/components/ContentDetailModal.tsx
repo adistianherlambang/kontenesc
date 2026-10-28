@@ -195,27 +195,27 @@ export default function ContentDetailModal({
   return (
     <div className="modal-overlay" onClick={handleAttemptClose}>
       <div 
-        className="modal max-w-2xl max-h-[92vh] overflow-hidden" 
+        className="modal max-w-2xl max-h-[92dvh] overflow-hidden" 
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header / Breadcrumb navigation */}
         <div className="modal-header">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
             <span className="font-mono text-xs font-semibold text-muted">
               #{draft.no}
             </span>
             <span className="text-line-strong">·</span>
-            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${tone.title}`}>
-              <span className={`size-2 rounded-full ${tone.dot}`} />
-              {draft.kategori}
+            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold truncate ${tone.title}`}>
+              <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
+              <span className="truncate">{draft.kategori}</span>
             </span>
-            <span className="text-line-strong">·</span>
-            <span className="text-xs text-muted">
+            <span className="text-line-strong hidden sm:inline">·</span>
+            <span className="text-xs text-muted hidden sm:inline">
               {draft.platform || "Instagram Feed"}
             </span>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 shrink-0">
             {onDelete && (
               <button
                 type="button"
@@ -227,7 +227,7 @@ export default function ContentDetailModal({
                 title="Hapus konten ini"
                 aria-label="Hapus konten"
               >
-                <Trash2 className="size-4" />
+                <Trash2 className="size-4.5" />
               </button>
             )}
             <button
@@ -236,13 +236,13 @@ export default function ContentDetailModal({
               className="btn btn-ghost btn-icon"
               aria-label="Tutup detail"
             >
-              <X className="size-4" />
+              <X className="size-5" />
             </button>
           </div>
         </div>
 
         {/* Scrollable Document Body */}
-        <div className="modal-body space-y-6 px-6 py-5">
+        <div className="modal-body space-y-6 px-4 sm:px-6 py-4 sm:py-5">
           {/* Metadata Properties Row (Clean Document Style) */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4 text-xs">
             {/* Status Eksekusi Toggle */}
@@ -251,15 +251,15 @@ export default function ContentDetailModal({
                 type="button"
                 onClick={handleToggleExecution}
                 disabled={isTogglingExecution}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 transition-colors hover:bg-subtle select-none"
+                className="inline-flex min-h-10 sm:min-h-9 cursor-pointer items-center gap-2.5 rounded-xl border border-line bg-surface px-4 py-2 sm:px-3.5 sm:py-1.5 transition-all hover:bg-subtle active:bg-subtle active:scale-[0.98] select-none"
                 title={draft.executed ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
               >
                 {isTogglingExecution ? (
                   <Loader2 className="size-4 animate-spin text-brand" />
                 ) : draft.executed ? (
-                  <CheckCircle2 className="size-4 text-success" />
+                  <CheckCircle2 className="size-4.5 text-success" />
                 ) : (
-                  <Circle className="size-4 text-faint" />
+                  <Circle className="size-4.5 text-faint" />
                 )}
                 <span className="font-medium text-ink">
                   {isTogglingExecution
@@ -278,16 +278,16 @@ export default function ContentDetailModal({
             </div>
 
             {/* Quick Copy Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => handleCopy("copywriting", draft.copywriting)}
-                className="btn btn-secondary text-xs"
+                className="btn btn-secondary text-xs flex-1 sm:flex-initial"
               >
                 {copiedField === "copywriting" ? (
-                  <Check className="size-3.5 text-success" />
+                  <Check className="size-4 text-success" />
                 ) : (
-                  <Copy className="size-3.5" />
+                  <Copy className="size-4" />
                 )}
                 <span>Salin Teks Feed</span>
               </button>
@@ -295,12 +295,12 @@ export default function ContentDetailModal({
                 <button
                   type="button"
                   onClick={() => handleCopy("caption", draft.caption)}
-                  className="btn btn-secondary text-xs"
+                  className="btn btn-secondary text-xs flex-1 sm:flex-initial"
                 >
                   {copiedField === "caption" ? (
-                    <Check className="size-3.5 text-success" />
+                    <Check className="size-4 text-success" />
                   ) : (
-                    <Copy className="size-3.5" />
+                    <Copy className="size-4" />
                   )}
                   <span>Salin Caption</span>
                 </button>
@@ -384,17 +384,17 @@ export default function ContentDetailModal({
 
         {/* Floating/Sticky Save Button Bar: Appears ONLY when edits are detected */}
         {isDirty && (
-          <div className="shrink-0 border-t border-line bg-canvas/95 px-6 py-3.5 backdrop-blur-md flex items-center justify-between shadow-[0_-8px_24px_rgba(28,25,23,0.06)] animate-in fade-in slide-in-from-bottom-2 duration-150">
+          <div className="shrink-0 border-t border-line bg-canvas/95 px-4 sm:px-6 py-3.5 backdrop-blur-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 shadow-[0_-8px_24px_rgba(28,25,23,0.06)] animate-in fade-in slide-in-from-bottom-2 duration-150">
             <div className="flex items-center gap-2 text-xs text-muted">
               <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
               <span>Ada perubahan pada teks konten</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleReset}
                 disabled={isSaving}
-                className="btn btn-secondary text-xs"
+                className="btn btn-secondary text-xs flex-1 sm:flex-initial"
               >
                 Batalkan
               </button>
@@ -402,9 +402,9 @@ export default function ContentDetailModal({
                 type="button"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="btn btn-primary text-xs"
+                className="btn btn-primary text-xs flex-1 sm:flex-initial"
               >
-                <Save className="size-3.5" />
+                <Save className="size-4" />
                 <span>{isSaving ? "Menyimpan..." : "Simpan Perubahan"}</span>
               </button>
             </div>
