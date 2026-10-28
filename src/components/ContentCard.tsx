@@ -4,12 +4,10 @@ import React, { useState } from "react";
 import { 
   Copy, 
   Check, 
-  Eye, 
   Edit2, 
   Trash2, 
   MoreHorizontal, 
-  Plus, 
-  CheckCircle2
+  Plus
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 
@@ -19,6 +17,7 @@ interface ContentCardProps {
   onEdit: (item: ContentItem) => void;
   onDelete: (item: ContentItem) => void;
   onPreview: (item: ContentItem) => void;
+  onAddContent?: () => void;
 }
 
 // 6 Color Themes Matching Reference Image Exactly
@@ -89,7 +88,8 @@ export default function ContentCard({
   onToggleExecuted,
   onEdit,
   onDelete,
-  onPreview
+  onPreview,
+  onAddContent
 }: ContentCardProps) {
   const [copied, setCopied] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -119,11 +119,11 @@ export default function ContentCard({
           {item.kategori || "Notes"}
         </h4>
 
-        {/* Right Tools: Execution Checkbox, Plus, Menu */}
+        {/* Right Tools: Checkbox, Plus, Menu */}
         <div className="flex items-center gap-2.5">
           {/* Checkbox Centang Eksekusi */}
           <label 
-            className="flex items-center gap-1.5 cursor-pointer select-none"
+            className="flex items-center cursor-pointer select-none"
             title={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
             onClick={(e) => e.stopPropagation()}
           >
@@ -135,11 +135,16 @@ export default function ContentCard({
             />
           </label>
 
-          {/* Plus button */}
+          {/* Plus button to add note */}
           <button
-            onClick={() => onPreview(item)}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onAddContent) {
+                onAddContent();
+              }
+            }}
             className={`p-1 rounded-md hover:bg-black/5 transition-colors cursor-pointer ${theme.headerText}`}
-            title="Pratinjau Feed"
+            title="Tambah Konten"
           >
             <Plus className="w-4 h-4" />
           </button>
@@ -147,7 +152,10 @@ export default function ContentCard({
           {/* More Horizontal (...) button */}
           <div className="relative">
             <button
-              onClick={() => setShowMenu(!showMenu)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
               className={`p-1 rounded-md hover:bg-black/5 transition-colors cursor-pointer ${theme.headerText}`}
               title="Menu Opsi"
             >
@@ -156,7 +164,7 @@ export default function ContentCard({
 
             {showMenu && (
               <div 
-                className="absolute right-0 mt-2 w-36 bg-white rounded-2xl shadow-xl border border-gray-150 py-1.5 z-20 text-xs text-gray-700"
+                className="absolute right-0 mt-2 w-40 bg-white rounded-2xl shadow-xl border border-gray-150 py-1.5 z-20 text-xs text-gray-700"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
@@ -170,14 +178,14 @@ export default function ContentCard({
                   <span>Edit Konten</span>
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
                     setShowMenu(false);
-                    onPreview(item);
+                    handleCopy(e);
                   }}
                   className="w-full text-left px-3.5 py-2 hover:bg-gray-100 flex items-center gap-2 font-medium"
                 >
-                  <Eye className="w-3.5 h-3.5 text-gray-500" />
-                  <span>Preview Feed</span>
+                  {copied ? <Check className="w-3.5 h-3.5 text-[#2F7E41]" /> : <Copy className="w-3.5 h-3.5 text-gray-500" />}
+                  <span>{copied ? "Tersalin!" : "Salin Teks"}</span>
                 </button>
                 <div className="h-px bg-gray-100 my-1" />
                 <button
@@ -196,10 +204,10 @@ export default function ContentCard({
         </div>
       </div>
 
-      {/* Inner White Card with Generous Padding */}
+      {/* Inner White Card: 100% Clean, matches reference image without noisy footer buttons */}
       <div 
         onClick={() => onPreview(item)}
-        className="bg-white rounded-[22px] p-6 sm:p-6.5 shadow-[0_2px_14px_rgba(0,0,0,0.03)] border border-white cursor-pointer flex flex-col justify-between flex-1 transition-all group/inner hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] min-h-[350px]"
+        className="bg-white rounded-[22px] p-6 sm:p-6.5 shadow-[0_2px_14px_rgba(0,0,0,0.03)] border border-white cursor-pointer flex flex-col justify-between flex-1 transition-all group/inner hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)] min-h-[320px]"
       >
         <div>
           {/* Tag Badges with Emoji */}
@@ -228,11 +236,11 @@ export default function ContentCard({
           </p>
 
           {/* Body Content */}
-          <div className="mb-4">
+          <div className="mb-3">
             <p className="font-bold text-[13.5px] text-[#18181B] mb-1.5">
               {theme.boldHook}
             </p>
-            <p className="text-[13px] text-[#4B4B52] leading-[1.65] line-clamp-4 whitespace-pre-line font-normal">
+            <p className="text-[13px] text-[#4B4B52] leading-[1.65] line-clamp-5 whitespace-pre-line font-normal">
               {item.copywriting || item.caption}
             </p>
           </div>
@@ -243,52 +251,6 @@ export default function ContentCard({
               💡 {item.ambience}
             </p>
           )}
-        </div>
-
-        {/* Card Footer Bar */}
-        <div className="pt-4 mt-4 border-t border-[#F4F4F5] flex items-center justify-between text-xs text-[#71717A]">
-          <div>
-            {isDone ? (
-              <span className="inline-flex items-center gap-1.5 text-[11.5px] font-bold text-[#2F7E41]">
-                <CheckCircle2 className="w-4 h-4" />
-                Sudah Dieksekusi
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-[11.5px] font-medium text-[#A1A1AA]">
-                Belum dieksekusi
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center gap-1">
-            <button
-              onClick={handleCopy}
-              className="p-1.5 text-[#A1A1AA] hover:text-[#1F6FB6] hover:bg-[#F4F4F5] rounded-lg transition-colors cursor-pointer"
-              title="Salin Copywriting"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-[#2F7E41]" /> : <Copy className="w-3.5 h-3.5" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onPreview(item);
-              }}
-              className="p-1.5 text-[#A1A1AA] hover:text-[#1F6FB6] hover:bg-[#F4F4F5] rounded-lg transition-colors cursor-pointer"
-              title="Lihat Feed Mockup"
-            >
-              <Eye className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit(item);
-              }}
-              className="p-1.5 text-[#A1A1AA] hover:text-[#C76722] hover:bg-[#F4F4F5] rounded-lg transition-colors cursor-pointer"
-              title="Edit"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
         </div>
       </div>
     </div>

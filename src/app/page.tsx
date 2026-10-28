@@ -47,7 +47,6 @@ export default function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedPlatform, setSelectedPlatform] = useState("Semua");
   const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false);
-  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
 
   // Modals
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
@@ -260,7 +259,6 @@ export default function DashboardPage() {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    setIsExportMenuOpen(false);
   };
 
   const handleExportCSV = () => {
@@ -274,7 +272,6 @@ export default function DashboardPage() {
     downloadAnchor.click();
     downloadAnchor.remove();
     URL.revokeObjectURL(url);
-    setIsExportMenuOpen(false);
   };
 
   const handlePushToFirebase = async () => {
@@ -337,7 +334,7 @@ export default function DashboardPage() {
       {/* Right Main Content View */}
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF9F6]">
         
-        {/* Top Header Navigation */}
+        {/* Top Header Navigation: Clean, matches reference image exactly */}
         <header className="px-8 py-4.5 bg-white border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0">
           
           {/* Left: Breadcrumbs (< Home / All notes) */}
@@ -382,7 +379,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Right Tools: Filtres + [|||] [▦] + + Tambah */}
+          {/* Right Tools: Filtres + [|||] [▦] + (+) Add */}
           <div className="flex items-center gap-3">
             
             {/* Filtres Button */}
@@ -423,99 +420,89 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* Add Content Button */}
+            {/* Quick Add Button */}
             <button
               onClick={handleOpenCreate}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold bg-[#18181B] hover:bg-black text-white shadow-xs transition-colors select-none cursor-pointer"
+              className="p-2 rounded-xl bg-[#18181B] hover:bg-black text-white shadow-xs transition-colors select-none cursor-pointer"
+              title="Tambah Konten Baru"
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah</span>
             </button>
-
-            {/* Export Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                className="p-2 rounded-xl border border-[#E4E4E7] bg-white text-[#71717A] hover:text-[#18181B] hover:bg-[#F4F4F5] shadow-2xs cursor-pointer"
-                title="Ekspor CSV / JSON"
-              >
-                <Download className="w-4 h-4" />
-              </button>
-
-              {isExportMenuOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white rounded-2xl shadow-xl border border-gray-150 py-1.5 z-30">
-                  <button
-                    onClick={handleExportCSV}
-                    className="w-full text-left px-3.5 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between font-medium"
-                  >
-                    <span>Format CSV</span>
-                    <span className="text-[10px] text-gray-400">.csv</span>
-                  </button>
-                  <button
-                    onClick={handleExportJSON}
-                    className="w-full text-left px-3.5 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between font-medium"
-                  >
-                    <span>Format JSON</span>
-                    <span className="text-[10px] text-gray-400">.json</span>
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
         </header>
 
         {/* Filter Popover Toolbar */}
         {isFilterPopoverOpen && (
-          <div className="px-8 py-3.5 bg-white border-b border-[#ECEBE8] flex flex-wrap items-center gap-3 text-xs">
-            <span className="font-semibold text-[#71717A]">Kategori:</span>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                onClick={() => setSelectedCategory("Semua")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  selectedCategory === "Semua" ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
-                }`}
-              >
-                Semua ({items.length})
-              </button>
-              {categoriesWithCounts.map(c => (
+          <div className="px-8 py-3.5 bg-white border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="font-semibold text-[#71717A]">Kategori:</span>
+              <div className="flex flex-wrap gap-1.5">
                 <button
-                  key={c.name}
-                  onClick={() => setSelectedCategory(c.name)}
+                  onClick={() => setSelectedCategory("Semua")}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    selectedCategory === c.name ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
+                    selectedCategory === "Semua" ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
                   }`}
                 >
-                  {c.name} ({c.count})
+                  Semua ({items.length})
                 </button>
-              ))}
+                {categoriesWithCounts.map(c => (
+                  <button
+                    key={c.name}
+                    onClick={() => setSelectedCategory(c.name)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      selectedCategory === c.name ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
+                    }`}
+                  >
+                    {c.name} ({c.count})
+                  </button>
+                ))}
+              </div>
+
+              <div className="h-4 w-px bg-gray-200 hidden sm:block mx-1.5" />
+
+              <span className="font-semibold text-[#71717A]">Format:</span>
+              <select
+                value={selectedPlatform}
+                onChange={(e) => setSelectedPlatform(e.target.value)}
+                className="bg-[#F4F4F6] border border-transparent rounded-lg px-3 py-1.5 text-xs text-[#18181B] focus:bg-white focus:outline-none"
+              >
+                <option value="Semua">Semua Format</option>
+                <option value="Instagram Carousel">Instagram Carousel</option>
+                <option value="Instagram Feed">Instagram Feed</option>
+                <option value="Instagram Reels">Instagram Reels</option>
+                <option value="Instagram Story">Instagram Story</option>
+              </select>
+
+              {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory("Semua");
+                    setSelectedPlatform("Semua");
+                  }}
+                  className="text-rose-600 hover:underline font-medium"
+                >
+                  Reset Filter
+                </button>
+              )}
             </div>
 
-            <div className="h-4 w-px bg-gray-200 hidden sm:block mx-1.5" />
-
-            <span className="font-semibold text-[#71717A]">Format:</span>
-            <select
-              value={selectedPlatform}
-              onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="bg-[#F4F4F6] border border-transparent rounded-lg px-3 py-1.5 text-xs text-[#18181B] focus:bg-white focus:outline-none"
-            >
-              <option value="Semua">Semua Format</option>
-              <option value="Instagram Carousel">Instagram Carousel</option>
-              <option value="Instagram Feed">Instagram Feed</option>
-              <option value="Instagram Reels">Instagram Reels</option>
-              <option value="Instagram Story">Instagram Story</option>
-            </select>
-
-            {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
+            {/* Quick Export options inside Filter toolbar */}
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => {
-                  setSelectedCategory("Semua");
-                  setSelectedPlatform("Semua");
-                }}
-                className="text-rose-600 hover:underline ml-auto font-medium"
+                onClick={handleExportCSV}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium flex items-center gap-1.5"
               >
-                Reset Filter
+                <Download className="w-3.5 h-3.5 text-gray-500" />
+                <span>Unduh CSV</span>
               </button>
-            )}
+              <button
+                onClick={handleExportJSON}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5 text-gray-500" />
+                <span>Unduh JSON</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -555,6 +542,7 @@ export default function DashboardPage() {
                   onEdit={handleOpenEdit}
                   onDelete={handleDeleteClick}
                   onPreview={(it) => setPreviewItem(it)}
+                  onAddContent={handleOpenCreate}
                 />
               ))}
             </div>

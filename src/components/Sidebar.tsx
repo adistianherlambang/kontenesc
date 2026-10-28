@@ -11,8 +11,7 @@ import {
   Share2, 
   Settings as SettingsIcon, 
   Cloud, 
-  X,
-  Sidebar as SidebarIcon
+  X
 } from "lucide-react";
 
 interface SidebarProps {
@@ -103,18 +102,12 @@ export default function Sidebar({
       `}>
         {/* Top Controls & Navigation */}
         <div className="p-6 overflow-y-auto">
-          {/* macOS Traffic Lights + Window controls */}
+          {/* macOS Traffic Lights */}
           <div className="flex items-center justify-between mb-6 px-1">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] inline-block shadow-2xs" />
               <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] inline-block shadow-2xs" />
               <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] inline-block shadow-2xs" />
-              <button 
-                className="ml-2.5 text-[#A1A1AA] hover:text-[#52525B] transition-colors hidden sm:block cursor-pointer"
-                title="Sidebar"
-              >
-                <SidebarIcon className="w-3.5 h-3.5" />
-              </button>
             </div>
 
             <button 
