@@ -156,28 +156,35 @@ export default function FirebaseSyncModal({
           <div className="rounded-xl border border-line bg-surface p-3.5 text-xs text-muted space-y-2">
             <div className="flex items-center gap-1.5 font-medium text-ink">
               <HelpCircle className="size-3.5 text-brand" />
-              <span>Cara Mengaktifkan Firestore di Firebase Console:</span>
+              <span>Langkah Mengatasi "Missing or insufficient permissions":</span>
             </div>
-            <ol className="list-decimal list-inside space-y-1 text-xs leading-relaxed pl-1">
+            <ol className="list-decimal list-inside space-y-1.5 text-xs leading-relaxed pl-1">
               <li>
-                Buka{" "}
+                Buka tab{" "}
                 <a
-                  href="https://console.firebase.google.com/project/konten-semarang/firestore"
+                  href="https://console.firebase.google.com/project/konten-semarang/firestore/rules"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-brand underline inline-flex items-center gap-0.5"
+                  className="text-brand underline font-medium inline-flex items-center gap-0.5"
                 >
-                  Firebase Console <ExternalLink className="size-2.5" />
+                  Firestore Rules di Firebase Console <ExternalLink className="size-2.5" />
                 </a>
               </li>
               <li>
-                Pilih menu <strong className="text-ink font-medium">Firestore Database</strong> lalu klik{" "}
-                <strong className="text-ink font-medium">Create database</strong>.
+                Ubah aturan keamanan menjadi:
+                <pre className="mt-1 p-2 rounded-lg bg-subtle text-[11px] font-mono text-ink overflow-x-auto select-all">
+{`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}`}
+                </pre>
               </li>
-              <li>Pilih mode pengujian (<em>Test mode</em>) atau <em>Production</em>.</li>
-              <li>
-                Klik tombol <strong className="text-brand font-medium">"Unggah ke Firestore"</strong> di bawah.
-              </li>
+              <li>Klik tombol <strong>Publish</strong> (Publikasikan).</li>
+              <li>Kembali ke sini dan klik tombol <strong>Unggah & Sinkronkan</strong> di bawah.</li>
             </ol>
           </div>
 
