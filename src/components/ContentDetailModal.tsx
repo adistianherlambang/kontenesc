@@ -11,7 +11,8 @@ import {
   Sparkles,
   MessageSquare,
   CheckCircle2,
-  Circle
+  Circle,
+  Loader2
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 import { getCategoryTone } from "@/lib/categoryTone";
@@ -21,7 +22,7 @@ interface ContentDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedItem: ContentItem) => Promise<void>;
-  onToggleExecuted?: (item: ContentItem) => void;
+  onToggleExecuted?: (item: ContentItem) => Promise<void> | void;
   onDelete?: (item: ContentItem) => void;
   existingCategories?: string[];
 }
@@ -37,6 +38,8 @@ export default function ContentDetailModal({
 }: ContentDetailModalProps) {
   const [draft, setDraft] = useState<ContentItem | null>(item);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTogglingExecution, setIsTogglingExecution] = useState(false);
+  const [justSavedExecution, setJustSavedExecution] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // References for auto-resizing textareas
@@ -82,7 +85,7 @@ export default function ContentDetailModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, draft, item]);
 
-  // Detect whether changes were made
+  // Detect whether text changes were made (checklist is auto-saved instantly, not part of isDirty)
   const isDirty = useMemo(() => {
     if (!item || !draft) return false;
     return (
@@ -91,8 +94,7 @@ export default function ContentDetailModal({
       (draft.ambience || "").trim() !== (item.ambience || "").trim() ||
       (draft.caption || "").trim() !== (item.caption || "").trim() ||
       (draft.kategori || "").trim() !== (item.kategori || "").trim() ||
-      (draft.platform || "Instagram Feed") !== (item.platform || "Instagram Feed") ||
-      Boolean(draft.executed) !== Boolean(item.executed)
+      (draft.platform || "Instagram Feed") !== (item.platform || "Instagram Feed")
     );
   }, [item, draft]);
 
@@ -127,6 +129,30 @@ export default function ContentDetailModal({
         resizeTextarea(ambienceRef.current);
         resizeTextarea(captionRef.current);
       }, 30);
+    }
+  };
+
+  const handleToggleExecution = async () => {
+    if (!draft || isTogglingExecution) return;
+    const nextExec = !Boolean(draft.executed);
+    const updated = { ...draft, executed: nextExec, updatedAt: new Date().toISOString() };
+
+    setDraft(updated);
+    setIsTogglingExecution(true);
+    setJustSavedExecution(false);
+
+    try {
+      if (onToggleExecuted) {
+        await onToggleExecuted(updated);
+      } else {
+        await onSave(updated);
+      }
+      setJustSavedExecution(true);
+      setTimeout(() => setJustSavedExecution(false), 1800);
+    } catch (err) {
+      console.warn("Error toggling execution", err);
+    } finally {
+      setIsTogglingExecution(false);
     }
   };
 
@@ -214,26 +240,36 @@ export default function ContentDetailModal({
           {/* Metadata Properties Row (Clean Document Style) */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4 text-xs">
             {/* Status Eksekusi Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                const nextExec = !draft.executed;
-                handleFieldChange("executed", nextExec);
-                if (onToggleExecuted) {
-                  onToggleExecuted({ ...draft, executed: nextExec });
-                }
-              }}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 transition-colors hover:bg-subtle select-none"
-            >
-              {draft.executed ? (
-                <CheckCircle2 className="size-4 text-success" />
-              ) : (
-                <Circle className="size-4 text-faint" />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleExecution}
+                disabled={isTogglingExecution}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 transition-colors hover:bg-subtle select-none"
+                title={draft.executed ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
+              >
+                {isTogglingExecution ? (
+                  <Loader2 className="size-4 animate-spin text-brand" />
+                ) : draft.executed ? (
+                  <CheckCircle2 className="size-4 text-success" />
+                ) : (
+                  <Circle className="size-4 text-faint" />
+                )}
+                <span className="font-medium text-ink">
+                  {isTogglingExecution
+                    ? "Menyimpan status..."
+                    : draft.executed
+                    ? "Sudah Dieksekusi"
+                    : "Belum Dieksekusi"}
+                </span>
+              </button>
+
+              {justSavedExecution && (
+                <span className="badge bg-success-soft text-success text-[11px] animate-in fade-in duration-150">
+                  ✓ Tersimpan
+                </span>
               )}
-              <span className="font-medium text-ink">
-                {draft.executed ? "Sudah Dieksekusi" : "Belum Dieksekusi"}
-              </span>
-            </button>
+            </div>
 
             {/* Quick Copy Action Buttons */}
             <div className="flex items-center gap-2">

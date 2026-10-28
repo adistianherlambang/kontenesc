@@ -229,6 +229,11 @@ export default function DashboardPage() {
     const nextList = items.map(i => (i.no === item.no ? updated : i));
     updateItemsState(nextList);
 
+    // Keep active previewItem in sync if detail modal is open
+    if (previewItem && ((previewItem.id && previewItem.id === item.id) || previewItem.no === item.no)) {
+      setPreviewItem(updated);
+    }
+
     try {
       await saveContentToDb(updated);
     } catch (e) {

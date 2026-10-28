@@ -1,12 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 interface ContentCardProps {
   item: ContentItem;
-  onToggleExecuted: (item: ContentItem) => void;
+  onToggleExecuted: (item: ContentItem) => Promise<void> | void;
   onOpen?: (item: ContentItem) => void;
   onPreview?: (item: ContentItem) => void;
   onEdit?: (item: ContentItem) => void;
@@ -23,6 +24,7 @@ export default function ContentCard({
 }: ContentCardProps) {
   const done = Boolean(item.executed);
   const tone = getCategoryTone(item.kategori);
+  const [isSavingExec, setIsSavingExec] = useState(false);
 
   const handleOpen = () => {
     if (onOpen) {
@@ -32,19 +34,40 @@ export default function ContentCard({
     }
   };
 
+  const handleToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    if (isSavingExec) return;
+    try {
+      setIsSavingExec(true);
+      await onToggleExecuted(item);
+    } finally {
+      setIsSavingExec(false);
+    }
+  };
+
   return (
     <article className={`flex flex-col rounded-2xl border p-1.5 transition-shadow hover:shadow-sm ${tone.card}`}>
-      {/* Category row: title + execution checkbox */}
+      {/* Category row: title + execution checkbox & saving state */}
       <header className="flex h-9 items-center justify-between gap-3 px-2.5">
         <h3 className={`truncate text-[13px] font-semibold ${tone.title}`}>{item.kategori}</h3>
-        <input
-          type="checkbox"
-          checked={done}
-          onChange={() => onToggleExecuted(item)}
-          className="checkbox"
-          title={done ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
-          aria-label={`Tandai #${item.no} sudah dieksekusi`}
-        />
+        
+        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+          {isSavingExec && (
+            <span className="flex items-center gap-1 text-[11px] font-medium text-brand animate-pulse">
+              <Loader2 className="size-3 animate-spin" />
+              <span>Menyimpan...</span>
+            </span>
+          )}
+          <input
+            type="checkbox"
+            checked={done}
+            disabled={isSavingExec}
+            onChange={handleToggle}
+            className="checkbox cursor-pointer"
+            title={done ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
+            aria-label={`Tandai #${item.no} sudah dieksekusi`}
+          />
+        </div>
       </header>
 
       {/* White sheet */}
