@@ -27,8 +27,7 @@ import {
   ChevronLeft, 
   Download, 
   Menu, 
-  X,
-  Smartphone
+  X
 } from "lucide-react";
 
 const STORAGE_KEY = "semarang_cell_brief_contents_v2";
@@ -317,7 +316,7 @@ export default function DashboardPage() {
   return (
     <div className="w-screen h-screen overflow-hidden flex bg-[#FAF9F6] text-[#18181B] font-sans">
       
-      {/* Left Sidebar matching reference image */}
+      {/* Left Sidebar */}
       <Sidebar
         activeView={activeSidebarView}
         onSelectView={(v) => {
@@ -338,8 +337,8 @@ export default function DashboardPage() {
       {/* Right Main Content View */}
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF9F6]">
         
-        {/* Top Header Navigation matching reference image */}
-        <header className="px-6 py-4 bg-white border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0">
+        {/* Top Header Navigation */}
+        <header className="px-8 py-4.5 bg-white border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0">
           
           {/* Left: Breadcrumbs (< Home / All notes) */}
           <div className="flex items-center gap-2">
@@ -350,7 +349,7 @@ export default function DashboardPage() {
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-1.5 text-sm select-none">
+            <div className="flex items-center gap-1.5 text-[13.5px] select-none">
               <button 
                 onClick={() => setActiveSidebarView("all")}
                 className="flex items-center gap-1 text-[#71717A] hover:text-[#18181B] transition-colors font-medium cursor-pointer"
@@ -358,20 +357,20 @@ export default function DashboardPage() {
                 <ChevronLeft className="w-4 h-4" />
                 <span>Home</span>
               </button>
-              <span className="text-[#D4D4D8]">/</span>
+              <span className="text-[#D4D4D8] mx-1">/</span>
               <span className="text-[#18181B] font-bold">{viewTitle}</span>
             </div>
           </div>
 
-          {/* Center: Search input (Search a note) */}
-          <div className="relative flex-1 max-w-md mx-2 hidden sm:block">
+          {/* Center: Search input */}
+          <div className="relative flex-1 max-w-sm mx-4 hidden sm:block">
             <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search a note"
-              className="w-full pl-10 pr-8 py-2 rounded-xl text-[13px] bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              className="w-full pl-10 pr-8 py-2.5 rounded-xl text-[13px] bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
             />
             {searchQuery && (
               <button
@@ -384,14 +383,14 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Tools: Filtres + [|||] [▦] + + Tambah */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-3">
             
             {/* Filtres Button */}
             <button
               onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors select-none cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-medium border transition-colors select-none cursor-pointer ${
                 selectedCategory !== "Semua" || selectedPlatform !== "Semua"
-                  ? "bg-[#1F6FB6]/10 border-[#1F6FB6] text-[#1F6FB6]"
+                  ? "bg-[#1F6FB6]/10 border-[#1F6FB6] text-[#1F6FB6] font-semibold"
                   : "bg-white border-[#E4E4E7] text-[#18181B] hover:bg-[#F4F4F5] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
               }`}
             >
@@ -403,7 +402,7 @@ export default function DashboardPage() {
             </button>
 
             {/* View Mode Toggle Capsule ([|||] and [▦]) */}
-            <div className="flex items-center p-0.5 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
+            <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
               <button
                 onClick={() => setViewMode("table")}
                 className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
@@ -411,7 +410,7 @@ export default function DashboardPage() {
                 }`}
                 title="Tampilan Tabel (|||)"
               >
-                <AlignJustify className="w-3.5 h-3.5" />
+                <AlignJustify className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("grid")}
@@ -420,16 +419,16 @@ export default function DashboardPage() {
                 }`}
                 title="Tampilan Kartu Pastel (▦)"
               >
-                <LayoutGrid className="w-3.5 h-3.5" />
+                <LayoutGrid className="w-4 h-4" />
               </button>
             </div>
 
             {/* Add Content Button */}
             <button
               onClick={handleOpenCreate}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#18181B] hover:bg-black text-white shadow-xs transition-colors select-none cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold bg-[#18181B] hover:bg-black text-white shadow-xs transition-colors select-none cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               <span>Tambah</span>
             </button>
 
@@ -437,24 +436,24 @@ export default function DashboardPage() {
             <div className="relative">
               <button
                 onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                className="p-1.5 rounded-xl border border-[#E4E4E7] bg-white text-[#71717A] hover:text-[#18181B] hover:bg-[#F4F4F5] shadow-2xs cursor-pointer"
+                className="p-2 rounded-xl border border-[#E4E4E7] bg-white text-[#71717A] hover:text-[#18181B] hover:bg-[#F4F4F5] shadow-2xs cursor-pointer"
                 title="Ekspor CSV / JSON"
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
               </button>
 
               {isExportMenuOpen && (
-                <div className="absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-lg border border-gray-150 py-1 z-30">
+                <div className="absolute right-0 mt-2 w-36 bg-white rounded-2xl shadow-xl border border-gray-150 py-1.5 z-30">
                   <button
                     onClick={handleExportCSV}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                    className="w-full text-left px-3.5 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between font-medium"
                   >
                     <span>Format CSV</span>
                     <span className="text-[10px] text-gray-400">.csv</span>
                   </button>
                   <button
                     onClick={handleExportJSON}
-                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                    className="w-full text-left px-3.5 py-2 text-xs text-gray-700 hover:bg-gray-100 flex items-center justify-between font-medium"
                   >
                     <span>Format JSON</span>
                     <span className="text-[10px] text-gray-400">.json</span>
@@ -467,12 +466,12 @@ export default function DashboardPage() {
 
         {/* Filter Popover Toolbar */}
         {isFilterPopoverOpen && (
-          <div className="px-6 py-3 bg-white border-b border-[#ECEBE8] flex flex-wrap items-center gap-2.5 text-xs">
+          <div className="px-8 py-3.5 bg-white border-b border-[#ECEBE8] flex flex-wrap items-center gap-3 text-xs">
             <span className="font-semibold text-[#71717A]">Kategori:</span>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={() => setSelectedCategory("Semua")}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   selectedCategory === "Semua" ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
                 }`}
               >
@@ -482,7 +481,7 @@ export default function DashboardPage() {
                 <button
                   key={c.name}
                   onClick={() => setSelectedCategory(c.name)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     selectedCategory === c.name ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
                   }`}
                 >
@@ -491,13 +490,13 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            <div className="h-4 w-px bg-gray-200 hidden sm:block mx-1" />
+            <div className="h-4 w-px bg-gray-200 hidden sm:block mx-1.5" />
 
             <span className="font-semibold text-[#71717A]">Format:</span>
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="bg-[#F4F4F6] border border-transparent rounded-lg px-2.5 py-1 text-xs text-[#18181B] focus:bg-white focus:outline-none"
+              className="bg-[#F4F4F6] border border-transparent rounded-lg px-3 py-1.5 text-xs text-[#18181B] focus:bg-white focus:outline-none"
             >
               <option value="Semua">Semua Format</option>
               <option value="Instagram Carousel">Instagram Carousel</option>
@@ -520,17 +519,17 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        {/* Scrollable Content Body with Generous Padding */}
+        <div className="flex-1 overflow-y-auto px-8 py-8 sm:px-10 sm:py-9">
           {filteredItems.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400">
-              <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-2xl mb-3 shadow-xs">
+            <div className="h-full flex flex-col items-center justify-center text-center p-12 text-gray-400">
+              <div className="w-16 h-16 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-2xl mb-4 shadow-xs">
                 🔍
               </div>
-              <h3 className="text-sm font-bold text-[#18181B] mb-1">
+              <h3 className="text-sm font-bold text-[#18181B] mb-1.5">
                 Tidak ada catatan ditemukan
               </h3>
-              <p className="text-xs max-w-sm text-[#71717A] mb-4">
+              <p className="text-xs max-w-sm text-[#71717A] mb-5">
                 Ubah kata kunci pencarian atau reset filter untuk menampilkan catatan brief kembali.
               </p>
               <button
@@ -540,14 +539,14 @@ export default function DashboardPage() {
                   setSelectedPlatform("Semua");
                   setActiveSidebarView("all");
                 }}
-                className="px-4 py-1.5 rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black"
+                className="px-5 py-2 rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black cursor-pointer"
               >
                 Tampilkan Semua Catatan
               </button>
             </div>
           ) : viewMode === "grid" ? (
             /* 2 or 3 Columns Pastel Cards Grid matching the Reference Screenshot */
-            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6 max-w-7xl mx-auto pb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-7 max-w-[1400px] mx-auto pb-24">
               {filteredItems.map((item) => (
                 <ContentCard
                   key={item.id || item.no}
@@ -561,7 +560,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             /* Table View */
-            <div className="max-w-7xl mx-auto pb-16">
+            <div className="max-w-[1400px] mx-auto pb-24">
               <ContentTable
                 items={filteredItems}
                 onToggleExecuted={handleToggleExecuted}
