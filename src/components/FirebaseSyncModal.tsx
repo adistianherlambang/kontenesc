@@ -127,12 +127,16 @@ export default function FirebaseSyncModal({
               <p className="font-semibold text-ink">
                 {firebaseStatus === "connected"
                   ? "Cloud Firestore Terhubung"
-                  : "Penyimpanan Lokal Aktif"}
+                  : firebaseStatus === "syncing"
+                  ? "Menyinkronkan ke Cloud..."
+                  : "Mode Offline (Menunggu Koneksi)"}
               </p>
               <p className="text-xs text-muted leading-relaxed">
                 {firebaseStatus === "connected"
-                  ? `Perubahan otomatis tersinkronisasi dengan Cloud Firestore (${localCount} konten aktif).`
-                  : `Aplikasi saat ini menyimpan perubahan di browser Anda (${localCount} konten). Hubungkan ke Firestore untuk sinkronisasi multi-perangkat.`}
+                  ? `Perubahan otomatis langsung tersimpan di Cloud Firestore (${localCount} konten aktif).`
+                  : firebaseStatus === "syncing"
+                  ? `Sedang mengunggah perubahan tertunda ke Cloud Firestore...`
+                  : `Koneksi internet tidak tersedia (${localCount} konten aktif). Anda tetap bisa mengedit secara bebas, dan perubahan akan otomatis diunggah ke Firestore begitu koneksi kembali.`}
               </p>
             </div>
           </div>

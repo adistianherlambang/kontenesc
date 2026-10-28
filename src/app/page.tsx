@@ -15,7 +15,8 @@ import {
   saveContentToDb, 
   deleteContentFromDb, 
   seedContentsToDb,
-  checkFirestoreHealth 
+  subscribeToContents,
+  SnapshotMetadataInfo 
 } from "@/lib/firebase";
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
 import { 
@@ -33,9 +34,10 @@ import {
 function runWithViewTransition(updateFn: () => void) {
   if (
     typeof document !== "undefined" &&
-    typeof (document as any).startViewTransition === "function"
+    "startViewTransition" in document &&
+    typeof (document as Document & { startViewTransition?: (cb: () => void) => void }).startViewTransition === "function"
   ) {
-    (document as any).startViewTransition(() => {
+    (document as Document & { startViewTransition: (cb: () => void) => void }).startViewTransition(() => {
       flushSync(() => {
         updateFn();
       });
@@ -46,120 +48,32 @@ function runWithViewTransition(updateFn: () => void) {
 }
 
 const STORAGE_KEY = "semarang_cell_brief_contents_v3";
-const DELETED_KEY = "semarang_cell_deleted_nos_v3";
-
-function getDeletedNos(): Set<number> {
-  if (typeof window === "undefined") return new Set();
-  try {
-    const raw = localStorage.getItem(DELETED_KEY);
-    if (raw) {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) return new Set(arr);
-    }
-  } catch (e) {
-    console.warn("Error reading deleted nos", e);
-  }
-  return new Set();
-}
-
-function saveDeletedNos(set: Set<number>) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(DELETED_KEY, JSON.stringify(Array.from(set)));
-  } catch (e) {
-    console.warn("Error saving deleted nos", e);
-  }
-}
-
-/**
- * Intelligently merges base brief data (60 items) with incoming cached or remote data.
- * Guarantees that items from the initial brief are NEVER accidentally wiped when only
- * 1 or a few items were saved/synchronized.
- */
-function mergeWithBaseData(incoming: ContentItem[], deletedSet: Set<number>): ContentItem[] {
-  const map = new Map<number, ContentItem>();
-
-  // 1. Seed with all 60 base brief items (unless deleted)
-  for (const base of INITIAL_BRIEF_DATA) {
-    if (!deletedSet.has(base.no)) {
-      map.set(base.no, { ...base });
-    }
-  }
-
-  // 2. Overlay incoming items (edits, execution toggle, new additions)
-  for (const item of incoming) {
-    if (!item || typeof item.no !== "number") continue;
-    if (deletedSet.has(item.no)) continue;
-
-    const existing = map.get(item.no);
-    if (existing) {
-      map.set(item.no, { ...existing, ...item });
-    } else {
-      map.set(item.no, item);
-    }
-  }
-
-  return Array.from(map.values()).sort((a, b) => a.no - b.no);
-}
-
-/**
- * Merges local cached items with remote Firestore items using Last-Write-Wins (LWW)
- * conflict resolution based on `updatedAt` timestamp.
- * Guarantees that:
- * 1. Base brief data (60 items) is preserved as foundation.
- * 2. Deleted items are never restored.
- * 3. Recent local modifications (edits or checklists) take precedence over older remote reads.
- * 4. Strictly newer remote updates are incorporated.
- */
-function mergeLocalAndRemote(
-  localList: ContentItem[],
-  remoteList: ContentItem[],
-  deletedSet: Set<number>
-): ContentItem[] {
-  const map = new Map<number, ContentItem>();
-
-  // 1. Seed with base brief data
-  for (const base of INITIAL_BRIEF_DATA) {
-    if (!deletedSet.has(base.no)) {
-      map.set(base.no, { ...base });
-    }
-  }
-
-  // 2. Overlay local items (guarantees local state is foundation)
-  for (const local of localList) {
-    if (!local || typeof local.no !== "number") continue;
-    if (deletedSet.has(local.no)) continue;
-    const existing = map.get(local.no);
-    map.set(local.no, existing ? { ...existing, ...local } : { ...local });
-  }
-
-  // 3. Merge remote items using timestamp comparison (Last-Write-Wins)
-  for (const remote of remoteList) {
-    if (!remote || typeof remote.no !== "number") continue;
-    if (deletedSet.has(remote.no)) continue;
-
-    const existing = map.get(remote.no);
-    if (!existing) {
-      map.set(remote.no, { ...remote });
-      continue;
-    }
-
-    const remoteTime = remote.updatedAt ? new Date(remote.updatedAt).getTime() : 0;
-    const localTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
-
-    // Remote only overwrites if strictly newer than local
-    if (remoteTime > localTime) {
-      map.set(remote.no, { ...existing, ...remote });
-    }
-  }
-
-  return Array.from(map.values()).sort((a, b) => a.no - b.no);
-}
 
 export default function DashboardPage() {
-  const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
+  // Cold-start fallback from localStorage or INITIAL_BRIEF_DATA for instant 0ms initial render
+  const [items, setItems] = useState<ContentItem[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const cached = localStorage.getItem(STORAGE_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Error reading cold-start cache", e);
+      }
+    }
+    return INITIAL_BRIEF_DATA;
+  });
+
+  const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">(() => {
+    if (typeof window !== "undefined" && !window.navigator.onLine) {
+      return "offline";
+    }
+    return "offline";
+  });
 
   // View & Nav State
   const [activeSidebarView, setActiveSidebarView] = useState<StatusView>("all");
@@ -179,72 +93,63 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
-  // 1. Initial Load
+  // Real-time Firestore subscription with offline persistence & online sync
   useEffect(() => {
-    let currentData: ContentItem[] = [];
-    try {
-      const deletedSet = getDeletedNos();
-      const cached = localStorage.getItem(STORAGE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          currentData = mergeWithBaseData(parsed, deletedSet);
-          setItems(currentData);
-        } else {
-          currentData = mergeWithBaseData([], deletedSet);
-          setItems(currentData);
-        }
-      } else {
-        // Also check v2 cache in case the user made edits in v2
-        const v2Cached = localStorage.getItem("semarang_cell_brief_contents_v2");
-        if (v2Cached) {
-          const parsedV2 = JSON.parse(v2Cached);
-          if (Array.isArray(parsedV2) && parsedV2.length > 0) {
-            currentData = mergeWithBaseData(parsedV2, deletedSet);
-            setItems(currentData);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-          }
-        } else {
-          currentData = mergeWithBaseData([], deletedSet);
-          setItems(currentData);
-        }
-      }
-    } catch (e) {
-      console.warn("Could not read local cache", e);
-      currentData = INITIAL_BRIEF_DATA;
-    }
-    setIsLoaded(true);
+    let isMounted = true;
 
-    checkFirestore();
-  }, []);
+    const handleOnline = () => {
+      // Let snapshot metadata or pending writes determine status
+      setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
+    };
 
-  const checkFirestore = async () => {
-    try {
-      const health = await checkFirestoreHealth();
-      if (health.ok) {
-        setFirebaseStatus("connected");
-        if (health.count && health.count > 0) {
-          const remoteItems = await getContentsFromDb();
-          if (remoteItems.length > 0) {
-            const deletedSet = getDeletedNos();
-            setItems((prev) => {
-              const merged = mergeLocalAndRemote(prev, remoteItems, deletedSet);
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-              } catch (e) {
-                console.warn("Could not write to local cache", e);
-              }
-              return merged;
-            });
-          }
-        }
-      } else {
-        setFirebaseStatus("offline");
-      }
-    } catch (err) {
+    const handleOffline = () => {
       setFirebaseStatus("offline");
-    }
-  };
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    // Subscribe to Firestore collection directly
+    const unsubscribe = subscribeToContents(
+      (remoteItems, info: SnapshotMetadataInfo) => {
+        if (!isMounted) return;
+
+        if (remoteItems.length > 0) {
+          setItems(remoteItems);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteItems));
+          } catch (e) {
+            console.warn("Storage write error", e);
+          }
+        } else if (!info.isFromCache) {
+          // Empty database on server: auto-seed INITIAL_BRIEF_DATA once
+          seedContentsToDb(INITIAL_BRIEF_DATA).catch(console.error);
+        }
+
+        // Update real-time connection status
+        if (typeof window !== "undefined" && !window.navigator.onLine) {
+          setFirebaseStatus("offline");
+        } else if (info.hasPendingWrites) {
+          setFirebaseStatus("syncing");
+        } else {
+          setFirebaseStatus("connected");
+        }
+      },
+      (err) => {
+        console.warn("Firestore listener error:", err);
+        if (typeof window !== "undefined" && !window.navigator.onLine) {
+          setFirebaseStatus("offline");
+        }
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+      unsubscribe();
+    };
+  }, []);
 
   const updateItemsState = (updater: ContentItem[] | ((prev: ContentItem[]) => ContentItem[])) => {
     setItems((prev) => {
@@ -322,15 +227,15 @@ export default function DashboardPage() {
     };
 
     runWithViewTransition(() => {
-      updateItemsState((prev) => prev.map((i) => (i.no === item.no ? updated : i)));
+      updateItemsState((prev) => prev.map((i) => ((i.id && i.id === item.id) || i.no === item.no ? updated : i)));
       if (previewItem && ((previewItem.id && previewItem.id === item.id) || previewItem.no === item.no)) {
         setPreviewItem(updated);
       }
     });
 
-    // Save to Firestore asynchronously in background so UI never freezes on mobile
-    saveContentToDb(updated).catch(() => {
-      // local-first fallback
+    // Save directly to Firestore (queued in IndexedDB if offline, auto-uploaded when online)
+    saveContentToDb(updated).catch((err) => {
+      console.warn("Firestore save error:", err);
     });
   };
 
@@ -347,6 +252,7 @@ export default function DashboardPage() {
   const handleSaveSingle = async (savedItem: ContentItem) => {
     const itemToSave: ContentItem = {
       ...savedItem,
+      id: savedItem.id || `konten-${savedItem.no}`,
       updatedAt: savedItem.updatedAt || new Date().toISOString()
     };
 
@@ -366,26 +272,20 @@ export default function DashboardPage() {
       }
     });
 
-    saveContentToDb(itemToSave)
-      .then(() => setFirebaseStatus("connected"))
-      .catch((err) => console.warn("Save remote error", err));
+    await saveContentToDb(itemToSave);
   };
 
   const handleSaveBatch = async (batchItems: ContentItem[]) => {
-    let mergedList: ContentItem[] = [];
     runWithViewTransition(() => {
       updateItemsState((prev) => {
         const itemMap = new Map<number, ContentItem>();
         prev.forEach((it) => itemMap.set(it.no, it));
         batchItems.forEach((it) => itemMap.set(it.no, it));
-        mergedList = Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
-        return mergedList;
+        return Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
       });
     });
 
-    seedContentsToDb(mergedList)
-      .then(() => setFirebaseStatus("connected"))
-      .catch((e) => console.warn("Batch sync error", e));
+    await seedContentsToDb(batchItems);
   };
 
   const handleDeleteClick = (item: ContentItem) => {
@@ -397,10 +297,6 @@ export default function DashboardPage() {
     const itemToDelete = deletingItem;
     setIsDeleting(true);
 
-    const deletedSet = getDeletedNos();
-    deletedSet.add(itemToDelete.no);
-    saveDeletedNos(deletedSet);
-
     runWithViewTransition(() => {
       updateItemsState((prev) =>
         prev.filter((i) => (i.id ? i.id !== itemToDelete.id : i.no !== itemToDelete.no))
@@ -409,9 +305,8 @@ export default function DashboardPage() {
       setIsDeleting(false);
     });
 
-    if (itemToDelete.id) {
-      deleteContentFromDb(itemToDelete.id).catch((e) => console.warn("Delete remote error", e));
-    }
+    const docId = itemToDelete.id || `konten-${itemToDelete.no}`;
+    await deleteContentFromDb(docId);
   };
 
   const handlePushToFirebase = async () => {
@@ -424,22 +319,21 @@ export default function DashboardPage() {
     setFirebaseStatus("syncing");
     const remote = await getContentsFromDb();
     if (remote.length > 0) {
-      const deletedSet = getDeletedNos();
-      const merged = mergeLocalAndRemote(items, remote, deletedSet);
-      updateItemsState(merged);
+      updateItemsState(remote);
     }
     setFirebaseStatus("connected");
   };
 
-  const handleResetToDefault = () => {
+  const handleResetToDefault = async () => {
     try {
-      localStorage.removeItem(DELETED_KEY);
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem("semarang_cell_brief_contents_v2");
     } catch (e) {
       console.warn("Reset error", e);
     }
-    updateItemsState(INITIAL_BRIEF_DATA);
+    setFirebaseStatus("syncing");
+    await seedContentsToDb(INITIAL_BRIEF_DATA);
+    setFirebaseStatus("connected");
   };
 
   const nextSuggestedNo = useMemo(() => {

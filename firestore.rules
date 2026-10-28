@@ -1,9 +1,34 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Izinkan akses baca dan tulis untuk koleksi contents
-    match /contents/{document=**} {
-      allow read, write: if true;
+
+    // Helper domain validator for contents
+    function isValidContent(data) {
+      return data.keys().hasAll(['no', 'judul', 'kategori', 'copywriting', 'ambience', 'caption', 'executed'])
+        && data.no is int
+        && data.judul is string && data.judul.size() <= 500
+        && data.kategori is string && data.kategori.size() <= 100
+        && data.copywriting is string && data.copywriting.size() <= 10000
+        && data.ambience is string && data.ambience.size() <= 5000
+        && data.caption is string && data.caption.size() <= 10000
+        && data.executed is bool
+        && (!('platform' in data) || (data.platform is string && data.platform.size() <= 100))
+        && (!('targetDate' in data) || (data.targetDate is string && data.targetDate.size() <= 100))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 5000))
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100))
+        && (!('id' in data) || (data.id is string && data.id.size() <= 100));
+    }
+
+    // Koleksi contents: Semarang Cell Instagram Content Hub
+    match /contents/{contentId} {
+      allow read: if true;
+      allow create, update: if isValidContent(request.resource.data);
+      allow delete: if true;
+    }
+
+    // Default deny for all other collections
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
