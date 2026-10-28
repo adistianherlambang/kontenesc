@@ -46,30 +46,10 @@ function runWithViewTransition(updateFn: () => void) {
 const STORAGE_KEY = "semarang_cell_brief_contents_v3";
 
 export default function DashboardPage() {
-  // Cold-start fallback from localStorage or INITIAL_BRIEF_DATA for instant 0ms initial render
-  const [items, setItems] = useState<ContentItem[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(STORAGE_KEY);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
-          }
-        }
-      } catch (e) {
-        console.warn("Error reading cold-start cache", e);
-      }
-    }
-    return INITIAL_BRIEF_DATA;
-  });
+  // Initialize with INITIAL_BRIEF_DATA to ensure identical SSR and client initial hydration
+  const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
 
-  const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">(() => {
-    if (typeof window !== "undefined" && !window.navigator.onLine) {
-      return "offline";
-    }
-    return "offline";
-  });
+  const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
 
   // View & Nav State
   const [activeSidebarView, setActiveSidebarView] = useState<StatusView>("all");
@@ -91,6 +71,19 @@ export default function DashboardPage() {
   // Real-time Firestore subscription with offline persistence & online sync
   useEffect(() => {
     let isMounted = true;
+
+    // Restore local cache immediately on client mount without causing SSR hydration mismatch
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setItems(parsed);
+        }
+      }
+    } catch (e) {
+      console.warn("Error reading cold-start cache", e);
+    }
 
     const handleOnline = () => {
       // Let snapshot metadata or pending writes determine status

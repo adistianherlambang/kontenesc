@@ -139,7 +139,9 @@ export default function ContentTable({
                       className="flex items-center gap-2 py-1.5 cursor-pointer text-left group/title w-full min-h-[38px]"
                     >
                       {/* <FileText className="size-4 text-muted shrink-0 group-hover/title:text-brand transition-colors" /> */}
-                      <span className={`font-medium text-xs leading-snug group-hover/title:text-brand transition-colors ${isDone ? "text-faint line-through" : "text-ink"
+                      <span
+                        suppressHydrationWarning
+                        className={`font-medium text-xs leading-snug group-hover/title:text-brand transition-colors ${isDone ? "text-faint line-through" : "text-ink"
                         }`}>
                         {truncateWords(item.judul, 4)}
                       </span>
@@ -157,7 +159,7 @@ export default function ContentTable({
                   {/* Copywriting */}
                   <td className="td">
                     <div className="flex items-start justify-between gap-2 group/copy">
-                      <p className="line-clamp-2 text-muted text-[11px] leading-relaxed">
+                      <p suppressHydrationWarning className="line-clamp-2 text-muted text-[11px] leading-relaxed">
                         {item.copywriting}
                       </p>
                       <button

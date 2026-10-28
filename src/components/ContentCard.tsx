@@ -106,13 +106,14 @@ export default function ContentCard({
         </div>
 
         <h4
+          suppressHydrationWarning
           className={`mb-2 text-[15px] font-semibold leading-snug ${done ? "text-faint line-through decoration-faint/60" : "text-ink"
             }`}
         >
           {item.judul}
         </h4>
 
-        <p className="line-clamp-4 whitespace-pre-line text-[13px] leading-relaxed text-muted">
+        <p suppressHydrationWarning className="line-clamp-4 whitespace-pre-line text-[13px] leading-relaxed text-muted">
           {item.copywriting}
         </p>
       </button>
