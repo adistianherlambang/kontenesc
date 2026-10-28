@@ -26,7 +26,62 @@ import {
   X
 } from "lucide-react";
 
-const STORAGE_KEY = "semarang_cell_brief_contents_v2";
+const STORAGE_KEY = "semarang_cell_brief_contents_v3";
+const DELETED_KEY = "semarang_cell_deleted_nos_v3";
+
+function getDeletedNos(): Set<number> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(DELETED_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return new Set(arr);
+    }
+  } catch (e) {
+    console.warn("Error reading deleted nos", e);
+  }
+  return new Set();
+}
+
+function saveDeletedNos(set: Set<number>) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(DELETED_KEY, JSON.stringify(Array.from(set)));
+  } catch (e) {
+    console.warn("Error saving deleted nos", e);
+  }
+}
+
+/**
+ * Intelligently merges base brief data (60 items) with incoming cached or remote data.
+ * Guarantees that items from the initial brief are NEVER accidentally wiped when only
+ * 1 or a few items were saved/synchronized.
+ */
+function mergeWithBaseData(incoming: ContentItem[], deletedSet: Set<number>): ContentItem[] {
+  const map = new Map<number, ContentItem>();
+
+  // 1. Seed with all 60 base brief items (unless deleted)
+  for (const base of INITIAL_BRIEF_DATA) {
+    if (!deletedSet.has(base.no)) {
+      map.set(base.no, { ...base });
+    }
+  }
+
+  // 2. Overlay incoming items (edits, execution toggle, new additions)
+  for (const item of incoming) {
+    if (!item || typeof item.no !== "number") continue;
+    if (deletedSet.has(item.no)) continue;
+
+    const existing = map.get(item.no);
+    if (existing) {
+      map.set(item.no, { ...existing, ...item });
+    } else {
+      map.set(item.no, item);
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.no - b.no);
+}
 
 export default function DashboardPage() {
   const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
@@ -54,11 +109,26 @@ export default function DashboardPage() {
   // 1. Initial Load
   useEffect(() => {
     try {
+      const deletedSet = getDeletedNos();
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setItems(parsed);
+          const merged = mergeWithBaseData(parsed, deletedSet);
+          setItems(merged);
+        } else {
+          setItems(mergeWithBaseData([], deletedSet));
+        }
+      } else {
+        // Also check v2 cache in case the user made edits in v2
+        const v2Cached = localStorage.getItem("semarang_cell_brief_contents_v2");
+        if (v2Cached) {
+          const parsedV2 = JSON.parse(v2Cached);
+          if (Array.isArray(parsedV2) && parsedV2.length > 0) {
+            const merged = mergeWithBaseData(parsedV2, deletedSet);
+            setItems(merged);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+          }
         }
       }
     } catch (e) {
@@ -77,8 +147,9 @@ export default function DashboardPage() {
         if (health.count && health.count > 0) {
           const remoteItems = await getContentsFromDb();
           if (remoteItems.length > 0) {
-            setItems(remoteItems);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteItems));
+            const deletedSet = getDeletedNos();
+            const merged = mergeWithBaseData(remoteItems, deletedSet);
+            updateItemsState(merged);
           }
         }
       } else {
@@ -220,6 +291,10 @@ export default function DashboardPage() {
     if (!deletingItem) return;
     try {
       setIsDeleting(true);
+      const deletedSet = getDeletedNos();
+      deletedSet.add(deletingItem.no);
+      saveDeletedNos(deletedSet);
+
       const nextList = items.filter(i => (i.id ? i.id !== deletingItem.id : i.no !== deletingItem.no));
       updateItemsState(nextList);
 
@@ -246,12 +321,21 @@ export default function DashboardPage() {
     setFirebaseStatus("syncing");
     const remote = await getContentsFromDb();
     if (remote.length > 0) {
-      updateItemsState(remote);
+      const deletedSet = getDeletedNos();
+      const merged = mergeWithBaseData(remote, deletedSet);
+      updateItemsState(merged);
     }
     setFirebaseStatus("connected");
   };
 
   const handleResetToDefault = () => {
+    try {
+      localStorage.removeItem(DELETED_KEY);
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem("semarang_cell_brief_contents_v2");
+    } catch (e) {
+      console.warn("Reset error", e);
+    }
     updateItemsState(INITIAL_BRIEF_DATA);
   };
 
