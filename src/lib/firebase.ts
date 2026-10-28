@@ -54,6 +54,7 @@ export interface ContentItem {
   ambience: string;
   caption: string;
   executed?: boolean; // Notion-style checkbox: true = konten sudah dieksekusi/tayang
+  priority?: boolean; // Status prioritas (true = konten prioritas)
   platform?: "Instagram Feed" | "Instagram Carousel" | "Instagram Reels" | "Instagram Story";
   targetDate?: string;
   notes?: string;
@@ -77,6 +78,7 @@ export function sanitizeContentItem(item: ContentItem, docId?: string): ContentI
     ambience: item.ambience || "",
     caption: item.caption || "",
     executed: Boolean(item.executed),
+    priority: Boolean(item.priority),
     platform: item.platform || "Instagram Feed",
     targetDate: item.targetDate || "",
     notes: item.notes || "",

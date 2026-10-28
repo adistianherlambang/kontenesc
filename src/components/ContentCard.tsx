@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Lightbulb } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 interface ContentCardProps {
   item: ContentItem;
   onToggleExecuted: (item: ContentItem, explicitExecuted?: boolean) => Promise<void> | void;
+  onTogglePriority?: (item: ContentItem, explicitPriority?: boolean) => Promise<void> | void;
   onOpen?: (item: ContentItem) => void;
   onPreview?: (item: ContentItem) => void;
   onEdit?: (item: ContentItem) => void;
@@ -18,11 +19,13 @@ interface ContentCardProps {
 export default function ContentCard({
   item,
   onToggleExecuted,
+  onTogglePriority,
   onOpen,
   onPreview,
   transitionPrefix = "active-card",
 }: ContentCardProps) {
   const done = Boolean(item.executed);
+  const isPriority = Boolean(item.priority);
   const tone = getCategoryTone(item.kategori);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -54,13 +57,20 @@ export default function ContentCard({
     }
   };
 
+  const handleTogglePriority = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (onTogglePriority) {
+      onTogglePriority(item, !isPriority);
+    }
+  };
+
   return (
     <article
       style={{ viewTransitionName: `${transitionPrefix}-${item.no}` }}
       className={`content-card-vt flex flex-col rounded-2xl border p-2 sm:p-1.5 transition-all duration-280 ease-out hover:shadow-sm ${tone.card
         } ${isExiting ? "-translate-x-24 opacity-0 scale-95 pointer-events-none" : "translate-x-0 opacity-100 scale-100"}`}
     >
-      {/* Category row: clickable title + execution toggle button */}
+      {/* Category row: clickable title + execution & priority toggle select boxes */}
       <header className="flex min-h-11 sm:min-h-10 items-center justify-between gap-2 pl-3 pr-1 pb-3">
         <button
           type="button"
@@ -70,27 +80,37 @@ export default function ContentCard({
           {item.kategori}
         </button>
 
-        <button
-          type="button"
-          onClick={handleToggle}
-          aria-pressed={done}
-          aria-label={done ? "Tandai belum dieksekusi" : "Tandai selesai dieksekusi"}
-          title={done ? "Klik untuk batalkan status selesai" : "Klik untuk tandai selesai"}
-          className={`inline-flex items-center gap-2 px-3 py-2 min-h-[40px] rounded-xl text-xs font-semibold cursor-pointer select-none transition-colors shrink-0 ${done
-            ? "bg-success/15 text-success hover:bg-success/25 active:bg-success/30"
-            : "bg-white/80 hover:bg-white active:bg-white text-ink border border-black/10 shadow-2xs"
-            }`}
-        >
-          <span
-            className={`flex size-5 sm:size-4.5 items-center justify-center rounded-md border-[1.5px] transition-colors ${done
-              ? "border-success bg-success text-white"
-              : "border-line-strong bg-white text-transparent"
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Kotak select eksekusi */}
+          <button
+            type="button"
+            onClick={handleToggle}
+            aria-pressed={done}
+            aria-label={done ? "Tandai belum dieksekusi" : "Tandai selesai dieksekusi"}
+            title={done ? "Selesai dieksekusi (Klik untuk batalkan)" : "Klik untuk tandai selesai"}
+            className={`flex size-8 sm:size-7.5 items-center justify-center rounded-lg border transition-all cursor-pointer select-none ${done
+              ? "opacity-100 bg-success text-white border-success shadow-xs"
+              : "opacity-50 bg-white hover:opacity-80 text-muted border-line-strong shadow-2xs"
               }`}
           >
-            <Check className="size-3.5 stroke-[2.75]" />
-          </span>
-          <span>{done ? "Selesai" : "Tandai Selesai"}</span>
-        </button>
+            <Check className="size-4 stroke-[2.5]" />
+          </button>
+
+          {/* Kotak select prioritas */}
+          <button
+            type="button"
+            onClick={handleTogglePriority}
+            aria-pressed={isPriority}
+            aria-label={isPriority ? "Hapus dari prioritas" : "Tandai prioritas"}
+            title={isPriority ? "Prioritas: Aktif (Klik untuk matikan)" : "Prioritas: Tidak aktif (Klik untuk aktifkan)"}
+            className={`flex size-8 sm:size-7.5 items-center justify-center rounded-lg border transition-all cursor-pointer select-none ${isPriority
+              ? "opacity-100 bg-amber-500 text-white border-amber-600 shadow-xs"
+              : "opacity-50 bg-white hover:opacity-80 text-muted border-line-strong shadow-2xs"
+              }`}
+          >
+            <Lightbulb className="size-4 stroke-[2.25]" />
+          </button>
+        </div>
       </header>
 
       {/* White sheet */}
@@ -102,7 +122,14 @@ export default function ContentCard({
       >
         <div className="mb-2 flex items-center gap-2 text-xs text-muted">
           <span className="truncate">{item.platform || "Instagram Feed"}</span>
-          {done && <span className="badge ml-auto bg-success-soft text-success">✓ Sudah Tayang</span>}
+          <div className="ml-auto flex items-center gap-1.5">
+            {isPriority && (
+              <span className="badge bg-amber-50 text-amber-700 border border-amber-200/60 font-medium">
+                Prioritas
+              </span>
+            )}
+            {done && <span className="badge bg-success-soft text-success">✓ Sudah Tayang</span>}
+          </div>
         </div>
 
         <h4

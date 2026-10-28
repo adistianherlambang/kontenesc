@@ -167,6 +167,10 @@ export default function DashboardPage() {
     return items.filter(i => Boolean(i.executed)).length;
   }, [items]);
 
+  const priorityCount = useMemo(() => {
+    return items.filter(i => Boolean(i.priority)).length;
+  }, [items]);
+
   const pendingCount = items.length - executedCount;
 
   // Filtering
@@ -175,6 +179,7 @@ export default function DashboardPage() {
       // Sidebar filter
       if (activeSidebarView === "pending" && item.executed) return false;
       if (activeSidebarView === "executed" && !item.executed) return false;
+      if (activeSidebarView === "priority" && !item.priority) return false;
 
       // Search Query
       if (searchQuery.trim()) {
@@ -230,6 +235,35 @@ export default function DashboardPage() {
     // Save directly to Firestore (queued in IndexedDB if offline, auto-uploaded when online)
     saveContentToDb(updated).catch((err) => {
       console.warn("Firestore save error:", err);
+    });
+  };
+
+  // Toggle priority status
+  const handleTogglePriority = (item: ContentItem, explicitPriority?: boolean) => {
+    const newPriority = typeof explicitPriority === "boolean" ? explicitPriority : !Boolean(item.priority);
+    const now = new Date().toISOString();
+    const updated: ContentItem = {
+      ...item,
+      priority: newPriority,
+      updatedAt: now
+    };
+
+    const applyToggle = () => {
+      updateItemsState((prev) => prev.map((i) => ((i.id && i.id === item.id) || i.no === item.no ? updated : i)));
+      if (previewItem && ((previewItem.id && previewItem.id === item.id) || previewItem.no === item.no)) {
+        setPreviewItem(updated);
+      }
+    };
+
+    if (activeSidebarView === "priority" && !previewItem) {
+      runWithViewTransition(applyToggle);
+    } else {
+      applyToggle();
+    }
+
+    // Save directly to Firestore
+    saveContentToDb(updated).catch((err) => {
+      console.warn("Firestore save priority error:", err);
     });
   };
 
@@ -305,6 +339,7 @@ export default function DashboardPage() {
   const viewTitle = useMemo(() => {
     switch (activeSidebarView) {
       case "pending": return "Belum Eksekusi";
+      case "priority": return "Prioritas";
       case "executed": return "Sudah Eksekusi";
       default: return "Semua Konten";
     }
@@ -320,6 +355,7 @@ export default function DashboardPage() {
         totalCount={items.length}
         pendingCount={pendingCount}
         executedCount={executedCount}
+        priorityCount={priorityCount}
         firebaseStatus={firebaseStatus}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
@@ -460,6 +496,16 @@ export default function DashboardPage() {
             </button>
             <button
               type="button"
+              onClick={() => setActiveSidebarView("priority")}
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "priority"
+                ? "bg-amber-500 text-white"
+                : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+                }`}
+            >
+              Prioritas ({priorityCount})
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveSidebarView("executed")}
               className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "executed"
                 ? "bg-emerald-600 text-white"
@@ -511,6 +557,7 @@ export default function DashboardPage() {
                           item={item}
                           transitionPrefix="active-card"
                           onToggleExecuted={handleToggleExecuted}
+                          onTogglePriority={handleTogglePriority}
                           onEdit={handleOpenEdit}
                           onDelete={handleDeleteClick}
                           onPreview={(it: ContentItem) => setPreviewItem(it)}
@@ -538,6 +585,7 @@ export default function DashboardPage() {
                             item={item}
                             transitionPrefix="done-card"
                             onToggleExecuted={handleToggleExecuted}
+                            onTogglePriority={handleTogglePriority}
                             onEdit={handleOpenEdit}
                             onDelete={handleDeleteClick}
                             onPreview={(it: ContentItem) => setPreviewItem(it)}
@@ -556,6 +604,7 @@ export default function DashboardPage() {
                     item={item}
                     transitionPrefix={activeSidebarView === "executed" ? "done-card" : "active-card"}
                     onToggleExecuted={handleToggleExecuted}
+                    onTogglePriority={handleTogglePriority}
                     onEdit={handleOpenEdit}
                     onDelete={handleDeleteClick}
                     onPreview={(it: ContentItem) => setPreviewItem(it)}
@@ -576,6 +625,7 @@ export default function DashboardPage() {
                     : filteredItems
                 }
                 onToggleExecuted={handleToggleExecuted}
+                onTogglePriority={handleTogglePriority}
                 onEdit={handleOpenEdit}
                 onDelete={handleDeleteClick}
                 onPreview={(it: ContentItem) => setPreviewItem(it)}

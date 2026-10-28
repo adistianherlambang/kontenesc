@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { Layers, Circle, CheckCircle2, Cloud, CloudOff, X } from "lucide-react";
+import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X } from "lucide-react";
 import { getCategoryTone } from "@/lib/categoryTone";
 
-export type StatusView = "all" | "pending" | "executed";
+export type StatusView = "all" | "pending" | "executed" | "priority";
 
 interface SidebarProps {
   activeView: StatusView;
@@ -12,6 +12,7 @@ interface SidebarProps {
   totalCount: number;
   pendingCount: number;
   executedCount: number;
+  priorityCount: number;
   categories: { name: string; count: number }[];
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
@@ -26,6 +27,7 @@ export default function Sidebar({
   totalCount,
   pendingCount,
   executedCount,
+  priorityCount,
   categories,
   selectedCategory,
   onSelectCategory,
@@ -38,6 +40,7 @@ export default function Sidebar({
   const views: { id: StatusView; label: string; icon: typeof Layers; count: number }[] = [
     { id: "all", label: "Semua konten", icon: Layers, count: totalCount },
     { id: "pending", label: "Belum dieksekusi", icon: Circle, count: pendingCount },
+    { id: "priority", label: "Prioritas", icon: Lightbulb, count: priorityCount },
     { id: "executed", label: "Sudah dieksekusi", icon: CheckCircle2, count: executedCount },
   ];
 

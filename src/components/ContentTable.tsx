@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   Copy,
   Check,
+  Lightbulb,
   Eye,
   Edit2,
   Trash2,
@@ -16,6 +17,7 @@ import { getCategoryTone } from "@/lib/categoryTone";
 interface ContentTableProps {
   items: ContentItem[];
   onToggleExecuted: (item: ContentItem, explicitExecuted?: boolean) => Promise<void> | void;
+  onTogglePriority?: (item: ContentItem, explicitPriority?: boolean) => Promise<void> | void;
   onEdit: (item: ContentItem) => void;
   onDelete: (item: ContentItem) => void;
   onPreview: (item: ContentItem) => void;
@@ -31,6 +33,7 @@ const truncateWords = (text: string, maxWords = 4): string => {
 export default function ContentTable({
   items,
   onToggleExecuted,
+  onTogglePriority,
   onEdit,
   onDelete,
   onPreview
@@ -88,7 +91,7 @@ export default function ContentTable({
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr>
-              <th className="th w-12 text-center">Status</th>
+              <th className="th w-20 text-center">Status</th>
               <th className="th min-w-[180px]">Judul Konten</th>
               <th className="th whitespace-nowrap">Kategori</th>
               <th className="th min-w-[280px]">Teks Visual (Copywriting)</th>
@@ -110,24 +113,42 @@ export default function ContentTable({
                   className={`content-card-vt hover:bg-subtle/50 transition-all duration-250 ${isDone ? "bg-subtle/20" : ""
                     } ${isExiting ? "-translate-x-20 opacity-0 pointer-events-none" : ""}`}
                 >
-                  {/* Execution Status Button */}
+                  {/* Execution & Priority Status Select Boxes */}
                   <td className="td text-center align-middle p-0">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleExecution(item)}
-                      className="flex items-center justify-center min-h-[44px] min-w-[44px] w-full p-2.5 cursor-pointer select-none"
-                      title={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
-                      aria-label="Tandai status eksekusi konten"
-                    >
-                      <span
-                        className={`flex size-5 items-center justify-center rounded-md border-[1.5px] transition-colors ${isDone
-                          ? "border-success bg-success text-white"
-                          : "border-line-strong bg-white text-transparent hover:border-brand"
+                    <div className="flex items-center justify-center gap-1.5 min-h-[44px] px-2">
+                      {/* Kotak select eksekusi */}
+                      <button
+                        type="button"
+                        onClick={() => handleToggleExecution(item)}
+                        aria-pressed={isDone}
+                        aria-label={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
+                        title={isDone ? "Selesai dieksekusi (Klik untuk batalkan)" : "Klik untuk tandai selesai"}
+                        className={`flex size-7 items-center justify-center rounded-lg border transition-all cursor-pointer select-none ${isDone
+                          ? "opacity-100 bg-success text-white border-success shadow-xs"
+                          : "opacity-50 bg-white hover:opacity-80 text-muted border-line-strong shadow-2xs"
                           }`}
                       >
                         <Check className="size-3.5 stroke-[2.75]" />
-                      </span>
-                    </button>
+                      </button>
+
+                      {/* Kotak select prioritas */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTogglePriority?.(item, !Boolean(item.priority));
+                        }}
+                        aria-pressed={Boolean(item.priority)}
+                        aria-label={item.priority ? "Hapus dari prioritas" : "Tandai prioritas"}
+                        title={item.priority ? "Prioritas: Aktif (Klik untuk matikan)" : "Prioritas: Tidak aktif (Klik untuk aktifkan)"}
+                        className={`flex size-7 items-center justify-center rounded-lg border transition-all cursor-pointer select-none ${item.priority
+                          ? "opacity-100 bg-amber-500 text-white border-amber-600 shadow-xs"
+                          : "opacity-50 bg-white hover:opacity-80 text-muted border-line-strong shadow-2xs"
+                          }`}
+                      >
+                        <Lightbulb className="size-3.5 stroke-[2.25]" />
+                      </button>
+                    </div>
                   </td>
 
                   {/* Judul Konten */}

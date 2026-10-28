@@ -73,6 +73,8 @@ export function convertRowsToContentItems(rows: Record<string, string>[], starti
     const no = parseInt(r.no || r.nomor || "") || (startingNo + idx);
     const executedVal = (r.executed || r.dieksekusi || r.selesai || r.status || "").toLowerCase();
     const isExecuted = executedVal === "true" || executedVal === "1" || executedVal === "ya" || executedVal === "sudah" || executedVal === "selesai";
+    const priorityVal = (r.priority || r.prioritas || "").toLowerCase();
+    const isPriority = priorityVal === "true" || priorityVal === "1" || priorityVal === "ya" || priorityVal === "yes";
 
     return {
       id: `konten-${no}`,
@@ -83,6 +85,7 @@ export function convertRowsToContentItems(rows: Record<string, string>[], starti
       ambience: r.ambience || r.visual || r.arahanvisual || "",
       caption: r.caption || r.takarir || "",
       executed: isExecuted,
+      priority: isPriority,
       platform: (r.platform as any) || "Instagram Feed",
       targetDate: r.targetdate || r.tanggal || "",
       updatedAt: new Date().toISOString()
