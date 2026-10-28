@@ -4,9 +4,6 @@ import React, { useState, useEffect } from "react";
 import { 
   X, 
   Save, 
-  Layers, 
-  Camera, 
-  MessageSquare, 
   AlertCircle,
   FileCode,
   FileSpreadsheet,
@@ -14,7 +11,8 @@ import {
   Copy,
   Check,
   Download,
-  Plus
+  Plus,
+  PenLine
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 import { 
@@ -73,6 +71,17 @@ export default function ContentModal({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [manualError, setManualError] = useState("");
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (item) {
@@ -246,216 +255,225 @@ export default function ContentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 notion-modal-overlay">
-      <div className="notion-modal max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
-        
+    <div className="modal-overlay" onClick={onClose}>
+      <div 
+        className="modal max-w-2xl max-h-[90vh]" 
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
-        <div className="px-5 py-3.5 border-b border-[#E9E9E7] flex items-center justify-between bg-white">
-          <div className="flex items-center gap-2">
-            <span className="text-base">📝</span>
-            <h2 className="text-sm font-semibold text-[#37352F]">
-              {isEditing ? `Edit Konten #${formData.no}` : "Tambah Konten"}
+        <div className="modal-header">
+          <div className="flex items-center gap-2.5">
+            <h2 className="modal-title">
+              {isEditing ? `Edit Konten #${formData.no}` : "Tambah Konten Baru"}
             </h2>
+            <span className="badge bg-subtle text-muted">
+              {isEditing ? "Mode Edit" : activeMode === "manual" ? "1 Konten" : "Import Batch"}
+            </span>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded text-[#9B9A97] hover:text-[#37352F] hover:bg-[#EFEFED] transition-colors"
+            className="btn btn-ghost btn-icon"
+            aria-label="Tutup modal"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
 
-        {/* Mode Tabs (Only shown when adding new content) */}
+        {/* Mode Tabs (Only when adding new content) */}
         {!isEditing && (
-          <div className="flex items-center border-b border-[#E9E9E7] bg-[#F7F6F3] px-5 text-xs">
-            <button
-              onClick={() => setActiveMode("manual")}
-              className={`py-2 px-3 border-b-2 font-medium cursor-pointer transition-colors ${
-                activeMode === "manual"
-                  ? "border-[#1F6FB6] text-[#1F6FB6] font-semibold bg-white"
-                  : "border-transparent text-[#787774] hover:text-[#37352F]"
-              }`}
-            >
-              Form Manual (1 Konten)
-            </button>
-            <button
-              onClick={() => setActiveMode("batch-json")}
-              className={`py-2 px-3 border-b-2 font-medium cursor-pointer transition-colors flex items-center gap-1.5 ${
-                activeMode === "batch-json"
-                  ? "border-[#1F6FB6] text-[#1F6FB6] font-semibold bg-white"
-                  : "border-transparent text-[#787774] hover:text-[#37352F]"
-              }`}
-            >
-              <FileCode className="w-3.5 h-3.5 text-[#1F6FB6]" />
-              <span>Batch JSON</span>
-            </button>
-            <button
-              onClick={() => setActiveMode("batch-csv")}
-              className={`py-2 px-3 border-b-2 font-medium cursor-pointer transition-colors flex items-center gap-1.5 ${
-                activeMode === "batch-csv"
-                  ? "border-[#1F6FB6] text-[#1F6FB6] font-semibold bg-white"
-                  : "border-transparent text-[#787774] hover:text-[#37352F]"
-              }`}
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Batch CSV / Excel</span>
-            </button>
+          <div className="shrink-0 border-b border-line bg-surface px-5 py-2.5">
+            <div className="flex items-center gap-1 rounded-xl bg-subtle p-1">
+              <button
+                type="button"
+                onClick={() => setActiveMode("manual")}
+                className={`btn flex-1 text-xs ${
+                  activeMode === "manual"
+                    ? "bg-canvas text-ink shadow-xs"
+                    : "btn-ghost text-muted hover:text-ink"
+                }`}
+              >
+                <PenLine className="size-3.5" />
+                <span>Form Manual (1 Konten)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveMode("batch-json")}
+                className={`btn flex-1 text-xs ${
+                  activeMode === "batch-json"
+                    ? "bg-canvas text-ink shadow-xs"
+                    : "btn-ghost text-muted hover:text-ink"
+                }`}
+              >
+                <FileCode className="size-3.5 text-brand" />
+                <span>Batch JSON</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveMode("batch-csv")}
+                className={`btn flex-1 text-xs ${
+                  activeMode === "batch-csv"
+                    ? "bg-canvas text-ink shadow-xs"
+                    : "btn-ghost text-muted hover:text-ink"
+                }`}
+              >
+                <FileSpreadsheet className="size-3.5 text-success" />
+                <span>Batch CSV / Excel</span>
+              </button>
+            </div>
           </div>
         )}
 
         {/* Tab 1: Manual Form */}
         {activeMode === "manual" && (
-          <form onSubmit={handleManualSubmit} className="flex-1 overflow-y-auto p-5 space-y-3.5">
-            {manualError && (
-              <div className="p-2.5 bg-[#FDEBEC] border border-[#E9E9E7] rounded text-xs text-[#DF5452] flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{manualError}</span>
-              </div>
-            )}
+          <form onSubmit={handleManualSubmit} className="flex flex-1 flex-col overflow-hidden">
+            <div className="modal-body space-y-4">
+              {manualError && (
+                <div className="notice notice-danger">
+                  <AlertCircle className="size-4 shrink-0" />
+                  <span>{manualError}</span>
+                </div>
+              )}
 
-            {/* Checkbox Status Eksekusi */}
-            <div className="p-2.5 bg-[#F7F6F3] border border-[#E9E9E7] rounded-md flex items-center justify-between">
-              <label className="flex items-center gap-2 text-xs font-medium text-[#37352F] cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={Boolean(formData.executed)}
-                  onChange={(e) => setFormData({ ...formData, executed: e.target.checked })}
-                  className="notion-checkbox"
-                />
-                <span>Konten ini sudah dieksekusi / ditayangkan</span>
-              </label>
-              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
-                formData.executed ? "bg-[#E7F3E8] text-[#2B7830]" : "bg-[#FAEBDD] text-[#D9730D]"
-              }`}>
-                {formData.executed ? "Sudah Selesai" : "Belum Selesai"}
-              </span>
-            </div>
-
-            {/* Row 1: No, Kategori, Format */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <div>
-                <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                  Nomor Konten
+              {/* Status Eksekusi Toggle */}
+              <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-3">
+                <label className="flex cursor-pointer select-none items-center gap-2.5 text-xs font-medium text-ink">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(formData.executed)}
+                    onChange={(e) => setFormData({ ...formData, executed: e.target.checked })}
+                    className="checkbox"
+                  />
+                  <span>Tandai konten ini sudah dieksekusi / ditayangkan</span>
                 </label>
-                <input
-                  type="number"
-                  value={formData.no || ""}
-                  onChange={(e) => setFormData({ ...formData, no: parseInt(e.target.value) || 0 })}
-                  className="w-full text-xs py-1.5 px-2.5 rounded border border-[#E9E9E7] bg-white focus:outline-none focus:border-[#1F6FB6]"
-                  min="1"
-                  required
-                />
+                <span
+                  className={`badge ${
+                    formData.executed ? "bg-success-soft text-success" : "bg-subtle text-muted"
+                  }`}
+                >
+                  {formData.executed ? "Sudah Selesai" : "Belum Dieksekusi"}
+                </span>
               </div>
 
+              {/* Row 1: Nomor, Kategori, Platform */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
+                <div className="sm:col-span-3">
+                  <label className="field-label">Nomor Urut</label>
+                  <input
+                    type="number"
+                    value={formData.no || ""}
+                    onChange={(e) => setFormData({ ...formData, no: parseInt(e.target.value) || 0 })}
+                    className="input font-mono"
+                    min="1"
+                    required
+                  />
+                </div>
+
+                <div className="sm:col-span-5">
+                  <label className="field-label">Kategori</label>
+                  <input
+                    type="text"
+                    list="category-options"
+                    value={formData.kategori || ""}
+                    onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
+                    placeholder="Contoh: Edukasi & Spesifikasi"
+                    className="input"
+                    required
+                  />
+                  <datalist id="category-options">
+                    {existingCategories.map((c) => (
+                      <option key={c} value={c} />
+                    ))}
+                  </datalist>
+                </div>
+
+                <div className="sm:col-span-4">
+                  <label className="field-label">Format Media</label>
+                  <select
+                    value={formData.platform || "Instagram Feed"}
+                    onChange={(e) => setFormData({ ...formData, platform: e.target.value as any })}
+                    className="input cursor-pointer"
+                  >
+                    <option value="Instagram Feed">Instagram Feed</option>
+                    <option value="Instagram Carousel">Instagram Carousel</option>
+                    <option value="Instagram Reels">Instagram Reels</option>
+                    <option value="Instagram Story">Instagram Story</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Judul Konten */}
               <div>
-                <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                  Kategori
+                <label className="field-label">
+                  Judul Konten <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
-                  list="category-options"
-                  value={formData.kategori || ""}
-                  onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
-                  placeholder="Kategori ide..."
-                  className="w-full text-xs py-1.5 px-2.5 rounded border border-[#E9E9E7] bg-white focus:outline-none focus:border-[#1F6FB6]"
+                  value={formData.judul || ""}
+                  onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
+                  placeholder="Masukkan topik atau headline ide konten..."
+                  className="input font-medium"
                   required
                 />
-                <datalist id="category-options">
-                  {existingCategories.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
               </div>
 
+              {/* Copywriting */}
               <div>
-                <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                  Format
+                <label className="field-label">
+                  Teks Visual Feed (Copywriting) <span className="text-danger">*</span>
                 </label>
-                <select
-                  value={formData.platform || "Instagram Feed"}
-                  onChange={(e) => setFormData({ ...formData, platform: e.target.value as any })}
-                  className="w-full text-xs py-1.5 px-2.5 rounded border border-[#E9E9E7] bg-white focus:outline-none focus:border-[#1F6FB6]"
-                >
-                  <option value="Instagram Feed">Instagram Feed</option>
-                  <option value="Instagram Carousel">Instagram Carousel</option>
-                  <option value="Instagram Reels">Instagram Reels</option>
-                  <option value="Instagram Story">Instagram Story</option>
-                </select>
+                <textarea
+                  rows={4}
+                  value={formData.copywriting || ""}
+                  onChange={(e) => setFormData({ ...formData, copywriting: e.target.value })}
+                  placeholder="Tuliskan teks yang akan ditampilkan pada desain visual feed..."
+                  className="textarea"
+                  required
+                />
+              </div>
+
+              {/* Ambience & Caption Grid */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="field-label">Arahan Visual / Ambience</label>
+                  <textarea
+                    rows={3}
+                    value={formData.ambience || ""}
+                    onChange={(e) => setFormData({ ...formData, ambience: e.target.value })}
+                    placeholder="Contoh: Background clean neon, smartphone di tangan..."
+                    className="textarea"
+                  />
+                </div>
+
+                <div>
+                  <label className="field-label">Caption Instagram</label>
+                  <textarea
+                    rows={3}
+                    value={formData.caption || ""}
+                    onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                    placeholder="Caption postingan Instagram..."
+                    className="textarea"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Judul */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                Judul Konten <span className="text-[#DF5452]">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.judul || ""}
-                onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
-                placeholder="Judul topik ide konten..."
-                className="w-full text-xs py-1.5 px-2.5 rounded border border-[#E9E9E7] bg-white font-medium text-[#37352F] focus:outline-none focus:border-[#1F6FB6]"
-                required
-              />
-            </div>
-
-            {/* Copywriting */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                Teks Visual Feed (Copywriting) <span className="text-[#DF5452]">*</span>
-              </label>
-              <textarea
-                rows={4}
-                value={formData.copywriting || ""}
-                onChange={(e) => setFormData({ ...formData, copywriting: e.target.value })}
-                placeholder="Teks yang akan didesain pada gambar..."
-                className="w-full text-xs font-mono py-2 px-2.5 rounded border border-[#E9E9E7] bg-[#F7F6F3] focus:bg-white focus:outline-none focus:border-[#1F6FB6]"
-                required
-              />
-            </div>
-
-            {/* Ambience */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                Arahan Visual / Ambience
-              </label>
-              <textarea
-                rows={2}
-                value={formData.ambience || ""}
-                onChange={(e) => setFormData({ ...formData, ambience: e.target.value })}
-                placeholder="Deskripsi objek, suasana, pencahayaan..."
-                className="w-full text-xs py-1.5 px-2.5 rounded border border-[#E9E9E7] bg-white focus:outline-none focus:border-[#1F6FB6]"
-              />
-            </div>
-
-            {/* Caption */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                Caption Instagram
-              </label>
-              <textarea
-                rows={4}
-                value={formData.caption || ""}
-                onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
-                placeholder="Caption lengkap postingan..."
-                className="w-full text-xs py-2 px-2.5 rounded border border-[#E9E9E7] bg-white focus:outline-none focus:border-[#1F6FB6] leading-relaxed"
-              />
-            </div>
-
-            <div className="pt-2 flex justify-end gap-2">
+            {/* Modal Footer */}
+            <div className="modal-footer">
               <button
                 type="button"
                 onClick={onClose}
-                className="notion-btn notion-btn-bordered text-xs"
+                disabled={isSubmitting}
+                className="btn btn-secondary"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="notion-btn notion-btn-primary text-xs"
+                className="btn btn-primary"
               >
-                <Save className="w-3.5 h-3.5" />
+                <Save className="size-4" />
                 <span>{isSubmitting ? "Menyimpan..." : "Simpan Konten"}</span>
               </button>
             </div>
@@ -464,95 +482,103 @@ export default function ContentModal({
 
         {/* Tab 2: Batch JSON */}
         {activeMode === "batch-json" && (
-          <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
-            {/* Guide & Sample Helper */}
-            <div className="bg-[#F7F6F3] p-3 rounded-md border border-[#E9E9E7] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="modal-body space-y-4">
+              {/* Helper Bar */}
+              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-ink">Import Sekaligus via JSON</p>
+                  <p className="text-xs text-muted">Upload berkas .json atau tempel array objek di bawah.</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setJsonInput(SAMPLE_JSON_TEMPLATE);
+                      setCopiedJsonTemplate(true);
+                      setTimeout(() => setCopiedJsonTemplate(false), 2000);
+                    }}
+                    className="btn btn-secondary text-xs"
+                  >
+                    {copiedJsonTemplate ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
+                    <span>Gunakan Contoh</span>
+                  </button>
+                  <label className="btn btn-secondary cursor-pointer text-xs">
+                    <Upload className="size-3.5 text-brand" />
+                    <span>Pilih Berkas .json</span>
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={handleJsonFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Status Notice */}
+              {jsonError && (
+                <div className="notice notice-danger">
+                  <AlertCircle className="size-4 shrink-0" />
+                  <span>{jsonError}</span>
+                </div>
+              )}
+              {parsedJsonItems.length > 0 && (
+                <div className="notice notice-success items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Check className="size-4 shrink-0" />
+                    <span className="font-medium">
+                      Terbaca {parsedJsonItems.length} ide konten valid siap diimpor.
+                    </span>
+                  </div>
+                  <span className="badge bg-success/20 text-success">Siap</span>
+                </div>
+              )}
+
+              {/* Textarea */}
               <div>
-                <p className="font-semibold text-[#37352F]">Import Data JSON Sekaligus</p>
-                <p className="text-[11.5px] text-[#787774]">Upload file .json atau tempel teks JSON array di bawah.</p>
+                <label className="field-label">Teks JSON (Array of Objects)</label>
+                <textarea
+                  rows={6}
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                  placeholder='[ { "no": 61, "kategori": "Edukasi & Spesifikasi", "judul": "Judul konten...", "copywriting": "Teks feed...", "caption": "Caption..." } ]'
+                  className="textarea font-mono text-xs"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setJsonInput(SAMPLE_JSON_TEMPLATE);
-                    setCopiedJsonTemplate(true);
-                    setTimeout(() => setCopiedJsonTemplate(false), 2000);
-                  }}
-                  className="notion-btn notion-btn-bordered text-[11px]"
-                >
-                  {copiedJsonTemplate ? <Check className="w-3 h-3 text-[#2B7830]" /> : <Copy className="w-3 h-3" />}
-                  <span>Pakai Contoh Template</span>
-                </button>
-                <label className="notion-btn notion-btn-bordered text-[11px] cursor-pointer">
-                  <Upload className="w-3 h-3 text-[#1F6FB6]" />
-                  <span>Pilih File .JSON</span>
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={handleJsonFileUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
 
-            {/* Error or Success indicator */}
-            {jsonError && (
-              <div className="p-2 bg-[#FDEBEC] border border-[#E9E9E7] rounded text-xs text-[#DF5452]">
-                {jsonError}
-              </div>
-            )}
-            {parsedJsonItems.length > 0 && (
-              <div className="p-2 bg-[#E7F3E8] border border-[#E9E9E7] rounded text-xs text-[#2B7830] font-medium flex items-center justify-between">
-                <span>✓ Berhasil membaca {parsedJsonItems.length} ide konten!</span>
-                <span className="text-[11px]">Siap ditambahkan ke database</span>
-              </div>
-            )}
-
-            {/* Textarea */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                Teks JSON (Array of Objects):
-              </label>
-              <textarea
-                rows={7}
-                value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
-                placeholder='[ { "no": 61, "kategori": "Edukasi", "judul": "Judul konten...", "copywriting": "Teks...", "caption": "Caption..." } ]'
-                className="w-full text-xs font-mono py-2 px-2.5 rounded border border-[#E9E9E7] bg-[#F7F6F3] focus:bg-white focus:outline-none focus:border-[#1F6FB6]"
-              />
-            </div>
-
-            {/* Preview Detected Items */}
-            {parsedJsonItems.length > 0 && (
-              <div className="border border-[#E9E9E7] rounded max-h-36 overflow-y-auto">
-                <table className="w-full text-left text-[11px]">
-                  <thead className="bg-[#F7F6F3] text-[#787774] sticky top-0">
-                    <tr>
-                      <th className="p-1.5">#No</th>
-                      <th className="p-1.5">Kategori</th>
-                      <th className="p-1.5">Judul</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E9E9E7]">
-                    {parsedJsonItems.map((it, idx) => (
-                      <tr key={idx} className="hover:bg-[#F7F6F3]">
-                        <td className="p-1.5 font-mono">#{it.no}</td>
-                        <td className="p-1.5">{it.kategori}</td>
-                        <td className="p-1.5 font-medium truncate max-w-xs">{it.judul}</td>
+              {/* Preview Table */}
+              {parsedJsonItems.length > 0 && (
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-line">
+                  <table className="w-full border-collapse text-left text-xs">
+                    <thead>
+                      <tr>
+                        <th className="th w-16">#No</th>
+                        <th className="th w-36">Kategori</th>
+                        <th className="th">Judul Konten</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {parsedJsonItems.map((it, idx) => (
+                        <tr key={idx} className="hover:bg-subtle transition-colors">
+                          <td className="td font-mono font-medium">#{it.no}</td>
+                          <td className="td text-muted">{it.kategori}</td>
+                          <td className="td font-medium text-ink truncate max-w-xs">{it.judul}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            {/* Modal Footer */}
+            <div className="modal-footer">
               <button
                 type="button"
                 onClick={onClose}
-                className="notion-btn notion-btn-bordered text-xs"
+                disabled={isSubmitting}
+                className="btn btn-secondary"
               >
                 Batal
               </button>
@@ -560,10 +586,14 @@ export default function ContentModal({
                 type="button"
                 onClick={handleBatchJsonSubmit}
                 disabled={parsedJsonItems.length === 0 || isSubmitting}
-                className="notion-btn notion-btn-primary text-xs disabled:opacity-40"
+                className="btn btn-primary"
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{isSubmitting ? "Mengimpor..." : `Tambahkan ${parsedJsonItems.length} Konten (Batch)`}</span>
+                <Plus className="size-4" />
+                <span>
+                  {isSubmitting
+                    ? "Mengimpor..."
+                    : `Tambahkan ${parsedJsonItems.length} Konten (Batch)`}
+                </span>
               </button>
             </div>
           </div>
@@ -571,104 +601,114 @@ export default function ContentModal({
 
         {/* Tab 3: Batch CSV */}
         {activeMode === "batch-csv" && (
-          <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
-            {/* Guide & Sample Helper */}
-            <div className="bg-[#F7F6F3] p-3 rounded-md border border-[#E9E9E7] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="modal-body space-y-4">
+              {/* Helper Bar */}
+              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-ink">Import Data CSV / Excel</p>
+                  <p className="text-xs text-muted">
+                    Kolom: <span className="font-mono text-ink">no, kategori, judul, copywriting, ambience, caption, executed</span>
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadSampleCSV}
+                    className="btn btn-secondary text-xs"
+                    title="Unduh file template CSV"
+                  >
+                    <Download className="size-3.5 text-success" />
+                    <span>Download Template</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCsvInput(SAMPLE_CSV_TEMPLATE);
+                      setCopiedCsvTemplate(true);
+                      setTimeout(() => setCopiedCsvTemplate(false), 2000);
+                    }}
+                    className="btn btn-secondary text-xs"
+                  >
+                    {copiedCsvTemplate ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
+                    <span>Gunakan Contoh</span>
+                  </button>
+                  <label className="btn btn-secondary cursor-pointer text-xs">
+                    <Upload className="size-3.5 text-brand" />
+                    <span>Pilih Berkas .csv</span>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleCsvFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Status Notice */}
+              {csvError && (
+                <div className="notice notice-danger">
+                  <AlertCircle className="size-4 shrink-0" />
+                  <span>{csvError}</span>
+                </div>
+              )}
+              {parsedCsvItems.length > 0 && (
+                <div className="notice notice-success items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Check className="size-4 shrink-0" />
+                    <span className="font-medium">
+                      Terbaca {parsedCsvItems.length} baris data valid siap diimpor.
+                    </span>
+                  </div>
+                  <span className="badge bg-success/20 text-success">Siap</span>
+                </div>
+              )}
+
+              {/* Textarea */}
               <div>
-                <p className="font-semibold text-[#37352F]">Import Data CSV / Excel Sekaligus</p>
-                <p className="text-[11.5px] text-[#787774]">Kolom yang didukung: no, kategori, judul, copywriting, ambience, caption, executed</p>
+                <label className="field-label">Teks Format CSV (Comma / Semicolon Separated)</label>
+                <textarea
+                  rows={6}
+                  value={csvInput}
+                  onChange={(e) => setCsvInput(e.target.value)}
+                  placeholder="no,kategori,judul,copywriting,ambience,caption,platform,executed"
+                  className="textarea font-mono text-xs"
+                />
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  type="button"
-                  onClick={handleDownloadSampleCSV}
-                  className="notion-btn notion-btn-bordered text-[11px]"
-                  title="Unduh file template CSV untuk dibuka di Excel/Sheets"
-                >
-                  <Download className="w-3 h-3 text-emerald-600" />
-                  <span>Download Template .CSV</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCsvInput(SAMPLE_CSV_TEMPLATE);
-                    setCopiedCsvTemplate(true);
-                    setTimeout(() => setCopiedCsvTemplate(false), 2000);
-                  }}
-                  className="notion-btn notion-btn-bordered text-[11px]"
-                >
-                  {copiedCsvTemplate ? <Check className="w-3 h-3 text-[#2B7830]" /> : <Copy className="w-3 h-3" />}
-                  <span>Pakai Contoh CSV</span>
-                </button>
-                <label className="notion-btn notion-btn-bordered text-[11px] cursor-pointer">
-                  <Upload className="w-3 h-3 text-[#1F6FB6]" />
-                  <span>Pilih File .CSV</span>
-                  <input
-                    type="file"
-                    accept=".csv,text/csv"
-                    onChange={handleCsvFileUpload}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
 
-            {/* Error or Success indicator */}
-            {csvError && (
-              <div className="p-2 bg-[#FDEBEC] border border-[#E9E9E7] rounded text-xs text-[#DF5452]">
-                {csvError}
-              </div>
-            )}
-            {parsedCsvItems.length > 0 && (
-              <div className="p-2 bg-[#E7F3E8] border border-[#E9E9E7] rounded text-xs text-[#2B7830] font-medium flex items-center justify-between">
-                <span>✓ Berhasil membaca {parsedCsvItems.length} baris konten dari CSV!</span>
-                <span className="text-[11px]">Siap ditambahkan ke database</span>
-              </div>
-            )}
-
-            {/* Textarea */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#787774] mb-1">
-                Teks CSV (Comma Separated Values):
-              </label>
-              <textarea
-                rows={7}
-                value={csvInput}
-                onChange={(e) => setCsvInput(e.target.value)}
-                placeholder="no,kategori,judul,copywriting,ambience,caption,platform,executed&#10;61,Edukasi,Judul konten,&quot;Teks copywriting...&quot;,&quot;Arahan visual...&quot;,&quot;Caption...&quot;,Instagram Feed,false"
-                className="w-full text-xs font-mono py-2 px-2.5 rounded border border-[#E9E9E7] bg-[#F7F6F3] focus:bg-white focus:outline-none focus:border-[#1F6FB6]"
-              />
-            </div>
-
-            {/* Preview Detected Items */}
-            {parsedCsvItems.length > 0 && (
-              <div className="border border-[#E9E9E7] rounded max-h-36 overflow-y-auto">
-                <table className="w-full text-left text-[11px]">
-                  <thead className="bg-[#F7F6F3] text-[#787774] sticky top-0">
-                    <tr>
-                      <th className="p-1.5">#No</th>
-                      <th className="p-1.5">Kategori</th>
-                      <th className="p-1.5">Judul</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E9E9E7]">
-                    {parsedCsvItems.map((it, idx) => (
-                      <tr key={idx} className="hover:bg-[#F7F6F3]">
-                        <td className="p-1.5 font-mono">#{it.no}</td>
-                        <td className="p-1.5">{it.kategori}</td>
-                        <td className="p-1.5 font-medium truncate max-w-xs">{it.judul}</td>
+              {/* Preview Table */}
+              {parsedCsvItems.length > 0 && (
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-line">
+                  <table className="w-full border-collapse text-left text-xs">
+                    <thead>
+                      <tr>
+                        <th className="th w-16">#No</th>
+                        <th className="th w-36">Kategori</th>
+                        <th className="th">Judul Konten</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {parsedCsvItems.map((it, idx) => (
+                        <tr key={idx} className="hover:bg-subtle transition-colors">
+                          <td className="td font-mono font-medium">#{it.no}</td>
+                          <td className="td text-muted">{it.kategori}</td>
+                          <td className="td font-medium text-ink truncate max-w-xs">{it.judul}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
 
-            <div className="pt-2 flex justify-end gap-2">
+            {/* Modal Footer */}
+            <div className="modal-footer">
               <button
                 type="button"
                 onClick={onClose}
-                className="notion-btn notion-btn-bordered text-xs"
+                disabled={isSubmitting}
+                className="btn btn-secondary"
               >
                 Batal
               </button>
@@ -676,15 +716,18 @@ export default function ContentModal({
                 type="button"
                 onClick={handleBatchCsvSubmit}
                 disabled={parsedCsvItems.length === 0 || isSubmitting}
-                className="notion-btn notion-btn-primary text-xs disabled:opacity-40"
+                className="btn btn-primary"
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{isSubmitting ? "Mengimpor..." : `Tambahkan ${parsedCsvItems.length} Konten dari CSV`}</span>
+                <Plus className="size-4" />
+                <span>
+                  {isSubmitting
+                    ? "Mengimpor..."
+                    : `Tambahkan ${parsedCsvItems.length} Konten (Batch)`}
+                </span>
               </button>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

@@ -62,23 +62,25 @@ export default function InstagramPreviewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 notion-modal-overlay">
-      <div className="notion-modal max-w-md w-full max-h-[92vh] flex flex-col overflow-hidden">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal max-w-md" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="px-4 py-3 border-b border-[#E9E9E7] flex items-center justify-between bg-white">
+        <div className="modal-header">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-semibold text-[#787774]">
+            <span className="font-mono text-xs font-semibold text-muted">
               #{item.no}
             </span>
-            <span className="text-xs font-medium text-[#37352F]">
+            <span className="modal-title">
               Pratinjau Feed Instagram
             </span>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 rounded text-[#9B9A97] hover:text-[#37352F] hover:bg-[#EFEFED] transition-colors"
+            className="btn btn-ghost btn-icon"
+            aria-label="Tutup"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
 
@@ -166,32 +168,34 @@ export default function InstagramPreviewModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3 border-t border-[#E9E9E7] bg-white flex items-center justify-between gap-2">
+        <div className="modal-footer justify-between">
           {onToggleExecuted ? (
-            <label className="flex items-center gap-1.5 text-xs text-[#37352F] cursor-pointer">
+            <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={Boolean(item.executed)}
                 onChange={() => onToggleExecuted(item)}
-                className="notion-checkbox"
+                className="checkbox"
               />
-              <span className="text-[11px] font-medium">Sudah Dieksekusi</span>
+              <span>Sudah Dieksekusi</span>
             </label>
           ) : <div />}
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={handleCopyCopywriting}
-              className="notion-btn notion-btn-bordered text-xs py-1 px-2.5"
+              className="btn btn-secondary text-xs"
             >
-              {copiedCopywriting ? <Check className="w-3 h-3 text-[#2B7830]" /> : <Copy className="w-3 h-3" />}
+              {copiedCopywriting ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
               <span>Salin Teks</span>
             </button>
             <button
+              type="button"
               onClick={handleCopyCaption}
-              className="notion-btn notion-btn-primary text-xs py-1 px-2.5"
+              className="btn btn-primary text-xs"
             >
-              {copiedCaption ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copiedCaption ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
               <span>Salin Caption</span>
             </button>
           </div>

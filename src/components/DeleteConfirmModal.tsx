@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AlertCircle, Trash2, X } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 
@@ -19,46 +19,60 @@ export default function DeleteConfirmModal({
   onConfirm,
   isDeleting
 }: DeleteConfirmModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !item) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 notion-modal-overlay">
-      <div className="notion-modal max-w-sm w-full p-5 shadow-xl text-left">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2 text-sm font-semibold text-[#DF5452]">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal max-w-sm" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="flex items-center gap-2 font-semibold text-sm text-danger">
+            <AlertCircle className="size-4 shrink-0" />
             <span>Hapus Konten #{item.no}?</span>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1 text-[#9B9A97] hover:text-[#37352F] rounded"
+            className="btn btn-ghost btn-icon"
+            aria-label="Tutup"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
 
-        <p className="text-xs text-[#787774] mb-3 leading-relaxed">
-          Konten <span className="font-semibold text-[#37352F]">"{item.judul}"</span> akan dihapus permanen dari database.
-        </p>
+        <div className="modal-body space-y-3">
+          <p className="text-xs text-muted leading-relaxed">
+            Konten <strong className="font-semibold text-ink">"{item.judul}"</strong> akan dihapus permanen dari database.
+          </p>
 
-        <div className="bg-[#F7F6F3] p-2.5 rounded border border-[#E9E9E7] mb-4 text-[11.5px] font-mono text-[#787774] line-clamp-2">
-          {item.copywriting}
+          <div className="rounded-lg border border-line bg-surface p-3 font-mono text-xs text-muted line-clamp-3">
+            {item.copywriting}
+          </div>
         </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="modal-footer">
           <button
+            type="button"
             onClick={onClose}
             disabled={isDeleting}
-            className="notion-btn notion-btn-bordered text-xs"
+            className="btn btn-secondary"
           >
             Batal
           </button>
           <button
+            type="button"
             onClick={onConfirm}
             disabled={isDeleting}
-            className="notion-btn bg-[#DF5452] hover:bg-[#c94543] text-white text-xs disabled:opacity-50"
+            className="btn btn-danger"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="size-3.5" />
             <span>{isDeleting ? "Menghapus..." : "Hapus Permanen"}</span>
           </button>
         </div>
