@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { 
-  X, 
-  Save, 
-  Copy, 
-  Check, 
-  Trash2, 
+import {
+  X,
+  Save,
+  Copy,
+  Check,
+  Trash2,
   FileText,
   Sparkles,
   MessageSquare,
@@ -147,10 +147,10 @@ export default function ContentDetailModal({
   const handleToggleExecution = async () => {
     if (!draft) return;
     const nextExec = !Boolean(draft.executed);
-    const updated: ContentItem = { 
-      ...draft, 
-      executed: nextExec, 
-      updatedAt: new Date().toISOString() 
+    const updated: ContentItem = {
+      ...draft,
+      executed: nextExec,
+      updatedAt: new Date().toISOString()
     };
 
     setDraft(updated);
@@ -202,8 +202,8 @@ export default function ContentDetailModal({
 
   return (
     <div className="modal-overlay" onClick={handleAttemptClose}>
-      <div 
-        className="modal max-w-2xl max-h-[92dvh] overflow-hidden" 
+      <div
+        className="modal max-w-2xl max-h-[92dvh] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header / Breadcrumb navigation */}
@@ -276,8 +276,8 @@ export default function ContentDetailModal({
                   {isTogglingExecution
                     ? "Menyimpan status..."
                     : draft.executed
-                    ? "Sudah Dieksekusi"
-                    : "Belum Dieksekusi"}
+                      ? "Sudah Dieksekusi"
+                      : "Belum Dieksekusi"}
                 </span>
               </button>
 
@@ -398,26 +398,27 @@ export default function ContentDetailModal({
         {/* Floating/Sticky Save Button Bar: Appears ONLY when edits are detected */}
         {isDirty && (
           <div className="shrink-0 border-t border-line bg-canvas/95 px-4 sm:px-6 py-3.5 backdrop-blur-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 shadow-[0_-8px_24px_rgba(28,25,23,0.06)] animate-in fade-in slide-in-from-bottom-2 duration-150">
-            <div className="flex items-center gap-2 text-xs text-muted">
+            {/* <div className="flex items-center gap-2 text-xs text-muted">
               <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
               <span>Ada perubahan pada teks konten</span>
-            </div>
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
+            </div> */}
+            <div className="flex items-center gap-2.5 w-full">
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleReset}
                 disabled={isSaving}
-                className="btn btn-secondary text-xs flex-1 sm:flex-initial"
+                className="btn btn-secondary text-xs flex-1"
               >
                 Batalkan
               </button>
+
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleSave}
                 disabled={isSaving}
-                className="btn btn-primary text-xs flex-1 sm:flex-initial"
+                className="btn btn-primary text-xs flex-1"
               >
                 <Save className="size-4" />
                 <span>{isSaving ? "Menyimpan..." : "Simpan Perubahan"}</span>

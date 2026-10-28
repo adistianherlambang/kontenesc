@@ -3,7 +3,7 @@ import { ContentItem } from "./firebase";
 export const INITIAL_BRIEF_DATA: ContentItem[] = [
   {
     "no": 1,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "RAM Fisik vs RAM Virtual: Jangan Terkecoh Angka",
     "copywriting": "ram 8gb + 8gb = 16gb murni?\n\nbukan, itu ram fisik + virtual!\n\n• ram fisik: modul hardware asli, super cepat, nampung banyak aplikasi aktif tanpa reload\n• ram virtual: ambil jatah memori internal, kecepatan lebih lambat, cuma penopang darurat\n\npilih hp dengan ram fisik bawaan yang sesuai beban kebutuhanmu",
     "ambience": "Ilustrasi grafis dua jalur jalan tol: jalur utama beraspal mulus (RAM Fisik) dan jalur cadangan berbatu (RAM Virtual), dengan smartphone modern di bagian tengah.",
@@ -16,7 +16,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 2,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Storage eMMC vs UFS: Rahasia HP Nggak Gampang Lemot",
     "copywriting": "hp kapasitas sama, tapi kok yang satu lebih gesit?\n\nrahasianya ada di tipe memori internal:\n\n• emmc: teknologi standar, cocok untuk pemakaian ringan & chat harian\n• ufs (2.2 / 3.1): transfer data super cepat, install aplikasi kilat, buka game anti-loading lama\n\ncek tipe storagemu sebelum beli biar awet bertahun-tahun",
     "ambience": "Dua chip memori semi-transparan berdampingan di atas sirkuit motherboard bercahaya neon, chip kiri berikon kura-kura tenang, chip kanan berikon kilat bercahaya tajam.",
@@ -29,7 +29,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 3,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Layar 60Hz vs 90Hz vs 120Hz: Seberapa Berpengaruh di Mata?",
     "copywriting": "apa arti refresh rate layar hp?\n\n• 60hz: standar harian, paling hemat konsumsi baterai\n• 90hz: scrolling sosmed terasa jauh lebih mulus dan nyaman\n• 120hz: pergerakan animasi super halus, bebas patah-patah, respon sentuhan instan\n\nsetiap tingkat punya keunggulan tersendiri",
     "ambience": "Layar smartphone menampilkan visual motion trail teks yang sedang di-scroll cepat, menunjukkan perbedaan kehalusan animasi dari frame rate 60Hz hingga 120Hz.",
@@ -42,7 +42,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 4,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Layar IPS LCD vs Super AMOLED: Mana yang Pas Buatmu?",
     "copywriting": "bingung pilih jenis panel layar hp?\n\nips lcd:\n+ karakter warna natural dan adem di mata\n+ sangat minim risiko bayangan layar (burn-in)\n\namoled / super amoled:\n+ warna cerah, hidup, dan kontras memukau\n+ hitam pekat sempurna karena piksel mati total\n+ lebih hemat baterai dengan mode gelap\n\nmana tipe layarmu?",
     "ambience": "Visual split-screen sebuah smartphone membelah dua: sisi kiri menampilkan foto pemandangan malam AMOLED dengan warna hitam pekat dan lampu menyala, sisi kanan IPS LCD dengan warna natural lembut.",
@@ -55,7 +55,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 5,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Megapiksel Besar vs OIS: Mana Lebih Penting di Kamera HP?",
     "copywriting": "kamera 50mp vs 108mp, jaminan foto jernih?\n\nbelum tentu!\n\nyang menentukan hasil foto tajam & video stabil:\n1. ukuran fisik sensor & bukaan lensa (f-number)\n2. ois (optical image stabilization) penstabil mekanik anti-goyang\n3. algoritma pemrosesan gambar (isp chipset)\n\njangan cuma terpaku pada angka megapiksel semata",
     "ambience": "Close-up modul lensa kamera smartphone dengan elemen diagram optik mekanik OIS (gimbal stabilizer mini) di sekeliling sensor cahaya.",
@@ -68,7 +68,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 6,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Mengenal Daya Charger: 18W, 25W, 45W, hingga 120W",
     "copywriting": "kecepatan ngecas hp makin bervariasi!\n\n• 18w – 25w: isi penuh baterai rata-rata 60–80 menit, suhu stabil & awet di baterai\n• 33w – 45w: isi penuh sekitar 45–60 menit, seimbang antara kecepatan & kontrol suhu\n• 67w – 120w: colok 15–25 menit baterai sudah kembali penuh!\n\ngunakan charger bersertifikasi resmi agar baterai tetap aman",
     "ambience": "Tiga kepala adapter charger berjajar di atas meja studio rapi dengan kabel Type-C melingkar elegan dan efek visual petir energi lembut berwarna biru keemasan.",
@@ -81,7 +81,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 7,
-    "kategori": "Edukasi & Fitur Teknologi",
+    "kategori": "Fitur Teknologi",
     "judul": "Fitur NFC di Smartphone: Manfaat Luas yang Jarang Dimaksimalkan",
     "copywriting": "hp sudah ada nfc? jangan cuma dianggurin!\n\nfungsi praktis nfc harian:\n1. cek & top-up saldo kartu tol / e-money lewat m-banking\n2. kirim kontak & file instan sekali tempel\n3. pairing instan ke tws / speaker bluetooth\n4. duplikasi kartu akses digital kantor / gerbang\n\nsudah coba fitur yang mana aja?",
     "ambience": "Tangan menempelkan kartu e-money ke bagian punggung atas smartphone dengan efek lingkaran gelombang sinyal biru bersinar lembut.",
@@ -94,7 +94,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 8,
-    "kategori": "Tips & Perawatan Perangkat",
+    "kategori": "Tips Perawatan",
     "judul": "5 Kebiasaan Sepele yang Bikin Baterai HP Cepat Drop",
     "copywriting": "baterai hpmu cepat bocor? bisa jadi karena kebiasaan ini:\n\n1. sering pakai hp sampai 0% mati total\n2. ngecas di atas kasur / bantal empuk\n3. main game berat sambil dicolok casan\n4. pakai charger non-resmi kualitas abal-abal\n5. sering membiarkan hp terpapar terik matahari\n\nubah kebiasaan ini agar baterai tetap sehat",
     "ambience": "Smartphone diletakkan di atas bantal kamar tidur dengan ikon peringatan suhu panas dan kabel charger kusut di sampingnya.",
@@ -107,7 +107,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 9,
-    "kategori": "Tips & Perawatan Perangkat",
+    "kategori": "Tips Perawatan",
     "judul": "Cara Bersihkan Port USB-C dan Speaker HP Tanpa Merusak",
     "copywriting": "port casan longgar? jangan dicolok jarum besi!\n\nlangkah aman bersihkan debu port hp:\n1. matikan smartphone terlebih dahulu\n2. gunakan sikat gigi berbulu ekstra halus & kering\n3. atau pakai tusuk gigi kayu secara perlahan dari tepi\n4. jangan semprotkan cairan pembersih langsung ke lubang port\n5. tiup debu halus dengan blower karet pembersih kamera\n\nport bersih, kabel cas kembali menancap presisi",
     "ambience": "Close-up makro bagian bawah smartphone menampilkan lubang port Type-C dan grill speaker yang bersih mengilap dengan sikat pembersih halus.",
@@ -120,7 +120,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 10,
-    "kategori": "Tips & Perawatan Perangkat",
+    "kategori": "Tips Perawatan",
     "judul": "Penyimpanan HP Penuh? Bersihkan File Sampah Tanpa Hapus Kenangan",
     "copywriting": "notifikasi 'ruang memori hampir habis' bikin pusing?\n\nsolusi bersihkan storage tanpa hapus foto penting:\n1. bersihkan cache aplikasi chat (wa & telegram)\n2. kosongkan folder 'recently deleted' di galeri foto\n3. uninstal aplikasi yang 3 bulan tidak pernah dibuka\n4. manfaatkan google photos / cloud backup otomatis\n5. pindahkan file video besar ke laptop / otg drive\n\nhp langsung lega dan kembali lancar",
     "ambience": "Visual antarmuka smartphone menampilkan bilah memori internal yang tadinya penuh berwarna merah berubah menjadi hijau lega setelah dibersihkan.",
@@ -133,7 +133,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 11,
-    "kategori": "Tips & Perawatan Perangkat",
+    "kategori": "Tips Perawatan",
     "judul": "Cara Merawat Layar Smartphone Bebas Jamur & Goresan",
     "copywriting": "layar hp jernih bikin mata nyaman!\n\ntips rawat layar harian:\n• gunakan kain microfiber halus, bukan ujung baju kasar\n• hindari semprotan cairan pembersih kaca jendela beralkohol keras\n• pasang pelindung layar / tempered glass berkualitas\n• jangan simpan hp satu kantong bersama kunci motor\n\nrawat layarmu sejak hari pertama beli",
     "ambience": "Tangan dengan kain microfiber lembut sedang mengusap layar smartphone hingga berkilau bening tanpa noda sidik jari.",
@@ -146,7 +146,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 12,
-    "kategori": "Tips & Perawatan Perangkat",
+    "kategori": "Tips Perawatan",
     "judul": "HP Tercebur Air? Langkah Cepat Penyelamatan Pertama",
     "copywriting": "hp kecemplung air? jangan panik!\n\nlakukan tindakan darurat ini:\n1. segera matikan hp detik itu juga\n2. jangan coba-coba dicolok charger\n3. lepas casing, sim card, dan memori\n4. tepuk perlahan menghadap bawah di atas handuk kering\n5. jangan dijemur terik atau pakai hairdryer panas!\n\nlangsung bawa ke teknisi kami untuk penanganan ultrasonik",
     "ambience": "Smartphone basah diletakkan di atas handuk kering bersih dengan latar gelas air tumpah dan timer stopwatch menunjukkan pentingnya penanganan cepat.",
@@ -159,7 +159,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 13,
-    "kategori": "Tips & Perawatan Perangkat",
+    "kategori": "Tips Perawatan",
     "judul": "Tips Optimalkan Kamera HP untuk Foto Produk Jualan Online",
     "copywriting": "foto produk estetik pakai hp biasa?\n\nbisa banget! kuncinya:\n1. lap kaca kamera hp sebelum jepret\n2. manfaatkan cahaya alami jendela pagi\n3. aktifkan fitur grid 3x3 untuk komposisi simetris\n4. pakai background polos (karton putih / kayu estetik)\n5. jangan pakai zoom digital, mending dekati objeknya\n\nsiap tingkatkan omset olshopmu",
     "ambience": "Flatlay meja kerja dengan alas kain kanvas bersih, produk jualan tertata rapi, dan smartphone dipegang tangan memotret dari atas menggunakan grid kamera aktif.",
@@ -172,7 +172,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 14,
-    "kategori": "Mitos & Fakta Gadget",
+    "kategori": "Mitos Fakta",
     "judul": "Mitos vs Fakta Seputar Baterai Smartphone",
     "copywriting": "banyak yang masih salah paham!\n\n❌ cas hp semalaman bikin meledak\n-> fakta: hp pintar modern punya ic proteksi pemutus arus otomatis\n\n❌ tutup semua aplikasi di background bikin hemat baterai\n-> fakta: buka ulang aplikasi dari nol malah makan siklus cpu lebih besar\n\n✅ hindari suhu panas berlebih saat mengecas\n-> fakta: panas adalah musuh nomor satu kesehatan baterai\n\nkamu masih percaya mitos yang mana?",
     "ambience": "Desain split screen warna kontras: sisi kiri berlatar merah dengan stempel silang 'MITOS', sisi kanan hijau dengan stempel centang 'FAKTA'.",
@@ -354,7 +354,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 28,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Mengenal Keunggulan Samsung Galaxy A57 5G untuk Jangka Panjang",
     "copywriting": "cari hp yang tenang dipakai 4-5 tahun ke depan?\n\nsamsung galaxy a57 5g:\n• perlindungan keamanan samsung knox tingkat tinggi\n• jaminan pembaruan os dan keamanan jangka panjang\n• layar super amoled 120hz jernih di bawah matahari\n• varian: 8/128 gb (rp7.250.000, cb 700rb)\n  8/256 gb (rp8.020.000, cb 1jt) | 12/256 gb (rp8.600.000, cb 1.1jt)\n\ninvestasi smartphone awet dan aman",
     "ambience": "Samsung Galaxy A57 5G berputar elegan dengan grafis perisai biru perlindungan data Samsung Knox di layarnya.",
@@ -367,7 +367,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 29,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Kupas Tuntas Xiaomi 17T Series: Performa Tinggi & Storage 512 GB",
     "copywriting": "kebutuhan editing berat & multitasking tanpa batas?\n\nxiaomi 17t series siap tempur:\n• mi 17t (12/512 gb): rp10.000.000 (cashback rp100.000)\n• mi 17t pro (12/512 gb): rp13.000.000 (cashback rp100.000)\n\nkeunggulan utama:\n1. ram monster 12 gb murni\n2. storage raksasa 512 gb ufs berkecepatan tinggi\n3. layar crystalres 144hz super tajam\n4. sistem pendingin canggih anti-throttling\n\nstandar baru smartphone performa tinggi",
     "ambience": "Xiaomi 17T dipegang tangan dengan layar menyala menampilkan render grafis 3D resolusi tinggi berkecepatan mulus.",
@@ -380,7 +380,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 30,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Oppo Reno 16F 5G: Desain Ramping Elegan dengan Konektivitas Kilat",
     "copywriting": "tampil stylish dengan konektivitas 5g masa kini!\n\noppo reno 16f 5g:\n• 8/128 gb: rp8.000.000 (cashback rp300.000)\n• 8/256 gb: rp8.700.000 (cashback rp300.000)\n\nfitur memikat:\n• desain ultra-slim yang nyaman digenggam seharian\n• kamera portrait profesional dengan ai enhancer\n• pengisian daya cepat supervooc yang aman\n• jaringan 5g super kencang untuk streaming & download\n\ngaya elegan, performa andalan",
     "ambience": "Tampak samping bodi ramping Oppo Reno 16F 5G yang memantulkan gradasi warna aurora lembut di bawah tata lampu estetik studio.",
@@ -393,7 +393,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 31,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Daya Tahan Harian Tangguh Bersama Vivo Y500 4G",
     "copywriting": "butuh hp yang siap kerja maraton tanpa bolak-balik colok casan?\n\nvivo y500 4g:\n• 6/128 gb: rp5.500.000 (cashback rp100.000)\n• 6/256 gb: rp6.300.000 (cashback rp100.000)\n\nkelebihan utama:\n1. manajemen konsumsi daya sangat efisien seharian\n2. layar jernih nyaman untuk navigasi luar ruangan\n3. antarmuka funtouch os yang bersih & ringan\n4. bodi kokoh tahan percikan air harian\n\nteman setia mobilitas tinggi",
     "ambience": "Vivo Y500 4G diletakkan di atas meja kerja aktif dengan cangkir kopi, kalender saku, dan kunci kendaraan, menciptakan suasana kerja dinamis.",
@@ -406,7 +406,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 32,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Realme C85 Pro: Kombinasi RAM 8 GB dan Bodi Tangguh",
     "copywriting": "cari hp ram 8 gb dengan bodi tahan banting?\n\nrealme c85 pro solusinya:\n• 8/128 gb: rp4.000.000 (cashback rp50.000)\n• 8/256 gb: rp4.400.000 (cashback rp50.000)\n\nkeunggulan:\n• ram fisik 8 gb lega untuk aktivitas sosial media & olshop\n• struktur bodi kokoh terlindungi dari benturan tak terduga\n• pengisian daya cepat flash charge\n• speaker bertenaga jernih untuk multimedia\n\ntangguh di luar, gesit di dalam",
     "ambience": "Realme C85 Pro diposisikan berdiri di atas permukaan batu alam modern dengan cipratan tetesan air halus untuk menonjolkan kesan ketangguhan fisik.",
@@ -419,7 +419,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 33,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Infinix GT50 Pro: Desain Cyber Gaming dengan RAM Monster 12 GB",
     "copywriting": "gaming kompetitif tanpa hambatan lag?\n\ninfinix gt50 pro hadir dengan spek buas:\n• 12/256 gb: rp7.000.000 (cashback rp100.000)\n• 12/512 gb: rp8.000.000 (cashback rp100.000)\n\nfitur jawara gaming:\n1. ram fisik 12 gb untuk beban game terberat\n2. storage lega hingga 512 gb untuk koleksi ratusan game\n3. desain punggung mecha futuristik dengan lampu led indikator\n4. sistem pendingin vapor chamber ekstra luas anti-panas\n\nsiap push rank seharian",
     "ambience": "Ruang gaming bernuansa gelap dengan lighting LED neon biru dan ungu, Infinix GT50 Pro berada di tengah dengan lampu indikator punggung menyala futuristik.",
@@ -432,7 +432,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 34,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Tecno Pova 8 5G: Performa Hiburan & Koneksi 5G Responsif",
     "copywriting": "hiburan tanpa henti di koneksi 5g cepat!\n\ntecno pova 8 5g:\n• 6/128 gb: rp4.300.000\n• 8/128 gb: rp5.000.000\n• 8/256 gb: rp5.600.000\n\nsfesifikasi unggulan:\n• layar refresh rate tinggi responsif untuk scrolling & video\n• baterai berkapasitas besar tahan seharian penuh\n• performa chipset 5g stabil untuk unduhan kilat\n• desain garis geometris modern yang khas\n\nserunya nonton & scrolling tanpa jeda",
     "ambience": "Tecno Pova 8 5G diletakkan mendatar dengan layar menyala memutar trailer video resolusi tinggi berkecepatan tinggi dengan ikon sinyal 5G bercahaya di sudutnya.",
@@ -445,7 +445,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 35,
-    "kategori": "Edukasi & Spesifikasi",
+    "kategori": "Edukasi Spesifikasi",
     "judul": "Nokia 105: HP Cadangan Terbaik untuk Telepon, Baterai Super Awet",
     "copywriting": "butuh hp kedua yang tahan banting & baterai awet berhari-hari?\n\nnokia 105:\nhanya rp290.000!\n\nkenapa wajib punya:\n1. baterai siaga tahan berhari-hari dalam sekali cas\n2. suara telepon jernih & sinyal stabil di segala kondisi\n3. bodi polikarbonat kuat tahan benturan\n4. ada fitur radio fm & senter darurat bawaan\n5. tombol keypad empuk anti-salah pencet\n\nhp cadangan andalan kerja lapangan",
     "ambience": "Nokia 105 warna biru klasik diletakkan di samping buku catatan saku, pulpen, dan helm kerja proyek, menampilkan nuansa fungsional dan keandalan tinggi.",
@@ -458,7 +458,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 36,
-    "kategori": "Informasi Produk Baru",
+    "kategori": "Produk Baru",
     "judul": "Samsung Galaxy Z Flip 8: Smartphone Lipat Ringkas Nan Stylish",
     "copywriting": "gaya futuristik yang pas di saku kecilmu!\n\nsamsung galaxy z flip 8 (12/512 gb):\nrp20.000.000 (cashback resmi rp1.200.000)\n\nfitur revolusioner:\n• flex mode: lipat 90 derajat, foto handsfree tanpa tripod\n• cover screen luas: balas pesan & cek notifikasi tanpa buka layar\n• engsel generasi terbaru super rapat & bodi tahan air ipx8\n• memori super besar: ram 12 gb + storage 512 gb\n\ndefinisi sejati gaya hidup modern",
     "ambience": "Samsung Galaxy Z Flip 8 dalam posisi setengah terlipat (Flex Cam mode) di atas meja marmer dengan cermin rias dan tas jinjing mini bernuansa mewah.",
@@ -471,7 +471,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 37,
-    "kategori": "Informasi Produk Baru",
+    "kategori": "Produk Baru",
     "judul": "Samsung Galaxy S26 Ultra: Standar Tertinggi Kamera Mobile & S-Pen",
     "copywriting": "karya visual terbaik & produktivitas tanpa kompromi!\n\nsamsung galaxy s26 ultra:\n• 12/256 gb: rp22.975.000 (cashback rp3.000.000)\n• 12/512 gb: rp25.850.000 (cashback rp3.200.000)\n\nfitur puncak teknologi:\n• s-pen bawaan untuk tanda tangan dokumen & menggambar presisi\n• sistem zoom optik profesional hingga 100x space zoom\n• layar dynamic amoled 2x paling terang & nyaman di mata\n• rangka titanium kokoh dengan pelindung kaca generasi terkuat\n\nkemewahan performa di tanganmu",
     "ambience": "Samsung Galaxy S26 Ultra diletakkan bersama S-Pen presisi di samping dokumen arsitektur dan jam tangan mewah dengan pencahayaan dramatis elegan.",
@@ -484,7 +484,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 38,
-    "kategori": "Informasi Produk Baru",
+    "kategori": "Produk Baru",
     "judul": "Samsung Galaxy Z Fold 8 & Fold 8 Ultra: Smartphone & Tablet Jadi Satu",
     "copywriting": "buka layar luas, selesaikan semua pekerjaan!\n\nsamsung galaxy z fold series:\n• z fold 8 (12/512 gb): rp30.500.000 (cb rp1.700.000)\n• z fold 8 ultra (12/512 gb): rp34.500.000 (cb rp2.200.000)\n\nkeunggulan produktivitas:\n• layar lipat luas setara tablet untuk multitasking 3 aplikasi sekaligus\n• cek email, spreadsheet, dan video call dalam satu layar\n• engsel presisi ultra-tahan lama dan tahan air\n• ram 12 gb & memori internal 512 gb kelas bisnis\n\nkantor mobile di dalam saku jasmu",
     "ambience": "Galaxy Z Fold 8 terbuka penuh menampilkan grafik bursa saham dan dokumen analisis bisnis secara berdampingan di atas meja rapat eksekutif.",
@@ -497,7 +497,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 39,
-    "kategori": "Aksesoris & Produk Pendukung",
+    "kategori": "Aksesoris Pendukung",
     "judul": "Kenapa Wajib Pakai Adapter Charger Original? Cek Risikonya",
     "copywriting": "hemat rp20 ribu di charger kw, rugi servis jutaan!\n\nbahaya charger tiruan non-resmi:\n❌ tegangan listrik tidak stabil bikin ic power jebol\n❌ baterai cepat kembung dan drop permanen\n❌ layar sentuh sering lompat-lompat (ghost touch) saat dicas\n\nsolusi aman charger original di store kami:\n• samsung ta 25w: rp125.000\n• samsung ta 45w type-c: rp475.000\n• xiaomi ta type-c 20w: rp90.000\n• xiaomi ta type-c 120w + cable: rp295.000\n\nsayangi hpmu dengan daya resmi",
     "ambience": "Satu kepala charger resmi berlogo original bersebelahan dengan grafik gelombang arus listrik stabil berwarna biru, kontras dengan charger abal-abal yang meletupkan percikan merah.",
@@ -510,7 +510,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 40,
-    "kategori": "Aksesoris & Produk Pendukung",
+    "kategori": "Aksesoris Pendukung",
     "judul": "Pilihan Smartwatch & Smartband Lintas Brand untuk Pantau Kebugaran",
     "copywriting": "pantau detak jantung & langkah kakimu setiap hari!\n\npilihan wearable resmi di katalog:\n• infinix xwatch h4: rp225.000\n• infinix smart xwatch h5 pro: rp350.000\n• xiaomi smart band 9 active: rp430.000\n• samsung fit 3: rp900.000\n\nnotifikasi wa masuk langsung ke pergelangan tangan",
     "ambience": "Tiga perangkat smartband dan smartwatch berjejer melingkar di atas bantalan display jam tangan dengan layar menyala menampilkan data kalori, detak jantung, dan jam.",
@@ -523,7 +523,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 41,
-    "kategori": "Aksesoris & Produk Pendukung",
+    "kategori": "Aksesoris Pendukung",
     "judul": "Pasang Tempered Glass Berkualitas: Lindungi Layar dari Awal",
     "copywriting": "biaya ganti lcd retak: ratusan ribu hingga jutaan rupiah\nbiaya pasang tempered glass: cuma puluhan ribu!\n\nkeuntungan pasang di store kami:\n• material kaca tahan gores & anti-benturan\n• lapisan oleophobic licin anti-bekas sidik jari\n• dipasangkan langsung oleh staf ahli secara presisi\n• dijamin rapi, bening, dan bebas gelembung udara\n\npasang sekarang sebelum terlambat",
     "ambience": "Staf toko sedang memasangkan tempered glass ke layar smartphone dengan kain pembersih dan roller perekat presisi di atas meja servis yang bersih.",
@@ -536,7 +536,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 42,
-    "kategori": "Aksesoris & Produk Pendukung",
+    "kategori": "Aksesoris Pendukung",
     "judul": "Pilihan Casing Berkualitas: Aman dari Benturan Tanpa Bikin HP Panas",
     "copywriting": "casing bukan cuma hiasan, tapi pelindung utama hpmu!\n\npilih casing dengan kriteria benar:\n1. sudut bodi memiliki bantalan peredam jatuh (airbag bumper)\n2. tepian kamera lebih tinggi agar kaca lensa tidak tergores meja\n3. material presisi tidak menutupi lubang mikrofon & speaker\n4. ada sirkulasi udara baik agar hp tidak overheat\n\ntemukan casing berkualitas di store kami",
     "ambience": "Koleksi casing premium tertata rapi di gantungan display toko dengan latar belakang pencahayaan hangat dan smartphone di sampingnya.",
@@ -549,7 +549,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 43,
-    "kategori": "Aksesoris & Produk Pendukung",
+    "kategori": "Aksesoris Pendukung",
     "judul": "Xiaomi TA Mobil Dual Port 37W: Isi Baterai Cepat Selama Perjalanan",
     "copywriting": "baterai hp habis di tengah jalan? tenang!\n\nxiaomi ta mobil usb dual port 37w:\nhanya rp100.000!\n\nkeunggulan:\n• dua port pengisian cepat sekaligus (driver + penumpang)\n• daya output hingga 37w untuk pengisian kilat di mobil\n• ring lampu led elegan yang mudah dilihat di malam hari\n• proteksi sirkuit pintar anti-arus pendek aki mobil\n\nperjalanan jauh tetap tenang & baterai aman",
     "ambience": "Car charger Xiaomi terpasang di soket konsol interior mobil modern dengan lampu cincin LED menyala elegan dan dua kabel Type-C terhubung rapi ke smartphone di dashboard.",
@@ -562,7 +562,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 44,
-    "kategori": "Aksesoris & Produk Pendukung",
+    "kategori": "Aksesoris Pendukung",
     "judul": "Tablet dengan Keyboard Fisik: Solusi Praktis Tugas & Kerja Mobile",
     "copywriting": "ketik tugas sekolah & laporan kerja tanpa bawa laptop berat!\n\nkombinasi tablet + keyboard resmi:\n• xiaomi pad 8 + keyboard (8/256 gb): rp8.500.000\n• infinix xpad 20 keyboard: rp525.000\n\nkeunggulan:\n1. keyboard fisik empuk untuk mengetik cepat tanpa typo\n2. bodi ringan mudah masuk tas ransel maupun totebag\n3. daya tahan baterai tablet jauh lebih tahan lama dibanding laptop\n4. layar sentuh responsif untuk tanda tangan & membaca materi\n\nkerja produktif di mana saja",
     "ambience": "Tablet berdiri elegan dengan keyboard fisik terpasang di atas meja kafe kayu, menampilkan dokumen teks yang sedang diketik di samping segelas es kopi.",
@@ -575,7 +575,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 45,
-    "kategori": "Panduan Pembeli & Kebutuhan",
+    "kategori": "Panduan Pembeli",
     "judul": "Pilihan HP Simpel dan Nyaman untuk Orang Tua",
     "copywriting": "ingin belikan hadiah hp untuk bapak / ibu tercinta?\n\nkriteria hp terbaik untuk orang tua:\n1. layar besar & teks bisa dibesarkan dengan jelas\n2. baterai awet tahan seharian tanpa bolak-balik ngecas\n3. speaker telepon nyaring & panggilan jernih\n4. menu simpel tidak rumit digunakan\n\nrekomendasi terjangkau di store:\n• xiaomi redmi a7pro (4/64 gb): rp2.000.000\n• tecno spark go 3 (4/64 gb): rp2.000.000\n• samsung a07 (4/64 gb): rp2.050.000\n\nvideo call sama anak cucu makin lancar",
     "ambience": "Foto hangat seorang bapak dan ibu tersenyum bahagia memegang smartphone dengan layar menampilkan panggilan video bersama cucunya.",
@@ -588,7 +588,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 46,
-    "kategori": "Panduan Pembeli & Kebutuhan",
+    "kategori": "Panduan Pembeli",
     "judul": "Pilihan HP Ramah Kantong untuk Pelajar & Kebutuhan Belajar",
     "copywriting": "anak butuh hp untuk sekolah tanpa bikin kantong jebol?\n\npilihan hemat memori 128 gb di bawah 2.5 juta:\n• tecno spark go 3 (4/128 gb): rp2.200.000\n• xiaomi redmi a7pro (4/128 gb): rp2.200.000\n• realme note 80 (4/128 gb): rp2.400.000\n• infinix smart 20 (4/128 gb): rp2.400.000\n\nkapasitas 128 gb muat ribuan tugas & file materi",
     "ambience": "Meja belajar rapi dengan tumpukan buku pelajaran sekolah, tempat pensil warna-warni, dan smartphone yang membuka aplikasi materi belajar digital.",
@@ -601,7 +601,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 47,
-    "kategori": "Panduan Pembeli & Kebutuhan",
+    "kategori": "Panduan Pembeli",
     "judul": "HP Tangguh untuk Pengemudi Online & Pekerja Lapangan",
     "copywriting": "kerja seharian di jalan butuh hp tahan banting!\n\nkriteria hp andalan driver ojol & kurir:\n1. baterai besar tahan navigasi gps seharian\n2. layar terang jelas di bawah terik matahari siang\n3. bodi kuat tidak gampang retak saat goncangan\n4. sinyal gps akurat & kunci lokasi instan\n\nrekomendasi terjangkau di katalog kami:\n• vivo y05 (4/64 gb): rp2.650.000\n• tecno spark 50 (4/128 gb): rp2.800.000\n• infinix hot 70 (4/128 gb): rp2.800.000\n\nsiap narik orderan tanpa drama lowbat",
     "ambience": "Smartphone terpasang kokoh pada holder stang sepeda motor dengan latar suasana jalan raya kota yang cerah, menampilkan rute peta GPS aktif.",
@@ -614,7 +614,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 48,
-    "kategori": "Panduan Pembeli & Kebutuhan",
+    "kategori": "Panduan Pembeli",
     "judul": "HP Multitasking untuk Admin Online Shop: Cepat & Anti-Lemot",
     "copywriting": "chat pelanggan masuk ratusan tiap menit?\n\nadmin olshop wajib pakai hp ram 6 gb / 8 gb:\n• xiaomi redmi 17 (6/128 gb): rp3.300.000\n• realme c100 x (6/128 gb): rp3.400.000\n• infinix hot 70 (8/128 gb): rp3.800.000\n• oppo a6 (6/128 gb): rp4.300.000 (cb 100rb)\n\nbalas pesan whatsapp bisnis, marketplace, dan banking lancar jaya",
     "ambience": "Suasana meja kerja online shop dengan tumpukan paket pesanan berlabel resi, printer thermal mini, dan smartphone yang menampilkan banyak notifikasi chat masuk.",
@@ -627,7 +627,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 49,
-    "kategori": "Panduan Pembeli & Kebutuhan",
+    "kategori": "Panduan Pembeli",
     "judul": "Smartphone Kamera Stabil untuk Kreator Konten Pemula",
     "copywriting": "mau mulai bikin video konten tanpa gimbal mahal?\n\npilihan kamera stabil di katalog:\n• tecno camon 50 pro (8/256 gb): rp5.800.000 (cb 50rb)\n• samsung galaxy a37 5g (8/128 gb): rp6.400.000 (cb 200rb)\n• oppo reno 16f 5g (8/128 gb): rp8.000.000 (cb 300rb)\n\nkeunggulan:\n• stabilisasi video ois anti-guncangan saat jalan\n• rekaman mikrofon jernih minim noise\n• warna kulit natural untuk video ulasan & vlog\n\nkaryamu siap viral di media sosial",
     "ambience": "Smartphone terpasang pada tripod mini ring light di atas meja kamar kreatif, menampilkan pratinjau rekaman video konten dengan kualitas gambar jernih.",
@@ -640,7 +640,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 50,
-    "kategori": "Promo & Penawaran",
+    "kategori": "Promo Penawaran",
     "judul": "Daftar Cashback Resmi Seluruh Brand di Eldorado Semarang Cell",
     "copywriting": "belanja cerdas dengan promo cashback resmi dari pabrikan!\n\nnikmati potongan cashback di katalog kami:\n• samsung: cashback mulai rp50.000 s/d rp3.200.000\n• xiaomi: cashback mulai rp100.000 s/d rp300.000\n• oppo: cashback mulai rp100.000 s/d rp300.000\n• vivo: cashback mulai rp50.000 s/d rp100.000\n• realme: cashback mulai rp50.000 s/d rp100.000\n• infinix: cashback rp100.000 untuk seri note & gt\n• tecno: cashback rp50.000 untuk seri camon pro\n\nharga hemat, garansi resmi 100%",
     "ambience": "Spanduk promosi digital elegan di etalase toko bertuliskan 'Official Cashback Program' dengan jajaran box smartphone dari berbagai brand di depannya.",
@@ -653,7 +653,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 51,
-    "kategori": "Promo & Penawaran",
+    "kategori": "Promo Penawaran",
     "judul": "Program Tukar Tambah (Trade-In): HP Lama Jadi HP Baru",
     "copywriting": "hp lama menumpuk di laci? jadikan modal hp baru!\n\nkeuntungan tukar tambah di toko kami:\n1. taksiran harga transparan di depan pelanggan\n2. pengecekan fungsi layar, bodi, & baterai jelas tanpa manipulasi\n3. nilai taksiran langsung memotong harga hp baru pilihanmu\n4. data di hp lama dibantu hapus bersih & aman\n\npraktis, hemat, dan tidak perlu repot cari pembeli",
     "ambience": "Dua smartphone berada di atas meja counter toko: smartphone lama yang sedang diperiksa kondisinya oleh teknisi dan smartphone baru yang masih tersegel rapi di sampingnya.",
@@ -666,7 +666,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 52,
-    "kategori": "Promo & Penawaran",
+    "kategori": "Promo Penawaran",
     "judul": "Simulasi Tukar Tambah HP Lama ke Smartphone Baru Idaman",
     "copywriting": "mau upgrade hp tapi budget pas-pasan?\n\nbegini alur mudah tukar tambah:\n1. bawa hp lamamu (bodi & kelengkapan dus jika ada)\n2. teknisi cek kondisi fisik & fungsi hardware secara terbuka\n3. dapatkan nilai taksir harga terbaik\n4. pilih hp baru di etalase kami\n5. bayar hanya selisih harganya saja!\n\nsolusinya hemat upgrade gadget impian",
     "ambience": "Papan ilustrasi alur proses tukar tambah dengan ikon langkah 1 sampai 5 yang tersusun rapi di samping kalkulator dan smartphone display.",
@@ -679,7 +679,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 53,
-    "kategori": "Promo & Penawaran",
+    "kategori": "Promo Penawaran",
     "judul": "Momen Promo Gajian: Saatnya Upgrade Gadget Penunjang Produktivitas",
     "copywriting": "notifikasi gajian sudah masuk?\nsaatnya reward diri dengan gadget baru!\n\nupgrade smartphone di toko kami:\n• stok unit baru segel resmi melimpah\n• bisa langsung coba demo unit sebelum bayar\n• dibantu setting awal & transfer data\n• bonus kenyamanan belanja di toko fisik terpercaya\n\nsambut bulan baru dengan performa baru",
     "ambience": "Smartphone baru yang berkilau di samping dompet kulit rapi dan kalender meja yang menunjukkan tanggal muda bernuansa hangat dan elegan.",
@@ -692,7 +692,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 54,
-    "kategori": "Promo & Penawaran",
+    "kategori": "Promo Penawaran",
     "judul": "Layanan Siap Pakai: Beli HP Baru, Pasang Pelindung & Transfer Data",
     "copywriting": "beli hp baru di tempat lain: repot pindah data sendiri\nbeli hp baru di eldorado: langsung siap pakai!\n\nlayanan gratis untuk setiap pembelian:\n1. dibantu unboxing & pengecekan fungsi layar bersama\n2. dibantu pasang tempered glass presisi tanpa debu\n3. dibantu transfer kontak, foto, & chat whatsapp dari hp lama\n4. dibantu login akun google / cloud sampai beres\n\nkeluar toko langsung siap dipakai aktivitas",
     "ambience": "Meja counter penyerahan smartphone dengan kotak kemasan baru terbuka, ponsel baru terpasang pelindung layar berkilau rapi, dan senyum ramah staf toko melayani pelanggan.",
@@ -705,7 +705,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 55,
-    "kategori": "Trust & Kredibilitas Toko",
+    "kategori": "Kredibilitas Toko",
     "judul": "Kenapa Beli di Toko Fisik Lebih Tenang Dibanding Asal Beli Online",
     "copywriting": "beli gadget online vs beli di toko fisik eldorado:\n\nbeli online:\n- khawatir barang tertukar atau rusak di kurir\n- repot proses komplain bila ada kendala\n\nbeli di eldorado semarang cell:\n+ unit dipegang, dicek, dan dites langsung di tempat\n+ nota resmi jelas & garansi pabrik terjamin\n+ ada toko fisik nyata yang siap bantu kapan saja\n\npilihan bijak untuk investasi gadgetmu",
     "ambience": "Suasana toko Eldorado Semarang Cell yang terang, rapi, dengan etalase kaca berkilau dan staf melayani pelanggan dengan ramah di dalam ruangan ber-AC yang nyaman.",
@@ -718,7 +718,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 56,
-    "kategori": "Trust & Kredibilitas Toko",
+    "kategori": "Kredibilitas Toko",
     "judul": "Tips Aman Beli HP Second: Cek Fisik, IMEI Kemenperin, dan Akun",
     "copywriting": "mau beli hp bekas berkualitas? jangan asal tergiur harga murah!\n\nchecklist wajib periksa sebelum bayar:\n1. cek imei via *#06# dan pastikan terdaftar resmi kemenperin\n2. uji sinyal seluler semua operator (4g/5g)\n3. pastikan icloud / akun google sudah logout tuntas\n4. periksa kesehatan baterai dan fungsi sensor sentuh layar\n\nsemua unit second di eldorado lolos uji quality control ketat",
     "ambience": "Layar smartphone menampilkan angka IMEI resmi dengan tanda centang hijau verifikasi, berdampingan dengan nota jaminan toko fisik.",
@@ -731,7 +731,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 57,
-    "kategori": "Layanan & Servis Teknisi",
+    "kategori": "Layanan Servis",
     "judul": "Layanan Servis Ganti LCD: Pengerjaan Rapi, Presisi, & Bergaransi",
     "copywriting": "layar hpmu retak, bergaris, atau tidak merespons sentuhan?\n\njangan biarkan debu dan air masuk ke mesin!\n\nlayanan servis lcd di eldorado:\n• menggunakan sparepart berkualitas dengan ketajaman warna presisi\n• dikerjakan oleh teknisi ahli berpengalaman\n• lem rapi tanpa sisa blepotan di tepian bodi\n• disertai garansi servis untuk ketenangan pikiran\n\nlayar jernih kembali seperti baru",
     "ambience": "Meja kerja teknisi dengan alat servis presisi, mikroskop perbaikan, lem khusus LCD, dan layar smartphone baru yang siap dipasang rapi.",
@@ -744,7 +744,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 58,
-    "kategori": "Layanan & Servis Teknisi",
+    "kategori": "Layanan Servis",
     "judul": "Gejala Baterai HP Drop & Layanan Ganti Baterai Original",
     "copywriting": "tanda baterai hpmu sudah waktunya diganti:\n1. persentase baterai lompat dari 40% langsung mati\n2. hp cepat panas meski cuma buka aplikasi chat\n3. bodi belakang terasa terangkat atau menggelembung\n4. baru dicabut casan, baterai berkurang sangat cepat\n\nganti baterai baru berkualitas di meja servis kami",
     "ambience": "Baterai smartphone baru berdampingan dengan alat ukur multitester voltase teknisi dan obeng presisi servis di atas matras antistatik.",
@@ -757,7 +757,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 59,
-    "kategori": "Layanan & Servis Teknisi",
+    "kategori": "Layanan Servis",
     "judul": "SOP Servis Teknisi Eldorado Semarang Cell: Transparan & Amanah",
     "copywriting": "standar perbaikan gadget di toko kami:\n\n1. diagnosa kerusakan awal dilakukan bersama pelanggan\n2. estimasi biaya dikonfirmasi sebelum pengerjaan dimulai\n3. tidak ada biaya tersembunyi yang ditambahkan sepihak\n4. privasi data dan file di dalam hp dijamin aman\n5. unit dites menyeluruh sebelum diserahkan kembali\n\nservis gadget terpercaya di kota metro",
     "ambience": "Formulir checklist pemeriksaan servis teknisi di atas meja counter servis yang bersih, dengan smartphone pelanggan yang sedang diperiksa secara profesional di depan pelanggan.",
@@ -770,7 +770,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
   },
   {
     "no": 60,
-    "kategori": "Trust & Kredibilitas Toko",
+    "kategori": "Kredibilitas Toko",
     "judul": "Pusat Solusi Gadget Lengkap: Eldorado Semarang Cell Kota Metro",
     "copywriting": "satu tempat untuk semua urusan gadgetmu!\n\nlayanan lengkap kami:\n1. jual smartphone baru garansi resmi semua brand\n2. jual beli hp second berkualitas & bergaransi\n3. program tukar tambah dengan taksiran transparan\n4. servis handphone profesional (ganti lcd, baterai, mesin)\n5. aksesoris original terlengkap & pemasangan tempered glass\n\ndatang dan buktikan pelayanannya langsung",
     "ambience": "Foto arsitektur tampak depan toko Eldorado Semarang Cell yang modern, terang, dengan papan nama toko jelas, etalase rapi, dan suasana hangat menyambut kedatangan pelanggan.",

@@ -9,22 +9,22 @@ import ContentDetailModal from "@/components/ContentDetailModal";
 import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import FirebaseSyncModal from "@/components/FirebaseSyncModal";
-import { 
-  ContentItem, 
-  getContentsFromDb, 
-  saveContentToDb, 
-  deleteContentFromDb, 
+import {
+  ContentItem,
+  getContentsFromDb,
+  saveContentToDb,
+  deleteContentFromDb,
   seedContentsToDb,
   subscribeToContents,
-  SnapshotMetadataInfo 
+  SnapshotMetadataInfo
 } from "@/lib/firebase";
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
-import { 
-  Search, 
-  LayoutGrid, 
-  AlignJustify, 
-  Plus, 
-  Menu, 
+import {
+  Search,
+  LayoutGrid,
+  AlignJustify,
+  Plus,
+  Menu,
   X,
   Cloud,
   CloudOff,
@@ -220,10 +220,10 @@ export default function DashboardPage() {
   const handleToggleExecuted = (item: ContentItem, explicitExecuted?: boolean) => {
     const newExecuted = typeof explicitExecuted === "boolean" ? explicitExecuted : !Boolean(item.executed);
     const now = new Date().toISOString();
-    const updated: ContentItem = { 
-      ...item, 
-      executed: newExecuted, 
-      updatedAt: now 
+    const updated: ContentItem = {
+      ...item,
+      executed: newExecuted,
+      updatedAt: now
     };
 
     runWithViewTransition(() => {
@@ -351,7 +351,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
-      
+
       {/* Left Sidebar */}
       <Sidebar
         activeView={activeSidebarView}
@@ -370,10 +370,10 @@ export default function DashboardPage() {
 
       {/* Right Main Content Area */}
       <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
-        
+
         {/* Top Header: Clean, purposeful, mobile-friendly touch targets */}
         <header className="min-h-[60px] sm:h-[62px] px-4 sm:px-8 py-2.5 border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 bg-white">
-          
+
           {/* Left Title */}
           <div className="flex items-center gap-2.5 min-w-0">
             <button
@@ -417,7 +417,7 @@ export default function DashboardPage() {
 
           {/* Right Actions: Cloud Sync (Mobile), View switch & Tambah Konten */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            
+
             {/* Cloud Sync Status Button (Mobile shortcut) */}
             <button
               type="button"
@@ -438,9 +438,8 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setViewMode("table")}
-                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
-                  viewMode === "table" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
-                }`}
+                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${viewMode === "table" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
+                  }`}
                 title="Tampilan Tabel"
                 aria-label="Tampilan Tabel"
               >
@@ -449,9 +448,8 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setViewMode("grid")}
-                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
-                  viewMode === "grid" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
-                }`}
+                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${viewMode === "grid" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
+                  }`}
                 title="Tampilan Kartu"
                 aria-label="Tampilan Kartu"
               >
@@ -498,33 +496,30 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setActiveSidebarView("all")}
-              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
-                activeSidebarView === "all"
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "all"
                   ? "bg-[#18181B] text-white"
                   : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
-              }`}
+                }`}
             >
               Semua ({items.length})
             </button>
             <button
               type="button"
               onClick={() => setActiveSidebarView("pending")}
-              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
-                activeSidebarView === "pending"
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "pending"
                   ? "bg-[#1F6FB6] text-white"
                   : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
-              }`}
+                }`}
             >
               Belum ({pendingCount})
             </button>
             <button
               type="button"
               onClick={() => setActiveSidebarView("executed")}
-              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
-                activeSidebarView === "executed"
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${activeSidebarView === "executed"
                   ? "bg-emerald-600 text-white"
                   : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
-              }`}
+                }`}
             >
               Selesai ({executedCount})
             </button>
@@ -630,9 +625,9 @@ export default function DashboardPage() {
                 items={
                   activeSidebarView === "all"
                     ? [
-                        ...filteredItems.filter((i) => !i.executed),
-                        ...filteredItems.filter((i) => Boolean(i.executed)),
-                      ]
+                      ...filteredItems.filter((i) => !i.executed),
+                      ...filteredItems.filter((i) => Boolean(i.executed)),
+                    ]
                     : filteredItems
                 }
                 onToggleExecuted={handleToggleExecuted}

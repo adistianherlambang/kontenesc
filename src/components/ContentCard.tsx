@@ -57,12 +57,11 @@ export default function ContentCard({
   return (
     <article
       style={{ viewTransitionName: `${transitionPrefix}-${item.no}` }}
-      className={`content-card-vt flex flex-col rounded-2xl border p-2 sm:p-1.5 transition-all duration-280 ease-out hover:shadow-sm ${
-        tone.card
-      } ${isExiting ? "-translate-x-24 opacity-0 scale-95 pointer-events-none" : "translate-x-0 opacity-100 scale-100"}`}
+      className={`content-card-vt flex flex-col rounded-2xl border p-2 sm:p-1.5 transition-all duration-280 ease-out hover:shadow-sm ${tone.card
+        } ${isExiting ? "-translate-x-24 opacity-0 scale-95 pointer-events-none" : "translate-x-0 opacity-100 scale-100"}`}
     >
       {/* Category row: clickable title + execution toggle button */}
-      <header className="flex min-h-11 sm:min-h-10 items-center justify-between gap-2 pl-3 pr-1">
+      <header className="flex min-h-11 sm:min-h-10 items-center justify-between gap-2 pl-3 pr-1 pb-3">
         <button
           type="button"
           onClick={handleOpen}
@@ -77,18 +76,16 @@ export default function ContentCard({
           aria-pressed={done}
           aria-label={done ? `Tandai #${item.no} belum dieksekusi` : `Tandai #${item.no} selesai dieksekusi`}
           title={done ? "Klik untuk batalkan status selesai" : "Klik untuk tandai selesai"}
-          className={`inline-flex items-center gap-2 px-3 py-2 min-h-[40px] rounded-xl text-xs font-semibold cursor-pointer select-none transition-colors shrink-0 ${
-            done
-              ? "bg-success/15 text-success hover:bg-success/25 active:bg-success/30"
-              : "bg-white/80 hover:bg-white active:bg-white text-ink border border-black/10 shadow-2xs"
-          }`}
+          className={`inline-flex items-center gap-2 px-3 py-2 min-h-[40px] rounded-xl text-xs font-semibold cursor-pointer select-none transition-colors shrink-0 ${done
+            ? "bg-success/15 text-success hover:bg-success/25 active:bg-success/30"
+            : "bg-white/80 hover:bg-white active:bg-white text-ink border border-black/10 shadow-2xs"
+            }`}
         >
           <span
-            className={`flex size-5 sm:size-4.5 items-center justify-center rounded-md border-[1.5px] transition-colors ${
-              done
-                ? "border-success bg-success text-white"
-                : "border-line-strong bg-white text-transparent"
-            }`}
+            className={`flex size-5 sm:size-4.5 items-center justify-center rounded-md border-[1.5px] transition-colors ${done
+              ? "border-success bg-success text-white"
+              : "border-line-strong bg-white text-transparent"
+              }`}
           >
             <Check className="size-3.5 stroke-[2.75]" />
           </span>
@@ -111,9 +108,8 @@ export default function ContentCard({
         </div>
 
         <h4
-          className={`mb-2 text-[15px] font-semibold leading-snug ${
-            done ? "text-faint line-through decoration-faint/60" : "text-ink"
-          }`}
+          className={`mb-2 text-[15px] font-semibold leading-snug ${done ? "text-faint line-through decoration-faint/60" : "text-ink"
+            }`}
         >
           {item.judul}
         </h4>
