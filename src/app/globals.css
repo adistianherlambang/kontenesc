@@ -52,6 +52,71 @@ label {
   touch-action: manipulation;
 }
 
+/* ==========================================================================
+   View Transitions — Group Element Transitions for Content Cards & Rows
+   ========================================================================== */
+:root {
+  /* Disable the root transition because we are only transitioning specific elements. */
+  view-transition-name: none;
+}
+
+::view-transition {
+  /* Non-transitioned elements below the view transitions remain interactive */
+  pointer-events: none;
+}
+
+.content-card-vt {
+  view-transition-class: content-card;
+}
+
+::view-transition-group(.content-card) {
+  animation-duration: 0.36s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(.content-card):only-child {
+  animation: card-fade-out-left 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+::view-transition-new(.content-card):only-child {
+  animation: card-fade-in-up 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes card-fade-out-left {
+  from {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    translate: -110px 0;
+    scale: 0.95;
+  }
+}
+
+@keyframes card-fade-in-up {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all group transitions, including the default `root` group. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -63,25 +128,25 @@ label {
 ::-webkit-scrollbar-thumb:hover { background-color: var(--color-faint); }
 
 @layer components {
-  /* ---------- Buttons (mobile-friendly 40px, desktop 34px) ---------- */
+  /* ---------- Buttons (mobile-friendly 42px, desktop 36px) ---------- */
   .btn {
-    @apply inline-flex min-h-10 sm:min-h-8.5 shrink-0 cursor-pointer select-none items-center justify-center gap-2
-      whitespace-nowrap rounded-xl px-4 py-2 sm:px-3.5 sm:py-1.5 text-[13px] font-medium transition-all
-      outline-none focus-visible:ring-3 focus-visible:ring-brand/25 active:scale-[0.98]
+    @apply inline-flex min-h-10.5 sm:min-h-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2
+      whitespace-nowrap rounded-xl px-4 py-2 sm:px-3.5 sm:py-1.5 text-[13px] font-medium transition-colors
+      outline-none focus-visible:ring-3 focus-visible:ring-brand/25
       disabled:pointer-events-none disabled:opacity-50;
   }
   .btn-primary { @apply bg-brand text-white hover:bg-brand-hover active:bg-brand-hover; }
-  .btn-secondary { @apply border border-line bg-canvas text-ink hover:bg-subtle active:bg-subtle; }
-  .btn-ghost { @apply text-muted hover:bg-subtle hover:text-ink active:bg-subtle; }
+  .btn-secondary { @apply border border-line bg-canvas text-ink hover:bg-subtle active:bg-line/60; }
+  .btn-ghost { @apply text-muted hover:bg-subtle hover:text-ink active:bg-line/60; }
   .btn-danger { @apply bg-danger text-white hover:bg-danger-hover active:bg-danger-hover; }
   .btn-danger-ghost { @apply text-danger hover:bg-danger-soft active:bg-danger-soft; }
-  .btn-icon { @apply min-w-10 min-h-10 sm:min-w-8.5 sm:min-h-8.5 p-2 sm:p-1.5; }
+  .btn-icon { @apply min-w-10.5 min-h-10.5 sm:min-w-9 sm:min-h-9 p-2 sm:p-1.5; }
 
   /* ---------- Notion-style buttons (used in Navbar) ---------- */
   .notion-btn {
-    @apply inline-flex min-h-10 sm:min-h-8.5 shrink-0 cursor-pointer select-none items-center justify-center gap-2
-      whitespace-nowrap rounded-xl px-3.5 py-2 sm:px-3 sm:py-1.5 text-xs font-medium transition-all
-      outline-none active:scale-[0.98];
+    @apply inline-flex min-h-10.5 sm:min-h-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2
+      whitespace-nowrap rounded-xl px-3.5 py-2 sm:px-3 sm:py-1.5 text-xs font-medium transition-colors
+      outline-none;
   }
   .notion-btn-default { @apply bg-subtle text-ink hover:bg-line/60 active:bg-line; }
   .notion-btn-bordered { @apply border border-line bg-canvas text-ink hover:bg-subtle active:bg-subtle; }

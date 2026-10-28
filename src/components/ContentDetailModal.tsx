@@ -112,7 +112,19 @@ export default function ContentDetailModal({
 
   const handleCopy = async (fieldKey: string, text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
       setCopiedField(fieldKey);
       setTimeout(() => setCopiedField(null), 1800);
     } catch (e) {
@@ -133,7 +145,7 @@ export default function ContentDetailModal({
   };
 
   const handleToggleExecution = async () => {
-    if (!draft || isTogglingExecution) return;
+    if (!draft) return;
     const nextExec = !Boolean(draft.executed);
     const updated: ContentItem = { 
       ...draft, 
@@ -142,21 +154,17 @@ export default function ContentDetailModal({
     };
 
     setDraft(updated);
-    setIsTogglingExecution(true);
-    setJustSavedExecution(false);
+    setJustSavedExecution(true);
+    setTimeout(() => setJustSavedExecution(false), 1800);
 
     try {
       if (onToggleExecuted) {
-        await onToggleExecuted(draft, nextExec);
+        onToggleExecuted(draft, nextExec);
       } else {
-        await onSave(updated);
+        onSave(updated);
       }
-      setJustSavedExecution(true);
-      setTimeout(() => setJustSavedExecution(false), 1800);
     } catch (err) {
       console.warn("Error toggling execution", err);
-    } finally {
-      setIsTogglingExecution(false);
     }
   };
 
@@ -173,8 +181,8 @@ export default function ContentDetailModal({
         executed: Boolean(draft.executed),
         updatedAt: new Date().toISOString()
       };
-      await onSave(updated);
       setDraft(updated);
+      onSave(updated);
     } catch (err) {
       console.error("Save error", err);
     } finally {
@@ -219,6 +227,7 @@ export default function ContentDetailModal({
             {onDelete && (
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
                   onClose();
                   onDelete(item);
@@ -232,6 +241,7 @@ export default function ContentDetailModal({
             )}
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={handleAttemptClose}
               className="btn btn-ghost btn-icon"
               aria-label="Tutup detail"
@@ -249,9 +259,10 @@ export default function ContentDetailModal({
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={handleToggleExecution}
                 disabled={isTogglingExecution}
-                className="inline-flex min-h-10 sm:min-h-9 cursor-pointer items-center gap-2.5 rounded-xl border border-line bg-surface px-4 py-2 sm:px-3.5 sm:py-1.5 transition-all hover:bg-subtle active:bg-subtle active:scale-[0.98] select-none"
+                className="inline-flex min-h-10.5 sm:min-h-9 cursor-pointer items-center gap-2.5 rounded-xl border border-line bg-surface px-4 py-2 sm:px-3.5 sm:py-1.5 transition-colors hover:bg-subtle active:bg-line/60 select-none"
                 title={draft.executed ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
               >
                 {isTogglingExecution ? (
@@ -281,6 +292,7 @@ export default function ContentDetailModal({
             <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleCopy("copywriting", draft.copywriting)}
                 className="btn btn-secondary text-xs flex-1 sm:flex-initial"
               >
@@ -294,6 +306,7 @@ export default function ContentDetailModal({
               {draft.caption && (
                 <button
                   type="button"
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => handleCopy("caption", draft.caption)}
                   className="btn btn-secondary text-xs flex-1 sm:flex-initial"
                 >
@@ -392,6 +405,7 @@ export default function ContentDetailModal({
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={handleReset}
                 disabled={isSaving}
                 className="btn btn-secondary text-xs flex-1 sm:flex-initial"
@@ -400,6 +414,7 @@ export default function ContentDetailModal({
               </button>
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={handleSave}
                 disabled={isSaving}
                 className="btn btn-primary text-xs flex-1 sm:flex-initial"

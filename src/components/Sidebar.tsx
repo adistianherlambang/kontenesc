@@ -59,7 +59,7 @@ export default function Sidebar({
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex h-full w-64 shrink-0 flex-col border-r border-line bg-surface
           transition-transform duration-200 md:static md:translate-x-0
-          ${isOpenMobile ? "translate-x-0" : "-translate-x-full"}`}
+          ${isOpenMobile ? "translate-x-0 pointer-events-auto" : "-translate-x-full max-md:pointer-events-none md:pointer-events-auto"}`}
       >
         {/* Brand — same height as the main header so the borders line up */}
         <div className="flex min-h-14 shrink-0 items-center justify-between border-b border-line px-4 sm:px-5">

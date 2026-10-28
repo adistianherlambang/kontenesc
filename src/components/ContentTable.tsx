@@ -29,11 +29,23 @@ export default function ContentTable({
   onPreview
 }: ContentTableProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [savingNos, setSavingNos] = useState<Set<number>>(new Set());
+  const [exitingNos, setExitingNos] = useState<Set<number>>(new Set());
 
   const copyText = async (id: string, text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 1500);
     } catch (e) {
@@ -41,17 +53,25 @@ export default function ContentTable({
     }
   };
 
-  const handleToggleExecution = async (item: ContentItem) => {
+  const handleToggleExecution = (item: ContentItem) => {
+    if (exitingNos.has(item.no)) return;
     const nextDone = !Boolean(item.executed);
-    setSavingNos(prev => new Set(prev).add(item.no));
-    try {
-      await onToggleExecuted(item, nextDone);
-    } finally {
-      setSavingNos(prev => {
-        const next = new Set(prev);
-        next.delete(item.no);
-        return next;
-      });
+    const supportsVT =
+      typeof document !== "undefined" &&
+      typeof (document as any).startViewTransition === "function";
+
+    if (supportsVT) {
+      onToggleExecuted(item, nextDone);
+    } else {
+      setExitingNos((prev) => new Set(prev).add(item.no));
+      setTimeout(() => {
+        onToggleExecuted(item, nextDone);
+        setExitingNos((prev) => {
+          const next = new Set(prev);
+          next.delete(item.no);
+          return next;
+        });
+      }, 250);
     }
   };
 
@@ -75,34 +95,35 @@ export default function ContentTable({
             {items.map((item) => {
               const tone = getCategoryTone(item.kategori);
               const isDone = Boolean(item.executed);
-              const isSaving = savingNos.has(item.no);
+              const isExiting = exitingNos.has(item.no);
 
               return (
                 <tr 
                   key={item.id || item.no}
-                  className={`hover:bg-subtle/50 transition-colors ${isDone ? "bg-subtle/20" : ""}`}
+                  style={{ viewTransitionName: `table-row-${isDone ? "done" : "active"}-${item.no}` }}
+                  className={`content-card-vt hover:bg-subtle/50 transition-all duration-250 ${
+                    isDone ? "bg-subtle/20" : ""
+                  } ${isExiting ? "-translate-x-20 opacity-0 pointer-events-none" : ""}`}
                 >
-                  {/* Execution Status Checkbox with Saving Spinner */}
+                  {/* Execution Status Button */}
                   <td className="td text-center align-middle p-0">
-                    {isSaving ? (
-                      <div className="flex items-center justify-center min-h-[44px] min-w-[44px]" title="Menyimpan status...">
-                        <Loader2 className="size-4 animate-spin text-brand" />
-                      </div>
-                    ) : (
-                      <label
-                        className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2.5 cursor-pointer"
-                        title={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleExecution(item)}
+                      className="flex items-center justify-center min-h-[44px] min-w-[44px] w-full p-2.5 cursor-pointer select-none"
+                      title={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
+                      aria-label={`Tandai #${item.no} dieksekusi`}
+                    >
+                      <span
+                        className={`flex size-5 items-center justify-center rounded-md border-[1.5px] transition-colors ${
+                          isDone
+                            ? "border-success bg-success text-white"
+                            : "border-line-strong bg-white text-transparent hover:border-brand"
+                        }`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isDone}
-                          disabled={isSaving}
-                          onChange={() => handleToggleExecution(item)}
-                          className="checkbox cursor-pointer"
-                          aria-label={`Tandai #${item.no} dieksekusi`}
-                        />
-                      </label>
-                    )}
+                        <Check className="size-3.5 stroke-[2.75]" />
+                      </span>
+                    </button>
                   </td>
 
                   {/* No */}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { flushSync } from "react-dom";
 import Sidebar, { StatusView } from "@/components/Sidebar";
 import ContentCard from "@/components/ContentCard";
 import ContentTable from "@/components/ContentTable";
@@ -23,8 +24,26 @@ import {
   AlignJustify, 
   Plus, 
   Menu, 
-  X
+  X,
+  Cloud,
+  CloudOff,
+  CheckCircle2
 } from "lucide-react";
+
+function runWithViewTransition(updateFn: () => void) {
+  if (
+    typeof document !== "undefined" &&
+    typeof (document as any).startViewTransition === "function"
+  ) {
+    (document as any).startViewTransition(() => {
+      flushSync(() => {
+        updateFn();
+      });
+    });
+  } else {
+    updateFn();
+  }
+}
 
 const STORAGE_KEY = "semarang_cell_brief_contents_v3";
 const DELETED_KEY = "semarang_cell_deleted_nos_v3";
@@ -196,10 +215,10 @@ export default function DashboardPage() {
     }
     setIsLoaded(true);
 
-    checkFirestore(currentData);
+    checkFirestore();
   }, []);
 
-  const checkFirestore = async (localSnapshot?: ContentItem[]) => {
+  const checkFirestore = async () => {
     try {
       const health = await checkFirestoreHealth();
       if (health.ok) {
@@ -208,9 +227,15 @@ export default function DashboardPage() {
           const remoteItems = await getContentsFromDb();
           if (remoteItems.length > 0) {
             const deletedSet = getDeletedNos();
-            const currentLocal = localSnapshot && localSnapshot.length > 0 ? localSnapshot : items;
-            const merged = mergeLocalAndRemote(currentLocal, remoteItems, deletedSet);
-            updateItemsState(merged);
+            setItems((prev) => {
+              const merged = mergeLocalAndRemote(prev, remoteItems, deletedSet);
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+              } catch (e) {
+                console.warn("Could not write to local cache", e);
+              }
+              return merged;
+            });
           }
         }
       } else {
@@ -221,13 +246,16 @@ export default function DashboardPage() {
     }
   };
 
-  const updateItemsState = (newItems: ContentItem[]) => {
-    setItems(newItems);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems));
-    } catch (e) {
-      console.warn("Could not write to local cache", e);
-    }
+  const updateItemsState = (updater: ContentItem[] | ((prev: ContentItem[]) => ContentItem[])) => {
+    setItems((prev) => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch (e) {
+        console.warn("Could not write to local cache", e);
+      }
+      return next;
+    });
   };
 
   // Aggregations
@@ -283,8 +311,8 @@ export default function DashboardPage() {
     }).sort((a, b) => a.no - b.no);
   }, [items, activeSidebarView, searchQuery, selectedCategory, selectedPlatform]);
 
-  // Toggle execution checkbox
-  const handleToggleExecuted = async (item: ContentItem, explicitExecuted?: boolean) => {
+  // Toggle execution checkbox with View Transition (fade out left + shift neighbors up/left)
+  const handleToggleExecuted = (item: ContentItem, explicitExecuted?: boolean) => {
     const newExecuted = typeof explicitExecuted === "boolean" ? explicitExecuted : !Boolean(item.executed);
     const now = new Date().toISOString();
     const updated: ContentItem = { 
@@ -292,19 +320,18 @@ export default function DashboardPage() {
       executed: newExecuted, 
       updatedAt: now 
     };
-    const nextList = items.map(i => (i.no === item.no ? updated : i));
-    updateItemsState(nextList);
 
-    // Keep active previewItem in sync if detail modal is open
-    if (previewItem && ((previewItem.id && previewItem.id === item.id) || previewItem.no === item.no)) {
-      setPreviewItem(updated);
-    }
+    runWithViewTransition(() => {
+      updateItemsState((prev) => prev.map((i) => (i.no === item.no ? updated : i)));
+      if (previewItem && ((previewItem.id && previewItem.id === item.id) || previewItem.no === item.no)) {
+        setPreviewItem(updated);
+      }
+    });
 
-    try {
-      await saveContentToDb(updated);
-    } catch (e) {
-      // local first fallback
-    }
+    // Save to Firestore asynchronously in background so UI never freezes on mobile
+    saveContentToDb(updated).catch(() => {
+      // local-first fallback
+    });
   };
 
   const handleOpenCreate = () => {
@@ -322,44 +349,43 @@ export default function DashboardPage() {
       ...savedItem,
       updatedAt: savedItem.updatedAt || new Date().toISOString()
     };
-    let nextList: ContentItem[];
-    const existingIndex = items.findIndex(i => (i.id && i.id === itemToSave.id) || i.no === itemToSave.no);
 
-    if (existingIndex >= 0) {
-      nextList = [...items];
-      nextList[existingIndex] = { ...itemToSave };
-    } else {
-      nextList = [...items, itemToSave];
-    }
+    runWithViewTransition(() => {
+      updateItemsState((prev) => {
+        const existingIndex = prev.findIndex((i) => (i.id && i.id === itemToSave.id) || i.no === itemToSave.no);
+        if (existingIndex >= 0) {
+          const next = [...prev];
+          next[existingIndex] = { ...itemToSave };
+          return next;
+        }
+        return [...prev, itemToSave].sort((a, b) => a.no - b.no);
+      });
 
-    updateItemsState(nextList);
+      if (previewItem && ((previewItem.id && previewItem.id === itemToSave.id) || previewItem.no === itemToSave.no)) {
+        setPreviewItem(itemToSave);
+      }
+    });
 
-    if (previewItem && ((previewItem.id && previewItem.id === itemToSave.id) || previewItem.no === itemToSave.no)) {
-      setPreviewItem(itemToSave);
-    }
-
-    try {
-      await saveContentToDb(itemToSave);
-      setFirebaseStatus("connected");
-    } catch (err) {
-      console.warn("Save remote error", err);
-    }
+    saveContentToDb(itemToSave)
+      .then(() => setFirebaseStatus("connected"))
+      .catch((err) => console.warn("Save remote error", err));
   };
 
   const handleSaveBatch = async (batchItems: ContentItem[]) => {
-    const itemMap = new Map<number, ContentItem>();
-    items.forEach(it => itemMap.set(it.no, it));
-    batchItems.forEach(it => itemMap.set(it.no, it));
+    let mergedList: ContentItem[] = [];
+    runWithViewTransition(() => {
+      updateItemsState((prev) => {
+        const itemMap = new Map<number, ContentItem>();
+        prev.forEach((it) => itemMap.set(it.no, it));
+        batchItems.forEach((it) => itemMap.set(it.no, it));
+        mergedList = Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
+        return mergedList;
+      });
+    });
 
-    const nextList = Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
-    updateItemsState(nextList);
-
-    try {
-      await seedContentsToDb(nextList);
-      setFirebaseStatus("connected");
-    } catch (e) {
-      console.warn("Batch sync error", e);
-    }
+    seedContentsToDb(mergedList)
+      .then(() => setFirebaseStatus("connected"))
+      .catch((e) => console.warn("Batch sync error", e));
   };
 
   const handleDeleteClick = (item: ContentItem) => {
@@ -368,25 +394,23 @@ export default function DashboardPage() {
 
   const handleConfirmDelete = async () => {
     if (!deletingItem) return;
-    try {
-      setIsDeleting(true);
-      const deletedSet = getDeletedNos();
-      deletedSet.add(deletingItem.no);
-      saveDeletedNos(deletedSet);
+    const itemToDelete = deletingItem;
+    setIsDeleting(true);
 
-      const nextList = items.filter(i => (i.id ? i.id !== deletingItem.id : i.no !== deletingItem.no));
-      updateItemsState(nextList);
+    const deletedSet = getDeletedNos();
+    deletedSet.add(itemToDelete.no);
+    saveDeletedNos(deletedSet);
 
-      if (deletingItem.id) {
-        try {
-          await deleteContentFromDb(deletingItem.id);
-        } catch (e) {
-          console.warn("Delete remote error", e);
-        }
-      }
+    runWithViewTransition(() => {
+      updateItemsState((prev) =>
+        prev.filter((i) => (i.id ? i.id !== itemToDelete.id : i.no !== itemToDelete.no))
+      );
       setDeletingItem(null);
-    } finally {
       setIsDeleting(false);
+    });
+
+    if (itemToDelete.id) {
+      deleteContentFromDb(itemToDelete.id).catch((e) => console.warn("Delete remote error", e));
     }
   };
 
@@ -497,9 +521,24 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Right Actions: View switch & Tambah Konten */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Right Actions: Cloud Sync (Mobile), View switch & Tambah Konten */}
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             
+            {/* Cloud Sync Status Button (Mobile shortcut) */}
+            <button
+              type="button"
+              onClick={() => setIsSyncModalOpen(true)}
+              className="md:hidden p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl bg-[#F0F0F2] border border-[#E4E4E7] text-[#18181B] active:bg-[#E4E4E7] cursor-pointer"
+              title="Data & Sinkronisasi Cloud"
+              aria-label="Data & Sinkronisasi Cloud"
+            >
+              {firebaseStatus === "connected" ? (
+                <Cloud className="w-4 h-4 text-emerald-600" />
+              ) : (
+                <CloudOff className="w-4 h-4 text-[#71717A]" />
+              )}
+            </button>
+
             {/* View Mode Toggle ([|||] and [▦]) */}
             <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
               <button
@@ -530,7 +569,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={handleOpenCreate}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] active:scale-[0.98] text-white shadow-xs transition-all select-none cursor-pointer"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span>Tambah Konten</span>
@@ -545,18 +584,56 @@ export default function DashboardPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Cari konten, judul, topik..."
-              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-sm bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-base bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setSearchQuery("")}
                 aria-label="Hapus pencarian"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] active:bg-black/5"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] active:bg-black/5 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
+          </div>
+
+          {/* Mobile Quick Status Filter Pills */}
+          <div className="flex items-center gap-1.5 w-full md:hidden overflow-x-auto pb-0.5">
+            <button
+              type="button"
+              onClick={() => setActiveSidebarView("all")}
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
+                activeSidebarView === "all"
+                  ? "bg-[#18181B] text-white"
+                  : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+              }`}
+            >
+              Semua ({items.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSidebarView("pending")}
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
+                activeSidebarView === "pending"
+                  ? "bg-[#1F6FB6] text-white"
+                  : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+              }`}
+            >
+              Belum ({pendingCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveSidebarView("executed")}
+              className={`flex-1 min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer select-none ${
+                activeSidebarView === "executed"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-[#F4F4F6] text-[#71717A] active:bg-[#E4E4E7]"
+              }`}
+            >
+              Selesai ({executedCount})
+            </button>
           </div>
         </header>
 
@@ -581,29 +658,89 @@ export default function DashboardPage() {
                   setSelectedPlatform("Semua");
                   setActiveSidebarView("all");
                 }}
-                className="px-5 py-2.5 min-h-[42px] rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black active:scale-[0.98] cursor-pointer"
+                className="px-5 py-2.5 min-h-[42px] rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black cursor-pointer"
               >
                 Tampilkan Semua Konten
               </button>
             </div>
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
-              {filteredItems.map((item) => (
-                <ContentCard
-                  key={item.id || item.no}
-                  item={item}
-                  onToggleExecuted={handleToggleExecuted}
-                  onEdit={handleOpenEdit}
-                  onDelete={handleDeleteClick}
-                  onPreview={(it: ContentItem) => setPreviewItem(it)}
-                  onOpen={(it: ContentItem) => setPreviewItem(it)}
-                />
-              ))}
-            </div>
+            activeSidebarView === "all" ? (
+              <div className="space-y-8 pb-24">
+                {/* Active / Unexecuted Cards */}
+                {filteredItems.filter((i) => !i.executed).length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
+                    {filteredItems
+                      .filter((i) => !i.executed)
+                      .map((item) => (
+                        <ContentCard
+                          key={`active-${item.id || item.no}`}
+                          item={item}
+                          transitionPrefix="active-card"
+                          onToggleExecuted={handleToggleExecuted}
+                          onEdit={handleOpenEdit}
+                          onDelete={handleDeleteClick}
+                          onPreview={(it: ContentItem) => setPreviewItem(it)}
+                          onOpen={(it: ContentItem) => setPreviewItem(it)}
+                        />
+                      ))}
+                  </div>
+                )}
+
+                {/* Completed / Executed Cards Section */}
+                {filteredItems.filter((i) => Boolean(i.executed)).length > 0 && (
+                  <section className="space-y-4 pt-2 border-t border-[#ECEBE8]">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-[#71717A]">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>
+                        Sudah Dieksekusi ({filteredItems.filter((i) => Boolean(i.executed)).length})
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 opacity-80">
+                      {filteredItems
+                        .filter((i) => Boolean(i.executed))
+                        .map((item) => (
+                          <ContentCard
+                            key={`done-${item.id || item.no}`}
+                            item={item}
+                            transitionPrefix="done-card"
+                            onToggleExecuted={handleToggleExecuted}
+                            onEdit={handleOpenEdit}
+                            onDelete={handleDeleteClick}
+                            onPreview={(it: ContentItem) => setPreviewItem(it)}
+                            onOpen={(it: ContentItem) => setPreviewItem(it)}
+                          />
+                        ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
+                {filteredItems.map((item) => (
+                  <ContentCard
+                    key={item.id || item.no}
+                    item={item}
+                    transitionPrefix={activeSidebarView === "executed" ? "done-card" : "active-card"}
+                    onToggleExecuted={handleToggleExecuted}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDeleteClick}
+                    onPreview={(it: ContentItem) => setPreviewItem(it)}
+                    onOpen={(it: ContentItem) => setPreviewItem(it)}
+                  />
+                ))}
+              </div>
+            )
           ) : (
-            <div className="pb-20">
+            <div className="pb-24">
               <ContentTable
-                items={filteredItems}
+                items={
+                  activeSidebarView === "all"
+                    ? [
+                        ...filteredItems.filter((i) => !i.executed),
+                        ...filteredItems.filter((i) => Boolean(i.executed)),
+                      ]
+                    : filteredItems
+                }
                 onToggleExecuted={handleToggleExecuted}
                 onEdit={handleOpenEdit}
                 onDelete={handleDeleteClick}
