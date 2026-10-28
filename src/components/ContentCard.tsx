@@ -74,7 +74,7 @@ export default function ContentCard({
           type="button"
           onClick={handleToggle}
           aria-pressed={done}
-          aria-label={done ? `Tandai #${item.no} belum dieksekusi` : `Tandai #${item.no} selesai dieksekusi`}
+          aria-label={done ? "Tandai belum dieksekusi" : "Tandai selesai dieksekusi"}
           title={done ? "Klik untuk batalkan status selesai" : "Klik untuk tandai selesai"}
           className={`inline-flex items-center gap-2 px-3 py-2 min-h-[40px] rounded-xl text-xs font-semibold cursor-pointer select-none transition-colors shrink-0 ${done
             ? "bg-success/15 text-success hover:bg-success/25 active:bg-success/30"
@@ -101,8 +101,6 @@ export default function ContentCard({
           outline-none transition-colors hover:bg-surface/60 active:bg-subtle/70 focus-visible:ring-3 focus-visible:ring-brand/25"
       >
         <div className="mb-2 flex items-center gap-2 text-xs text-muted">
-          <span className="font-mono font-medium">#{item.no}</span>
-          <span className="text-line-strong">·</span>
           <span className="truncate">{item.platform || "Instagram Feed"}</span>
           {done && <span className="badge ml-auto bg-success-soft text-success">✓ Sudah Tayang</span>}
         </div>

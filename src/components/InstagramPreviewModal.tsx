@@ -66,14 +66,9 @@ export default function InstagramPreviewModal({
       <div className="modal max-w-md" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-semibold text-muted">
-              #{item.no}
-            </span>
-            <span className="modal-title">
-              Pratinjau Feed Instagram
-            </span>
-          </div>
+          <h2 className="modal-title">
+            Pratinjau Feed Instagram
+          </h2>
           <button
             type="button"
             onClick={onClose}
@@ -119,9 +114,6 @@ export default function InstagramPreviewModal({
               <div className="flex items-center justify-between">
                 <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/20 backdrop-blur-xs text-white">
                   {item.kategori}
-                </span>
-                <span className="text-[9px] font-mono text-white/80">
-                  #{item.no}
                 </span>
               </div>
 

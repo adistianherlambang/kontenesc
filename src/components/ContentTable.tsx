@@ -82,7 +82,6 @@ export default function ContentTable({
           <thead>
             <tr>
               <th className="th w-12 text-center">Status</th>
-              <th className="th w-14 text-center">#No</th>
               <th className="th min-w-[220px]">Judul Konten</th>
               <th className="th min-w-[150px]">Kategori</th>
               <th className="th min-w-[280px]">Teks Visual (Copywriting)</th>
@@ -112,7 +111,7 @@ export default function ContentTable({
                       onClick={() => handleToggleExecution(item)}
                       className="flex items-center justify-center min-h-[44px] min-w-[44px] w-full p-2.5 cursor-pointer select-none"
                       title={isDone ? "Tandai belum dieksekusi" : "Tandai sudah dieksekusi"}
-                      aria-label={`Tandai #${item.no} dieksekusi`}
+                      aria-label="Tandai status eksekusi konten"
                     >
                       <span
                         className={`flex size-5 items-center justify-center rounded-md border-[1.5px] transition-colors ${
@@ -124,11 +123,6 @@ export default function ContentTable({
                         <Check className="size-3.5 stroke-[2.75]" />
                       </span>
                     </button>
-                  </td>
-
-                  {/* No */}
-                  <td className="td text-center font-mono font-medium text-muted align-middle">
-                    #{item.no}
                   </td>
 
                   {/* Judul Konten */}

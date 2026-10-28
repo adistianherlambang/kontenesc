@@ -119,7 +119,7 @@ export default function ContentModal({
         id: `konten-${x.no || (nextSuggestedNo + idx)}`,
         no: Number(x.no) || (nextSuggestedNo + idx),
         kategori: x.kategori || "Edukasi & Tips",
-        judul: x.judul || `Ide Konten #${nextSuggestedNo + idx}`,
+        judul: x.judul || "Ide Konten Baru",
         copywriting: x.copywriting || "",
         ambience: x.ambience || "",
         caption: x.caption || "",
@@ -264,7 +264,7 @@ export default function ContentModal({
         <div className="modal-header">
           <div className="flex items-center gap-2.5 min-w-0">
             <h2 className="modal-title">
-              {isEditing ? `Edit Konten #${formData.no}` : "Tambah Konten Baru"}
+              {isEditing ? "Edit Konten" : "Tambah Konten Baru"}
             </h2>
             <span className="badge bg-subtle text-muted">
               {isEditing ? "Mode Edit" : activeMode === "manual" ? "1 Konten" : "Import Batch"}
@@ -355,21 +355,9 @@ export default function ContentModal({
                 </span>
               </div>
 
-              {/* Row 1: Nomor, Kategori, Platform */}
+              {/* Row 1: Kategori, Platform */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
-                <div className="sm:col-span-3">
-                  <label className="field-label">Nomor Urut</label>
-                  <input
-                    type="number"
-                    value={formData.no || ""}
-                    onChange={(e) => setFormData({ ...formData, no: parseInt(e.target.value) || 0 })}
-                    className="input font-mono"
-                    min="1"
-                    required
-                  />
-                </div>
-
-                <div className="sm:col-span-5">
+                <div className="sm:col-span-7">
                   <label className="field-label">Kategori</label>
                   <input
                     type="text"
@@ -387,7 +375,7 @@ export default function ContentModal({
                   </datalist>
                 </div>
 
-                <div className="sm:col-span-4">
+                <div className="sm:col-span-5">
                   <label className="field-label">Format Media</label>
                   <select
                     value={formData.platform || "Instagram Feed"}
@@ -553,7 +541,6 @@ export default function ContentModal({
                   <table className="w-full border-collapse text-left text-xs">
                     <thead>
                       <tr>
-                        <th className="th w-16">#No</th>
                         <th className="th w-36">Kategori</th>
                         <th className="th">Judul Konten</th>
                       </tr>
@@ -561,7 +548,6 @@ export default function ContentModal({
                     <tbody>
                       {parsedJsonItems.map((it, idx) => (
                         <tr key={idx} className="hover:bg-subtle transition-colors">
-                          <td className="td font-mono font-medium">#{it.no}</td>
                           <td className="td text-muted">{it.kategori}</td>
                           <td className="td font-medium text-ink truncate max-w-xs">{it.judul}</td>
                         </tr>
@@ -683,7 +669,6 @@ export default function ContentModal({
                   <table className="w-full border-collapse text-left text-xs">
                     <thead>
                       <tr>
-                        <th className="th w-16">#No</th>
                         <th className="th w-36">Kategori</th>
                         <th className="th">Judul Konten</th>
                       </tr>
@@ -691,7 +676,6 @@ export default function ContentModal({
                     <tbody>
                       {parsedCsvItems.map((it, idx) => (
                         <tr key={idx} className="hover:bg-subtle transition-colors">
-                          <td className="td font-mono font-medium">#{it.no}</td>
                           <td className="td text-muted">{it.kategori}</td>
                           <td className="td font-medium text-ink truncate max-w-xs">{it.judul}</td>
                         </tr>

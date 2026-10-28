@@ -241,10 +241,6 @@ export default function ContentDetailModal({
         {/* Top Header / Breadcrumb navigation */}
         <div className="modal-header">
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <span className="font-mono text-xs font-semibold text-muted">
-              #{draft.no}
-            </span>
-            <span className="text-line-strong">·</span>
             <span className={`inline-flex items-center gap-1.5 text-xs font-semibold truncate ${tone.title}`}>
               <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
               <span className="truncate">{draft.kategori}</span>

@@ -35,7 +35,7 @@ export default function DeleteConfirmModal({
         <div className="modal-header">
           <div className="flex items-center gap-2 font-semibold text-sm text-danger">
             <AlertCircle className="size-4 shrink-0" />
-            <span>Hapus Konten #{item.no}?</span>
+            <span>Hapus Konten?</span>
           </div>
           <button
             type="button"

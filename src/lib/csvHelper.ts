@@ -78,7 +78,7 @@ export function convertRowsToContentItems(rows: Record<string, string>[], starti
       id: `konten-${no}`,
       no,
       kategori: r.kategori || r.category || "Edukasi & Tips",
-      judul: r.judul || r.title || `Ide Konten #${no}`,
+      judul: r.judul || r.title || "Ide Konten Baru",
       copywriting: r.copywriting || r.teks || r.content || "",
       ambience: r.ambience || r.visual || r.arahanvisual || "",
       caption: r.caption || r.takarir || "",
