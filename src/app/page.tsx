@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Sidebar, { StatusView } from "@/components/Sidebar";
 import ContentCard from "@/components/ContentCard";
 import ContentTable from "@/components/ContentTable";
-import InstagramPreviewModal from "@/components/InstagramPreviewModal";
+import ContentDetailModal from "@/components/ContentDetailModal";
 import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import FirebaseSyncModal from "@/components/FirebaseSyncModal";
@@ -433,10 +433,17 @@ export default function DashboardPage() {
       )}
 
       {previewItem && (
-        <InstagramPreviewModal
+        <ContentDetailModal
           item={previewItem}
+          isOpen={Boolean(previewItem)}
           onClose={() => setPreviewItem(null)}
+          onSave={async (updatedItem) => {
+            await handleSaveSingle(updatedItem);
+            setPreviewItem(updatedItem);
+          }}
           onToggleExecuted={handleToggleExecuted}
+          onDelete={handleDeleteClick}
+          existingCategories={categoriesWithCounts.map(c => c.name)}
         />
       )}
 
