@@ -8,10 +8,8 @@ import ContentTable from "@/components/ContentTable";
 import ContentDetailModal from "@/components/ContentDetailModal";
 import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-import FirebaseSyncModal from "@/components/FirebaseSyncModal";
 import {
   ContentItem,
-  getContentsFromDb,
   saveContentToDb,
   deleteContentFromDb,
   seedContentsToDb,
@@ -26,8 +24,6 @@ import {
   Plus,
   Menu,
   X,
-  Cloud,
-  CloudOff,
   CheckCircle2
 } from "lucide-react";
 
@@ -91,7 +87,6 @@ export default function DashboardPage() {
   const [previewItem, setPreviewItem] = useState<ContentItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<ContentItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
   // Real-time Firestore subscription with offline persistence & online sync
   useEffect(() => {
@@ -309,33 +304,6 @@ export default function DashboardPage() {
     await deleteContentFromDb(docId);
   };
 
-  const handlePushToFirebase = async () => {
-    setFirebaseStatus("syncing");
-    await seedContentsToDb(items);
-    setFirebaseStatus("connected");
-  };
-
-  const handlePullFromFirebase = async () => {
-    setFirebaseStatus("syncing");
-    const remote = await getContentsFromDb();
-    if (remote.length > 0) {
-      updateItemsState(remote);
-    }
-    setFirebaseStatus("connected");
-  };
-
-  const handleResetToDefault = async () => {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem("semarang_cell_brief_contents_v2");
-    } catch (e) {
-      console.warn("Reset error", e);
-    }
-    setFirebaseStatus("syncing");
-    await seedContentsToDb(INITIAL_BRIEF_DATA);
-    setFirebaseStatus("connected");
-  };
-
   const nextSuggestedNo = useMemo(() => {
     if (items.length === 0) return 1;
     return Math.max(...items.map(i => i.no)) + 1;
@@ -360,7 +328,6 @@ export default function DashboardPage() {
         pendingCount={pendingCount}
         executedCount={executedCount}
         firebaseStatus={firebaseStatus}
-        onOpenSyncModal={() => setIsSyncModalOpen(true)}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         categories={categoriesWithCounts}
@@ -415,23 +382,8 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Right Actions: Cloud Sync (Mobile), View switch & Tambah Konten */}
+          {/* Right Actions: View switch & Tambah Konten */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
-
-            {/* Cloud Sync Status Button (Mobile shortcut) */}
-            {/* <button
-              type="button"
-              onClick={() => setIsSyncModalOpen(true)}
-              className="md:hidden p-2.5 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl bg-[#F0F0F2] border border-[#E4E4E7] text-[#18181B] active:bg-[#E4E4E7] cursor-pointer"
-              title="Data & Sinkronisasi Cloud"
-              aria-label="Data & Sinkronisasi Cloud"
-            >
-              {firebaseStatus === "connected" ? (
-                <Cloud className="w-4 h-4 text-emerald-600" />
-              ) : (
-                <CloudOff className="w-4 h-4 text-[#71717A]" />
-              )}
-            </button> */}
 
             {/* View Mode Toggle ([|||] and [▦]) */}
             <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
@@ -675,18 +627,6 @@ export default function DashboardPage() {
           isDeleting={isDeleting}
           onConfirm={handleConfirmDelete}
           onClose={() => setDeletingItem(null)}
-        />
-      )}
-
-      {isSyncModalOpen && (
-        <FirebaseSyncModal
-          isOpen={isSyncModalOpen}
-          onClose={() => setIsSyncModalOpen(false)}
-          firebaseStatus={firebaseStatus}
-          localCount={items.length}
-          onPushToFirebase={handlePushToFirebase}
-          onPullFromFirebase={handlePullFromFirebase}
-          onResetToDefault={handleResetToDefault}
         />
       )}
     </div>

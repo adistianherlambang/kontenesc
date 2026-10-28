@@ -16,8 +16,6 @@ interface SidebarProps {
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
   firebaseStatus: "connected" | "offline" | "syncing";
-  onOpenDataModal?: () => void;
-  onOpenSyncModal?: () => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
 }
@@ -32,8 +30,6 @@ export default function Sidebar({
   selectedCategory,
   onSelectCategory,
   firebaseStatus,
-  onOpenDataModal,
-  onOpenSyncModal,
   isOpenMobile,
   onCloseMobile,
 }: SidebarProps) {
@@ -142,21 +138,17 @@ export default function Sidebar({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={pick(() => (onOpenDataModal ?? onOpenSyncModal)?.())}
-            className="nav-item"
-          >
+          <div className="flex items-center gap-2.5 px-2.5 py-1 text-xs text-muted select-none">
             {firebaseStatus === "connected" ? (
               <Cloud className="size-4 shrink-0 text-success" />
             ) : (
               <CloudOff className="size-4 shrink-0" />
             )}
-            <span className="truncate">Data & sinkronisasi</span>
+            <span className="truncate">Status sinkronisasi</span>
             <span className="ml-auto text-[11px] text-faint">
               {firebaseStatus === "connected" ? "Cloud" : firebaseStatus === "syncing" ? "…" : "Lokal"}
             </span>
-          </button>
+          </div>
         </div>
       </aside>
     </>
