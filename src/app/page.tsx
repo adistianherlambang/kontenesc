@@ -221,12 +221,18 @@ export default function DashboardPage() {
       updatedAt: now
     };
 
-    runWithViewTransition(() => {
+    const applyToggle = () => {
       updateItemsState((prev) => prev.map((i) => ((i.id && i.id === item.id) || i.no === item.no ? updated : i)));
       if (previewItem && ((previewItem.id && previewItem.id === item.id) || previewItem.no === item.no)) {
         setPreviewItem(updated);
       }
-    });
+    };
+
+    if (previewItem) {
+      applyToggle();
+    } else {
+      runWithViewTransition(applyToggle);
+    }
 
     // Save directly to Firestore (queued in IndexedDB if offline, auto-uploaded when online)
     saveContentToDb(updated).catch((err) => {
@@ -251,33 +257,29 @@ export default function DashboardPage() {
       updatedAt: savedItem.updatedAt || new Date().toISOString()
     };
 
-    runWithViewTransition(() => {
-      updateItemsState((prev) => {
-        const existingIndex = prev.findIndex((i) => (i.id && i.id === itemToSave.id) || i.no === itemToSave.no);
-        if (existingIndex >= 0) {
-          const next = [...prev];
-          next[existingIndex] = { ...itemToSave };
-          return next;
-        }
-        return [...prev, itemToSave].sort((a, b) => a.no - b.no);
-      });
-
-      if (previewItem && ((previewItem.id && previewItem.id === itemToSave.id) || previewItem.no === itemToSave.no)) {
-        setPreviewItem(itemToSave);
+    updateItemsState((prev) => {
+      const existingIndex = prev.findIndex((i) => (i.id && i.id === itemToSave.id) || i.no === itemToSave.no);
+      if (existingIndex >= 0) {
+        const next = [...prev];
+        next[existingIndex] = { ...itemToSave };
+        return next;
       }
+      return [...prev, itemToSave].sort((a, b) => a.no - b.no);
     });
+
+    if (previewItem && ((previewItem.id && previewItem.id === itemToSave.id) || previewItem.no === itemToSave.no)) {
+      setPreviewItem(itemToSave);
+    }
 
     await saveContentToDb(itemToSave);
   };
 
   const handleSaveBatch = async (batchItems: ContentItem[]) => {
-    runWithViewTransition(() => {
-      updateItemsState((prev) => {
-        const itemMap = new Map<number, ContentItem>();
-        prev.forEach((it) => itemMap.set(it.no, it));
-        batchItems.forEach((it) => itemMap.set(it.no, it));
-        return Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
-      });
+    updateItemsState((prev) => {
+      const itemMap = new Map<number, ContentItem>();
+      prev.forEach((it) => itemMap.set(it.no, it));
+      batchItems.forEach((it) => itemMap.set(it.no, it));
+      return Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
     });
 
     await seedContentsToDb(batchItems);
@@ -292,13 +294,11 @@ export default function DashboardPage() {
     const itemToDelete = deletingItem;
     setIsDeleting(true);
 
-    runWithViewTransition(() => {
-      updateItemsState((prev) =>
-        prev.filter((i) => (i.id ? i.id !== itemToDelete.id : i.no !== itemToDelete.no))
-      );
-      setDeletingItem(null);
-      setIsDeleting(false);
-    });
+    updateItemsState((prev) =>
+      prev.filter((i) => (i.id ? i.id !== itemToDelete.id : i.no !== itemToDelete.no))
+    );
+    setDeletingItem(null);
+    setIsDeleting(false);
 
     const docId = itemToDelete.id || `konten-${itemToDelete.no}`;
     await deleteContentFromDb(docId);
