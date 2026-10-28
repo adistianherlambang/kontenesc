@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar";
-import StatsCards from "@/components/StatsCards";
 import FilterBar from "@/components/FilterBar";
 import ContentCard from "@/components/ContentCard";
 import ContentTable from "@/components/ContentTable";
@@ -19,22 +18,22 @@ import {
   checkFirestoreHealth 
 } from "@/lib/firebase";
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
-import { Sparkles, Plus, Smartphone, Layers, AlertCircle } from "lucide-react";
+import { contentItemsToCSV } from "@/lib/csvHelper";
+import { Plus, CheckSquare, Clock, Smartphone, Table, LayoutGrid, FileText } from "lucide-react";
 
-const STORAGE_KEY = "semarang_cell_brief_contents_v1";
+const STORAGE_KEY = "semarang_cell_brief_contents_v2";
 
 export default function DashboardPage() {
   const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
   const [isLoaded, setIsLoaded] = useState(false);
   const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
 
-  // Filter & Search states
+  // Tab & Filter states
+  const [activeTab, setActiveTab] = useState<"all" | "pending" | "executed" | "gallery" | "simulator">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedPlatform, setSelectedPlatform] = useState("Semua");
-  const [selectedStatus, setSelectedStatus] = useState("Semua");
   const [sortBy, setSortBy] = useState<"no-asc" | "no-desc" | "title-asc">("no-asc");
-  const [viewMode, setViewMode] = useState<"grid" | "table" | "preview">("grid");
 
   // Modal states
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
@@ -44,7 +43,7 @@ export default function DashboardPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
 
-  // 1. Initial Load from LocalStorage + Background Firestore Sync Check
+  // 1. Initial Load from LocalStorage + Cloud Firestore Check
   useEffect(() => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
@@ -59,7 +58,6 @@ export default function DashboardPage() {
     }
     setIsLoaded(true);
 
-    // Check Firestore
     checkFirestore();
   }, []);
 
@@ -68,7 +66,6 @@ export default function DashboardPage() {
       const health = await checkFirestoreHealth();
       if (health.ok) {
         setFirebaseStatus("connected");
-        // If Firestore has data, we can optionally fetch
         if (health.count && health.count > 0) {
           const remoteItems = await getContentsFromDb();
           if (remoteItems.length > 0) {
@@ -84,7 +81,7 @@ export default function DashboardPage() {
     }
   };
 
-  // 2. Persist to localStorage whenever items change
+  // 2. Persist to localStorage
   const updateItemsState = (newItems: ContentItem[]) => {
     setItems(newItems);
     try {
@@ -94,7 +91,7 @@ export default function DashboardPage() {
     }
   };
 
-  // 3. Category List with counts
+  // 3. Category count aggregation
   const categoriesWithCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const item of items) {
@@ -110,9 +107,19 @@ export default function DashboardPage() {
     return categoriesWithCounts.map(c => c.name);
   }, [categoriesWithCounts]);
 
+  const executedCount = useMemo(() => {
+    return items.filter(i => Boolean(i.executed)).length;
+  }, [items]);
+
+  const pendingCount = items.length - executedCount;
+
   // 4. Filtering and Sorting logic
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
+      // Tab filter
+      if (activeTab === "pending" && item.executed) return false;
+      if (activeTab === "executed" && !item.executed) return false;
+
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -136,11 +143,6 @@ export default function DashboardPage() {
         return false;
       }
 
-      // Status
-      if (selectedStatus !== "Semua" && (item.status || "Siap Tayang") !== selectedStatus) {
-        return false;
-      }
-
       return true;
     }).sort((a, b) => {
       if (sortBy === "no-asc") return a.no - b.no;
@@ -148,9 +150,23 @@ export default function DashboardPage() {
       if (sortBy === "title-asc") return a.judul.localeCompare(b.judul);
       return 0;
     });
-  }, [items, searchQuery, selectedCategory, selectedPlatform, selectedStatus, sortBy]);
+  }, [items, activeTab, searchQuery, selectedCategory, selectedPlatform, sortBy]);
 
-  // 5. CRUD Handlers
+  // 5. Toggle Checkbox Execution Status (Core Notion Action)
+  const handleToggleExecuted = async (item: ContentItem) => {
+    const newExecuted = !Boolean(item.executed);
+    const updated = { ...item, executed: newExecuted, updatedAt: new Date().toISOString() };
+    const nextList = items.map(i => (i.no === item.no ? updated : i));
+    updateItemsState(nextList);
+
+    try {
+      await saveContentToDb(updated);
+    } catch (e) {
+      // silent local fallback
+    }
+  };
+
+  // 6. CRUD Handlers
   const handleOpenCreate = () => {
     setEditingItem(null);
     setIsContentModalOpen(true);
@@ -161,7 +177,7 @@ export default function DashboardPage() {
     setIsContentModalOpen(true);
   };
 
-  const handleSaveContent = async (savedItem: ContentItem) => {
+  const handleSaveSingle = async (savedItem: ContentItem) => {
     let nextList: ContentItem[];
     const existingIndex = items.findIndex(i => (i.id && i.id === savedItem.id) || i.no === savedItem.no);
 
@@ -169,17 +185,34 @@ export default function DashboardPage() {
       nextList = [...items];
       nextList[existingIndex] = { ...savedItem };
     } else {
-      nextList = [savedItem, ...items];
+      nextList = [...items, savedItem];
     }
 
     updateItemsState(nextList);
 
-    // Save to Firestore in background if available
     try {
       await saveContentToDb(savedItem);
       setFirebaseStatus("connected");
     } catch (err) {
-      console.warn("Could not save to Firestore, kept in local cache:", err);
+      console.warn("Could not save to Firestore:", err);
+    }
+  };
+
+  // 7. Batch Save Handler (CSV or JSON)
+  const handleSaveBatch = async (batchItems: ContentItem[]) => {
+    // Avoid duplicate numbers: if item number already exists, update it, otherwise append
+    const itemMap = new Map<number, ContentItem>();
+    items.forEach(it => itemMap.set(it.no, it));
+    batchItems.forEach(it => itemMap.set(it.no, it));
+
+    const nextList = Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
+    updateItemsState(nextList);
+
+    try {
+      await seedContentsToDb(nextList);
+      setFirebaseStatus("connected");
+    } catch (e) {
+      console.warn("Batch sync error:", e);
     }
   };
 
@@ -207,19 +240,7 @@ export default function DashboardPage() {
     }
   };
 
-  const handleStatusChange = async (item: ContentItem, newStatus: ContentItem["status"]) => {
-    const updated = { ...item, status: newStatus };
-    const nextList = items.map(i => (i.no === item.no ? updated : i));
-    updateItemsState(nextList);
-
-    try {
-      await saveContentToDb(updated);
-    } catch (e) {
-      // offline fallback
-    }
-  };
-
-  // 6. Sync Handlers
+  // 8. Sync Handlers
   const handlePushToFirebase = async () => {
     setFirebaseStatus("syncing");
     await seedContentsToDb(items);
@@ -239,15 +260,28 @@ export default function DashboardPage() {
     updateItemsState(INITIAL_BRIEF_DATA);
   };
 
-  // 7. Export JSON file
+  // 9. Export Functions
   const handleExportJSON = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `brief_semarang_cell_${new Date().toISOString().split("T")[0]}.json`);
+    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
+  };
+
+  const handleExportCSV = () => {
+    const csvContent = contentItemsToCSV(items);
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", url);
+    downloadAnchor.setAttribute("download", `brief_konten_semarang_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    URL.revokeObjectURL(url);
   };
 
   const nextSuggestedNo = useMemo(() => {
@@ -255,30 +289,44 @@ export default function DashboardPage() {
     return Math.max(...items.map(i => i.no)) + 1;
   }, [items]);
 
-  const hasActiveFilters = searchQuery !== "" || selectedCategory !== "Semua" || selectedPlatform !== "Semua" || selectedStatus !== "Semua";
+  const hasActiveFilters = searchQuery !== "" || selectedCategory !== "Semua" || selectedPlatform !== "Semua";
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/70">
+    <div className="min-h-screen flex flex-col bg-white text-[#37352F]">
       {/* Top Navigation */}
       <Navbar
         firebaseStatus={firebaseStatus}
         totalCount={items.length}
+        executedCount={executedCount}
         onOpenCreate={handleOpenCreate}
         onOpenSync={() => setIsSyncModalOpen(true)}
-        onExport={handleExportJSON}
+        onExportJSON={handleExportJSON}
+        onExportCSV={handleExportCSV}
       />
 
-      {/* Main Dashboard Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-        {/* KPI Stats Bar */}
-        <StatsCards
-          items={items}
-          activeFilterStatus={selectedStatus}
-          onFilterStatus={(status) => setSelectedStatus(status)}
-        />
+      {/* Main Notion Page Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-5">
+        
+        {/* Notion Header Banner */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-2xl select-none">📱</span>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#37352F]">
+              Manajemen Konten Semarang Cell
+            </h1>
+          </div>
+          <p className="text-xs text-[#787774] max-w-2xl leading-relaxed">
+            Database 60 brief konten pemasaran Instagram. Centang checkbox untuk menandai konten yang telah dieksekusi atau dipublikasikan.
+          </p>
+        </div>
 
-        {/* Filter & View Switcher Bar */}
+        {/* Database View Tabs & Filter Toolbar */}
         <FilterBar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          totalCount={items.length}
+          pendingCount={pendingCount}
+          executedCount={executedCount}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           selectedCategory={selectedCategory}
@@ -288,158 +336,110 @@ export default function DashboardPage() {
           onSelectPlatform={setSelectedPlatform}
           sortBy={sortBy}
           onSortChange={setSortBy}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
           onResetFilters={() => {
             setSearchQuery("");
             setSelectedCategory("Semua");
             setSelectedPlatform("Semua");
-            setSelectedStatus("Semua");
           }}
           hasActiveFilters={hasActiveFilters}
         />
 
-        {/* Content Listing Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-xs text-slate-500 font-medium">
-            Menampilkan <span className="font-bold text-slate-800">{filteredItems.length}</span> dari {items.length} ide konten
-            {hasActiveFilters && " (difilter)"}
-          </div>
-          <div className="text-xs text-slate-400 hidden sm:block">
-            Semarang Cell Metro • Primary #1F6FB6
-          </div>
-        </div>
-
-        {/* Content Display based on View Mode */}
+        {/* Views Rendering */}
         {filteredItems.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center shadow-xs">
-            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#1F6FB6] flex items-center justify-center mx-auto mb-3">
-              <Layers className="w-6 h-6" />
-            </div>
-            <h3 className="text-base font-bold text-slate-800 mb-1">
-              Tidak ada ide konten yang cocok
-            </h3>
-            <p className="text-xs text-slate-500 mb-4 max-w-sm mx-auto">
-              Coba sesuaikan kata kunci pencarian atau reset filter kategori untuk melihat kembali seluruh materi brief.
-            </p>
+          <div className="border border-[#E9E9E7] rounded-lg p-10 text-center bg-[#F7F6F3] text-xs text-[#787774]">
+            <p className="font-medium text-[#37352F] mb-1">Tidak ada konten yang sesuai filter</p>
+            <p className="mb-3">Ubah kata kunci pencarian atau reset filter untuk menampilkan kembali data.</p>
             <button
               onClick={() => {
                 setSearchQuery("");
                 setSelectedCategory("Semua");
                 setSelectedPlatform("Semua");
-                setSelectedStatus("Semua");
+                setActiveTab("all");
               }}
-              className="btn-secondary text-xs py-2 px-4"
+              className="notion-btn notion-btn-bordered text-xs"
             >
-              Reset Semua Filter
+              Tampilkan Semua Konten
             </button>
           </div>
-        ) : viewMode === "grid" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        ) : activeTab === "gallery" ? (
+          /* Notion Gallery View */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {filteredItems.map((item) => (
               <ContentCard
                 key={item.id || item.no}
                 item={item}
+                onToggleExecuted={handleToggleExecuted}
                 onEdit={handleOpenEdit}
                 onDelete={handleDeleteClick}
                 onPreview={(it) => setPreviewItem(it)}
-                onStatusChange={handleStatusChange}
               />
             ))}
           </div>
-        ) : viewMode === "table" ? (
-          <ContentTable
-            items={filteredItems}
-            onEdit={handleOpenEdit}
-            onDelete={handleDeleteClick}
-            onPreview={(it) => setPreviewItem(it)}
-            onStatusChange={handleStatusChange}
-          />
-        ) : (
-          /* Instagram Simulator Feed View */
-          <div className="space-y-6 max-w-md mx-auto">
-            <div className="bg-blue-50 border border-blue-200 text-[#1F6FB6] p-3 rounded-xl text-xs text-center font-medium">
-              Mode Simulator Feed Instagram (Menampilkan {filteredItems.length} postingan)
+        ) : activeTab === "simulator" ? (
+          /* Instagram Mobile Feed Simulator View */
+          <div className="space-y-6 max-w-sm mx-auto">
+            <div className="bg-[#E8F3FA] text-[#1F6FB6] p-2.5 rounded border border-[#BCD8F0] text-xs text-center font-medium">
+              Simulator Feed Instagram ({filteredItems.length} konten)
             </div>
-            {filteredItems.slice(0, 15).map((item) => (
-              <div key={item.id || item.no} className="phone-mockup">
-                {/* Header */}
-                <div className="p-3.5 flex items-center justify-between border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-[#1F6FB6] p-[2px]">
-                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-[10px] text-[#1F6FB6]">
-                        ESC
-                      </div>
+            {filteredItems.slice(0, 20).map((item) => (
+              <div key={item.id || item.no} className="ig-phone-preview">
+                <div className="p-3 flex items-center justify-between border-b border-[#E9E9E7]">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-[#1F6FB6] text-white flex items-center justify-center font-bold text-[9px]">
+                      ESC
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 leading-tight">
-                        eldoradosemarangcell
-                      </h4>
-                      <p className="text-[10px] text-slate-500">
-                        Metro Barat, Kota Metro
-                      </p>
+                      <h4 className="text-[11px] font-bold text-slate-900 leading-none">eldoradosemarangcell</h4>
+                      <span className="text-[9px] text-slate-500">Metro Barat, Kota Metro</span>
                     </div>
                   </div>
-                  <span className="text-[11px] font-bold text-slate-400">
-                    #{item.no}
-                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">#{item.no}</span>
                 </div>
 
-                {/* Canvas Post */}
-                <div className="ig-canvas-post">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-white/20 backdrop-blur-xs text-white">
-                      {item.kategori}
-                    </span>
-                    <span className="text-[10px] font-mono text-white/80">
-                      Eldorado
-                    </span>
-                  </div>
-
+                <div className="ig-canvas-post p-4">
+                  <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white/20 text-white w-max">
+                    {item.kategori}
+                  </span>
                   <div className="my-auto py-2">
-                    <h3 className="text-sm font-extrabold text-amber-300 mb-1.5 uppercase tracking-wide">
-                      {item.judul}
-                    </h3>
-                    <p className="text-xs font-mono text-white/95 whitespace-pre-wrap leading-relaxed drop-shadow-xs">
-                      {item.copywriting}
-                    </p>
+                    <h3 className="text-xs font-bold text-amber-300 mb-1 uppercase">{item.judul}</h3>
+                    <p className="text-[11px] font-mono text-white/95 whitespace-pre-wrap">{item.copywriting}</p>
                   </div>
-
-                  <div className="pt-2 border-t border-white/20 flex items-center justify-between text-[10px] text-white/80">
+                  <div className="pt-1.5 border-t border-white/20 flex justify-between text-[9px] text-white/80">
                     <span>Eldorado Semarang Cell</span>
                     <span>Swipe ➔</span>
                   </div>
                 </div>
 
-                {/* Caption preview */}
-                <div className="p-3 text-xs text-slate-800 border-t border-slate-100">
-                  <p className="whitespace-pre-line leading-relaxed text-[11px]">
-                    <span className="font-bold mr-1">eldoradosemarangcell</span>
-                    {item.caption}
-                  </p>
+                <div className="p-3 text-[11px] text-slate-800">
+                  <span className="font-bold mr-1">eldoradosemarangcell</span>
+                  <span className="whitespace-pre-line text-slate-700">{item.caption}</span>
                 </div>
               </div>
             ))}
           </div>
+        ) : (
+          /* Notion Database Table View (Default for "all", "pending", "executed") */
+          <ContentTable
+            items={filteredItems}
+            onToggleExecuted={handleToggleExecuted}
+            onEdit={handleOpenEdit}
+            onDelete={handleDeleteClick}
+            onPreview={(it) => setPreviewItem(it)}
+          />
         )}
-      </main>
 
-      {/* Footer */}
-      <footer className="mt-12 py-6 border-t border-slate-200/80 bg-white text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>
-            © 2026 <span className="font-semibold text-slate-700">Eldorado Semarang Cell</span> • Sistem Manajemen Konten Media Sosial
-          </p>
-          <p className="text-slate-400">
-            Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro • WA: 088272202241
-          </p>
+        {/* Bottom Status Count */}
+        <div className="mt-3 flex items-center justify-between text-xs text-[#9B9A97] px-1">
+          <span>Menampilkan {filteredItems.length} dari {items.length} konten</span>
+          <span>Eldorado Semarang Cell • Metro Barat</span>
         </div>
-      </footer>
+      </main>
 
       {/* Modals */}
       <InstagramPreviewModal
         item={previewItem}
         onClose={() => setPreviewItem(null)}
+        onToggleExecuted={handleToggleExecuted}
       />
 
       <ContentModal
@@ -449,7 +449,8 @@ export default function DashboardPage() {
           setIsContentModalOpen(false);
           setEditingItem(null);
         }}
-        onSave={handleSaveContent}
+        onSaveSingle={handleSaveSingle}
+        onSaveBatch={handleSaveBatch}
         existingCategories={uniqueCategoryNames}
         nextSuggestedNo={nextSuggestedNo}
       />

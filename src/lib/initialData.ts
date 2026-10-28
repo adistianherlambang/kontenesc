@@ -9,10 +9,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Ilustrasi grafis dua jalur jalan tol: jalur utama beraspal mulus (RAM Fisik) dan jalur cadangan berbatu (RAM Virtual), dengan smartphone modern di bagian tengah.",
     "caption": "Sering lihat spesifikasi HP bertuliskan RAM 8GB + 8GB Extended? 🤔 Jangan salah paham ya! RAM virtual memang membantu menahan aplikasi di latar belakang agar tidak cepat tertutup, tapi performa multitasking murni tetap ditentukan oleh kapasitas RAM fisik bawaan perangkat.\n\nKalau kamu tipe pengguna yang sering buka banyak aplikasi perbankan, olshop, dan edit video sekaligus, prioritaskan kapasitas RAM fisik yang cukup sejak awal. Mau tanya rekomendasi HP dengan RAM fisik lega di budgetmu? Langsung chat kami ya! ✨\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-1",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-10-31",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.515Z"
   },
   {
     "no": 2,
@@ -22,10 +22,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua chip memori semi-transparan berdampingan di atas sirkuit motherboard bercahaya neon, chip kiri berikon kura-kura tenang, chip kanan berikon kilat bercahaya tajam.",
     "caption": "Kapasitas penyimpanan sama-sama 128GB, tapi kok kecepatan install aplikasi dan buka galerinya beda jauh? ⚡ Jawabannya ada pada teknologi memori internal: eMMC vs UFS.\n\nMemori UFS mampu membaca dan menulis data jauh lebih kencang dibanding eMMC generasi terdahulu, sehingga smartphone terasa tetap responsif meski memori sudah mulai terisi. Di Eldorado Semarang Cell, kamu bisa konsultasikan detail jeroan HP biar dapat unit yang paling awet dan sesuai kebutuhan! 💡\n\nWa admin : 088272202241",
     "id": "konten-2",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-01",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 3,
@@ -35,10 +35,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Layar smartphone menampilkan visual motion trail teks yang sedang di-scroll cepat, menunjukkan perbedaan kehalusan animasi dari frame rate 60Hz hingga 120Hz.",
     "caption": "Begitu terbiasa scrolling Instagram atau TikTok di layar 90Hz atau 120Hz, rasanya susah kembali ke layar standar 60Hz! 😍 Refresh rate yang lebih tinggi menampilkan frame gambar lebih banyak setiap detiknya, membuat mata tidak cepat lelah saat membaca artikel panjang atau bermain game.\n\nNamun, refresh rate tinggi juga butuh konsumsi daya lebih. Untungnya, smartphone modern sudah dibekali fitur adaptive refresh rate otomatis. Mau coba langsung sensasi mulusnya layar di store kami? Mampir yuk! 📱\n\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-3",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-02",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 4,
@@ -48,10 +48,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Visual split-screen sebuah smartphone membelah dua: sisi kiri menampilkan foto pemandangan malam AMOLED dengan warna hitam pekat dan lampu menyala, sisi kanan IPS LCD dengan warna natural lembut.",
     "caption": "Beda panel layar, beda pula pengalaman visual yang didapat! 👀 Buat kamu penikmat nonton serial film atau video streaming, panel AMOLED menyuguhkan kontras yang memanjakan mata dengan warna hitam pekat sempurna. Sementara itu, panel IPS LCD tetap menjadi andalan buat yang suka akurasi warna natural tanpa khawatir bayangan statis.\n\nDi toko kami, kamu bisa melihat dan membandingkan tampilan kedua jenis layar ini secara langsung sebelum memutuskan membeli. No tebak-tebak! 🎯\n\nWa admin : 088272202241",
     "id": "konten-4",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-03",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 5,
@@ -61,10 +61,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Close-up modul lensa kamera smartphone dengan elemen diagram optik mekanik OIS (gimbal stabilizer mini) di sekeliling sensor cahaya.",
     "caption": "Megapiksel besar berguna saat foto ingin dicetak ukuran jumbo atau di-crop detailnya 📸 Tapi untuk perekaman video jalan santai atau foto malam hari, kehadiran stabilisasi mekanik (OIS) dan kualitas sensor cahaya jauh lebih menentukan apakah fotomu tajam atau buram.\n\nYuk kenali spesifikasi kamera yang tepat agar hasil fotomu makin memukau tanpa harus bayar lebih mahal dari yang kamu butuhkan! 🌟\n\nWa admin : 088272202241",
     "id": "konten-5",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-04",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 6,
@@ -74,10 +74,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tiga kepala adapter charger berjajar di atas meja studio rapi dengan kabel Type-C melingkar elegan dan efek visual petir energi lembut berwarna biru keemasan.",
     "caption": "Kecepatan fast charging smartphone sekarang luar biasa beragam ⚡ Mulai dari 25W pada seri Samsung, hingga pengisian super kilat 120W pada lini Xiaomi. Pastikan adapter dan kabelmu mendukung protokol pengisian cepat resmi ya, agar sirkuit pengisian bekerja optimal dan baterai tidak overheat.\n\nButuh kepala charger original yang pas untuk HP kamu? Kami sediakan stok aksesoris resmi lengkap di store! 🔌\n\nWa admin : 088272202241",
     "id": "konten-6",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-11-05",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 7,
@@ -87,10 +87,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tangan menempelkan kartu e-money ke bagian punggung atas smartphone dengan efek lingkaran gelombang sinyal biru bersinar lembut.",
     "caption": "NFC (Near Field Communication) bukan lagi fitur mewah! Banyak smartphone kelas terjangkau di katalog kami sudah dilengkapi sensor NFC bawaan 💳 Sangat berguna untuk mobilitas harian, terutama buat kamu yang rutin lewat jalan tol atau naik transportasi umum.\n\nCek apakah HP incaranmu sudah punya NFC di daftar katalog kami ya! Siap pakai dan praktis banget 💙\n\nWa admin : 088272202241",
     "id": "konten-7",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-06",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 8,
@@ -100,10 +100,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Smartphone diletakkan di atas bantal kamar tidur dengan ikon peringatan suhu panas dan kabel charger kusut di sampingnya.",
     "caption": "Baterai smartphone menggunakan material lithium-ion yang sensitif terhadap suhu panas berlebih dan siklus pengosongan daya ekstrem 🔋 Menghindari lima kebiasaan di atas bisa memperpanjang usia kesehatan baterai (battery health) hingga bertahun-tahun ke depan!\n\nKalau baterai HP-mu sudah terlanjur boros atau kembung, bawa ke teknisi kami untuk diganti baterai baru berkualitas 🛠️\n\nWa servis : 089614351864",
     "id": "konten-8",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-07",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 9,
@@ -113,10 +113,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Close-up makro bagian bawah smartphone menampilkan lubang port Type-C dan grill speaker yang bersih mengilap dengan sikat pembersih halus.",
     "caption": "Sering merasa kabel charger gampang lepas atau speaker suaranya mendem? Sering kali itu bukan karena rusak, tapi karena tumpukan serat kain kantong celana dan debu di dalam lubang port! 🧹\n\nBersihkan secara perlahan dengan sikat kering antistatik. Ragu membersihkan sendiri? Bawa ke counter servis kami, kami bantu bersihkan dengan alat khusus teknisi secara aman! 🔧\n\nWa servis : 089614351864",
     "id": "konten-9",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-08",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 10,
@@ -126,10 +126,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Visual antarmuka smartphone menampilkan bilah memori internal yang tadinya penuh berwarna merah berubah menjadi hijau lega setelah dibersihkan.",
     "caption": "Jangan buru-buru hapus foto kenangan berharga cuma gara-gara memori internal merah! 📂 Kebanyakan memori tersita oleh file cache aplikasi media sosial dan video kiriman grup chat yang menumpuk bertahun-tahun.\n\nCoba bersihkan cache aplikasi secara berkala. Dan kalau memang file pekerjaanmu makin banyak, ini tanda saatnya mempertimbangkan HP dengan storage 256GB di katalog kami! 🚀\n\nWa admin : 088272202241",
     "id": "konten-10",
-    "status": "Siap Tayang",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-09",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 11,
@@ -139,10 +139,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tangan dengan kain microfiber lembut sedang mengusap layar smartphone hingga berkilau bening tanpa noda sidik jari.",
     "caption": "Layar adalah bagian yang paling sering kita pandang setiap hari ✨ Melindunginya dengan tempered glass berkualitas dan membersihkannya memakai kain microfiber khusus menjaga lapisan oleophobic anti-minyak tetap awet.\n\nMau pasang tempered glass yang rapi, presisi, dan bebas gelembung udara? Langsung ke Eldorado Semarang Cell, teknisi kami siap pasangkan langsung di tempat! 🛡️\n\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-11",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-11-10",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 12,
@@ -152,10 +152,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Smartphone basah diletakkan di atas handuk kering bersih dengan latar gelas air tumpah dan timer stopwatch menunjukkan pentingnya penanganan cepat.",
     "caption": "Kesalahan paling fatal saat HP terkena air adalah buru-buru menyalakannya atau langsung dicolok charger karena penasaran! 🚫 Arus listrik yang bertemu sisa cairan di dalam mesin bisa memicu korsleting permanen pada motherboard.\n\nSegera matikan dan bawa ke meja servis kami untuk dibongkar, dibersihkan dengan cairan kimia khusus teknisi, dan dikeringkan secara tuntas 🛠️\n\nWa servis : 089614351864",
     "id": "konten-12",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-11",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 13,
@@ -165,10 +165,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Flatlay meja kerja dengan alas kain kanvas bersih, produk jualan tertata rapi, dan smartphone dipegang tangan memotret dari atas menggunakan grid kamera aktif.",
     "caption": "Nggak perlu kamera DSLR mahal untuk mulai jualan online yang meyakinkan pembeli! 📸 Cahaya alami yang melimpah dan lensa kamera yang bersih sudah cukup membuat foto produkmu tajam dan menggugah selera pembeli.\n\nYuk maksimalkan perangkat yang ada di tanganmu. Butuh smartphone dengan sensor kamera lebih jernih di kelas harga bersahabat? Tanya kami ya! ✨\n\nWa admin : 088272202241",
     "id": "konten-13",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-12",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 14,
@@ -178,10 +178,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Desain split screen warna kontras: sisi kiri berlatar merah dengan stempel silang 'MITOS', sisi kanan hijau dengan stempel centang 'FAKTA'.",
     "caption": "Banyak mitos perawatan baterai yang berasal dari zaman baterai nikel jadul 🤯 Smartphone modern dengan chip manajemen daya cerdas sudah jauh lebih aman terhadap pengisian semalaman.\n\nNamun, musuh utama baterai tetap sama: SUHU PANAS. Jaga agar HP tetap berada di ruangan bersuhu sejuk saat mengecas, dan hindari casing yang terlalu tebal ya! ❄️\n\nWa admin : 088272202241",
     "id": "konten-14",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-13",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 15,
@@ -191,10 +191,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tujuh unit smartphone dari masing-masing brand berjejer rapi di etalase toko bertingkat dengan pencahayaan warm white modern dan label harga terpasang jelas.",
     "caption": "Cari smartphone 2 jutaan untuk kebutuhan sekolah, komunikasi kerja, atau aktivitas harian? 📱 Di Eldorado Semarang Cell, kami sediakan pilihan lengkap dari seluruh brand terkemuka dengan garansi resmi Indonesia.\n\nMasing-masing brand menawarkan keunggulan desain dan antarmuka yang nyaman. Mau pegang dan coba langsung feel genggamannya? Datang ke store kami ya!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-15",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-14",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 16,
@@ -204,10 +204,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Deretan 7 unit smartphone kelas menengah tertata rapi di atas meja kayu estetik dengan kartu informasi spesifikasi ringkas di depannya.",
     "caption": "Di rentang 3 hingga 4 jutaan, kamu sudah bisa menikmati kapasitas memori lebih lega dan layar yang makin memanjakan mata 🚀 Mulai dari Samsung Galaxy A08, Xiaomi Redmi 17, Oppo A6C, Vivo Y11D, Realme C100i, Infinix Hot 70, hingga Tecno Spark 50 siap melengkapi hari-harimu.\n\nBingung menentukan mana yang paling pas dengan gaya pemakaianmu? Tim kami siap berikan konsultasi gratis di store! 💙\n\nWa admin : 088272202241",
     "id": "konten-16",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-15",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 17,
@@ -217,10 +217,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Grafis modern bergaya kartu etalase digital menampilkan ikon RAM 8GB bersinar dengan 7 smartphone terpajang elegan di atas podium akrilik.",
     "caption": "Multitasking sering reload bikin jengkel? Saatnya beralih ke smartphone dengan RAM fisik 8 GB murni! ⚡ Di katalog kami, setiap brand memiliki pilihan varian RAM 8 GB yang siap diajak kerja maraton tanpa hambatan.\n\nCek stok ketersediaan warna favoritmu dengan chat admin sekarang juga ya!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-17",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-16",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 18,
@@ -230,10 +230,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Mockup smartphone menampilkan diagram lingkaran kapasitas penyimpanan 256 GB dengan visual box retail masing-masing brand berjejer rapi di latar belakang.",
     "caption": "Sering hapus foto lama karena memori penuh? Dengan kapasitas penyimpanan 256 GB, kamu leluasa rekam video resolusi tinggi, unduh aplikasi kerja, dan simpan dokumen tanpa khawatir cepat sesak 📸✨\n\nPilihan dari Samsung, Xiaomi, Oppo, Vivo, Realme, Infinix, hingga Tecno semua tersedia lengkap di store kami. Yuk upgrade memorimu!\n\nWa admin : 088272202241",
     "id": "konten-18",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-17",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 19,
@@ -243,10 +243,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Empat unit tablet menyala berjejer di atas meja belajar modern, menampilkan aplikasi menggambar, e-book pelajaran, dan spreadsheet produktivitas.",
     "caption": "Layar smartphone terasa terlalu kecil untuk tugas sekolah atau membaca e-book? Tablet adalah solusi paling pas untuk kenyamanan mata keluarga 📚 Layar luasnya bikin streaming edukasi dan kerja dokumen jadi jauh lebih leluasa.\n\nKatalog kami menyediakan pilihan tablet dari Xiaomi, Infinix, Samsung, hingga Tecno. Bisa dicoba langsung di store!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-19",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-18",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 20,
@@ -256,10 +256,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Casing charging TWS terbuka menampilkan sepasang earbud dari masing-masing brand di atas kain satin gelap dengan pantulan cahaya studio lembut.",
     "caption": "Tinggalkan kabel kusut! Saatnya nikmati kemudahan mendengarkan lagu favorit, meeting online, atau teleponan santai dengan True Wireless Stereo (TWS) nirkabel 🎶\n\nKatalog aksesoris kami punya pilihan dari Infinix, Xiaomi, Oppo, hingga Samsung. Pilih yang paling cocok dengan telinga dan budgetmu!\n\nWa admin : 088272202241",
     "id": "konten-20",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-19",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 21,
@@ -269,10 +269,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua unit smartphone Samsung berdampingan di atas dudukan akrilik transparan, menampilkan bagian depan dan belakang bodi secara simetris.",
     "caption": "Sama-sama lini entry dari keluarga Galaxy A series, Galaxy A07 dan A08 hadir untuk melengkapi kebutuhan yang berbeda 🌟 Galaxy A07 jadi pilihan paling ramah di kantong mulai 2 jutaan kecil, sementara Galaxy A08 menawarkan sentuhan desain dan kamera terbaru dengan program cashback resmi 50 ribu.\n\nKedua tipe ready di store kami. Yuk konsultasikan mana yang paling cocok buatmu!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-21",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-11-20",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 22,
@@ -282,10 +282,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua smartphone Xiaomi berjejer dengan grafis visual minimalis menampilkan perbandingan poin baterai, layar, dan kamera.",
     "caption": "Punya budget 3 sampai 4 jutaan di lini Xiaomi? Redmi 17 dan Redmi Note 17 4G adalah dua kandidat terpopuler 📱 Kalau kamu cari nilai guna terbaik untuk rutinitas santai, Redmi 17 sudah sangat mencukupi. Tapi kalau butuh ketajaman layar dan kecepatan cas lebih tinggi, seri Redmi Note 17 4G siap memanjakanmu apalagi ada cashback resmi 300 ribu!\n\nDatang ke toko untuk coba langsung ya!\n\nWa admin : 088272202241",
     "id": "konten-22",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-21",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 23,
@@ -295,10 +295,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua smartphone Oppo berdiri elegan memamerkan kilau back cover reflektif dengan kartu perbandingan RAM 6GB vs 8GB di tengah.",
     "caption": "Keluarga Oppo A Series selalu memikat lewat ketahanan bodi dan desain rampingnya ✨ Oppo A6 dengan RAM 6GB menawarkan efisiensi prima untuk kebutuhan harian, sedangkan Oppo A6S hadir dengan lonjakan RAM 8GB bagi kamu yang aktif membuka banyak aplikasi berat secara bersamaan.\n\nSemua varian dapat cashback resmi Rp100.000 di toko kami. Yuk tanya ketersediaan warnanya sekarang!\n\nWa admin : 088272202241",
     "id": "konten-23",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-22",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 24,
@@ -308,10 +308,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua smartphone Vivo berdampingan di atas meja etalase kaca bersih, menampilkan desain modul kamera belakang yang elegan.",
     "caption": "Lini Y series dari Vivo terkenal dengan durabilitas baterai dan antarmuka yang sangat ramah pengguna 🔋 Vivo Y05 adalah pilihan praktis untuk pemakaian harian santai. Sementara jika kamu butuh performa lebih gesit untuk bekerja seharian, Vivo Y11D dengan opsi RAM hingga 6GB siap memberikan pengalaman yang lebih responsif.\n\nCek unit aslinya langsung di Eldorado Semarang Cell ya!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-24",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-23",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 25,
@@ -321,10 +321,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua smartphone Realme berwarna segar berdiri di atas tatakan kubus minimalis dengan aksen warna kuning khas Realme di latar belakang.",
     "caption": "Seri C dari Realme selalu punya tempat di hati pengguna yang mencari spesifikasi fungsional dengan tampilan trendy 💛 Kalau prioritas utamamu adalah gudang penyimpanan luas dengan budget hemat, Realme C100i 256GB di harga 3.200.000 adalah jawabannya. Tapi kalau mengincar kelancaran animasi dan RAM 6GB, Realme C100X adalah teman setia yang tepat!\n\nKonsultasikan pilihanmu ke admin kami yuk!\n\nWa admin : 088272202241",
     "id": "konten-25",
-    "status": "Terjadwal",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-24",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 26,
@@ -334,10 +334,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua unit smartphone Infinix Note Series diletakkan miring dengan efek pencahayaan garis neon biru-cyan futuristik yang dinamis.",
     "caption": "Infinix Note series selalu menjadi primadona bagi yang menginginkan spesifikasi tinggi di kelas menengah ⚡ Note 60 reguler sudah sangat memuaskan dengan RAM 8GB dan ROM 256GB. Sedangkan Note 60 Pro menawarkan tenaga ekstra dengan varian RAM hingga 12GB dan pengisian daya yang lebih kilat.\n\nSemua varian berhak atas promo cashback Rp100.000. Datang ke toko dan rasakan performanya!\n\nWa admin : 088272202241",
     "id": "konten-26",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-11-25",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 27,
@@ -347,10 +347,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Close-up modul kamera belakang Tecno Camon 50 dan Camon 50 Pro dengan pantulan cahaya ring light fotografi profesional.",
     "caption": "Seri Camon dari Tecno memang dirancang khusus bagi pecinta fotografi dan konten visual 📷 Camon 50 memberikan ketajaman gambar yang sangat memuaskan di harga 4 jutaan. Naik ke Camon 50 Pro, kamu mendapatkan sensor yang lebih superior serta opsi memori luar biasa lega hingga 512GB untuk menampung ribuan foto dan klip video resolusi tinggi.\n\nReady stock di Eldorado Semarang Cell!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-27",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-26",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 28,
@@ -360,10 +360,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Samsung Galaxy A57 5G berputar elegan dengan grafis perisai biru perlindungan data Samsung Knox di layarnya.",
     "caption": "Membeli smartphone bukan cuma soal spek hari ini, tapi juga bagaimana performa dan keamanannya 3 hingga 5 tahun mendatang 🛡️ Samsung Galaxy A57 5G hadir dengan perlindungan data kelas enterprise Samsung Knox dan komitmen update sistem operasi yang panjang.\n\nDitambah promo cashback hingga Rp1.100.000, Galaxy A57 5G adalah pilihan cerdas untuk perangkat kerja dan harian yang bisa diandalkan. Yuk amankan unitmu!\n\nWa admin : 088272202241",
     "id": "konten-28",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-27",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 29,
@@ -373,10 +373,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Xiaomi 17T dipegang tangan dengan layar menyala menampilkan render grafis 3D resolusi tinggi berkecepatan mulus.",
     "caption": "Buat para power user, video editor di HP, maupun hardcore gamer, seri Xiaomi 17T adalah jawaban tuntas 🚀 Dibekali RAM 12 GB dan penyimpanan 512 GB UFS, kamu tidak perlu lagi pusing memikirkan aplikasi macet atau ruang penyimpanan habis.\n\nKedua tipe resmi ini sudah bergaransi resmi Indonesia dan ready di toko kami dengan cashback Rp100.000. Cek unitnya sekarang!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-29",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-28",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 30,
@@ -386,10 +386,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tampak samping bodi ramping Oppo Reno 16F 5G yang memantulkan gradasi warna aurora lembut di bawah tata lampu estetik studio.",
     "caption": "Bukan rahasia lagi kalau Oppo Reno series selalu memimpin dalam hal keindahan desain bodi dan kenyamanan genggaman ✨ Reno 16F 5G memadukan ketipisan bodi dengan kemampuan kamera portrait yang membuat setiap foto orang tampak seperti jepretan studio profesional.\n\nDapatkan promo cashback resmi Rp300.000 langsung di Eldorado Semarang Cell. Stok sangat terbatas, buruan tanya admin!\n\nWa admin : 088272202241",
     "id": "konten-30",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-11-29",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 31,
@@ -399,10 +399,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Vivo Y500 4G diletakkan di atas meja kerja aktif dengan cangkir kopi, kalender saku, dan kunci kendaraan, menciptakan suasana kerja dinamis.",
     "caption": "Buat kamu yang mobilitasnya tinggi dari pagi sampai malam, punya smartphone yang tahan banting dan hemat baterai adalah prioritas utama 🔋 Vivo Y500 4G dirancang untuk memberi kenyamanan tersebut lewat optimalisasi sistem Funtouch OS yang efisien.\n\nTersedia pilihan kapasitas memori hingga 256 GB dengan cashback resmi Rp100.000 di store kami. Yuk bawa pulang sekarang!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-31",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-11-30",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 32,
@@ -412,10 +412,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Realme C85 Pro diposisikan berdiri di atas permukaan batu alam modern dengan cipratan tetesan air halus untuk menonjolkan kesan ketangguhan fisik.",
     "caption": "Kenyamanan memakai smartphone datang dari performa yang lancar dan rasa aman saat dibawa beraktivitas outdoor 💪 Realme C85 Pro memadukan RAM 8 GB yang sangat leluasa dengan proteksi bodi tangguh di kelas harganya.\n\nPilihan 128 GB maupun 256 GB sama-sama mendapatkan cashback Rp50.000 di toko kami. Ready stock warna-warna favorit!\n\nWa admin : 088272202241",
     "id": "konten-32",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-01",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 33,
@@ -425,10 +425,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Ruang gaming bernuansa gelap dengan lighting LED neon biru dan ungu, Infinix GT50 Pro berada di tengah dengan lampu indikator punggung menyala futuristik.",
     "caption": "Mabar game kompetitif butuh smartphone dengan performa kencang dan kestabilan suhu yang terjaga 🎮 Infinix GT50 Pro memanjakan para gamer lewat kapasitas RAM 12 GB dan penyimpanan hingga 512 GB yang super lapang.\n\nSetiap pembelian di toko kami bergaransi resmi dan berhak atas cashback Rp100.000. Buktikan performanya langsung di store kami!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-33",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-02",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 34,
@@ -438,10 +438,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tecno Pova 8 5G diletakkan mendatar dengan layar menyala memutar trailer video resolusi tinggi berkecepatan tinggi dengan ikon sinyal 5G bercahaya di sudutnya.",
     "caption": "Buat kamu yang gemar menikmati konten video streaming, download dokumen besar, atau game online di perjalanan, Tecno Pova 8 5G hadir dengan dukungan jaringan generasi kelima yang responsif ⚡ Baterainya yang berkapasitas besar menjamin kamu tidak perlu cemas kehabisan daya saat asyik beraktivitas.\n\nPilihan RAM 6GB hingga 8GB tersedia di Eldorado Semarang Cell. Yuk mampir!\n\nWa admin : 088272202241",
     "id": "konten-34",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-03",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 35,
@@ -451,10 +451,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Nokia 105 warna biru klasik diletakkan di samping buku catatan saku, pulpen, dan helm kerja proyek, menampilkan nuansa fungsional dan keandalan tinggi.",
     "caption": "Ponsel klasik yang tak lekang oleh waktu! 📞 Nokia 105 dengan harga Rp290.000 adalah pilihan nomor satu bagi para pekerja proyek, driver, maupun siapa saja yang butuh nomor darurat kedua yang selalu aktif tanpa repot dicas setiap hari.\n\nKecil, ringan, dan tahan banting. Unit resmi bergaransi ready di store kami!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-35",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-04",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 36,
@@ -464,10 +464,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Samsung Galaxy Z Flip 8 dalam posisi setengah terlipat (Flex Cam mode) di atas meja marmer dengan cermin rias dan tas jinjing mini bernuansa mewah.",
     "caption": "Tinggalkan cara lama berfoto! Dengan Samsung Galaxy Z Flip 8, kamu cukup melipat smartphone separuh dan meletakkannya di atas meja untuk mengambil foto grup atau vlogging secara handsfree 📸 Layar lipatnya yang ringkas membuatnya sangat mudah diselipkan ke saku celana atau tas pesta kecil.\n\nNikmati penawaran spesial cashback resmi Rp1.200.000 hanya di Eldorado Semarang Cell. Konsultasi unit flagship bersama tim kami hari ini!\n\nWa admin : 088272202241",
     "id": "konten-36",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-12-05",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 37,
@@ -477,10 +477,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Samsung Galaxy S26 Ultra diletakkan bersama S-Pen presisi di samping dokumen arsitektur dan jam tangan mewah dengan pencahayaan dramatis elegan.",
     "caption": "Bagi profesional, eksekutif, dan kreator visual tingkat lanjut, Samsung Galaxy S26 Ultra adalah mahakarya teknologi yang memadukan kamera berkemampuan zoom luar biasa dengan kepraktisan pena stylus S-Pen bawaan ✒️\n\nManfaatkan promo cashback fantastis hingga Rp3.200.000 untuk pembelian unit bergaransi resmi di toko kami. Rasakan kemewahannya langsung di store!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-37",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-06",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 38,
@@ -490,10 +490,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Galaxy Z Fold 8 terbuka penuh menampilkan grafik bursa saham dan dokumen analisis bisnis secara berdampingan di atas meja rapat eksekutif.",
     "caption": "Mengapa harus membawa smartphone dan tablet secara terpisah jika kamu bisa memiliki keduanya dalam satu perangkat? 💼 Samsung Galaxy Z Fold 8 dan Fold 8 Ultra memberikan fleksibilitas layar smartphone saat tertutup dan layar tablet imersif saat dibuka.\n\nDapatkan cashback resmi hingga Rp2.200.000 di Eldorado Semarang Cell. Pengalaman unboxing dan transfer data dibantu sepenuhnya oleh staf kami!\n\nWa admin : 088272202241",
     "id": "konten-38",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-07",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 39,
@@ -503,10 +503,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Satu kepala charger resmi berlogo original bersebelahan dengan grafik gelombang arus listrik stabil berwarna biru, kontras dengan charger abal-abal yang meletupkan percikan merah.",
     "caption": "Jangan pernah korbankan smartphone kesayanganmu dengan charger murahan yang tidak jelas sertifikasi keamanannya ⚡ Charger original memiliki komponen proteksi lonjakan voltase dan kontrol suhu yang memastikan baterai terisi stabil tanpa merusak sirkuit internal.\n\nDi Eldorado Semarang Cell, kami sediakan kepala charger dan kabel data original lengkap bergaransi. Lindungi HP-mu sekarang!\n\nWa admin : 088272202241",
     "id": "konten-39",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-08",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 40,
@@ -516,10 +516,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tiga perangkat smartband dan smartwatch berjejer melingkar di atas bantalan display jam tangan dengan layar menyala menampilkan data kalori, detak jantung, dan jam.",
     "caption": "Ingin hidup lebih bugar dan tidak ketinggalan telepon penting saat berkendara? 🏃‍♂️ Smartband dan smartwatch adalah asisten harian terbaik untuk mencatat kualitas tidur, jarak jalan kaki, hingga membaca notifikasi chat masuk.\n\nKatalog kami punya pilihan lengkap mulai dari Rp225.000 saja! Tersedia dari Infinix, Xiaomi, hingga Samsung. Yuk pilih model kesukaanmu!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-40",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-09",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 41,
@@ -529,10 +529,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Staf toko sedang memasangkan tempered glass ke layar smartphone dengan kain pembersih dan roller perekat presisi di atas meja servis yang bersih.",
     "caption": "Layar smartphone adalah komponen paling rentan sekaligus paling mahal biaya perbaikannya jika pecah 🛡️ Menempelkan tempered glass berkualitas sejak hari pertama adalah perlindungan termurah yang bisa kamu berikan untuk smartphone barumu.\n\nNggak perlu pusing pasang sendiri takut miring atau ada debu di dalam! Datang ke toko kami, kami pasangkan sampai rapi sempurna tanpa biaya pasang tambahan ✨\n\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-41",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-12-10",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 42,
@@ -542,10 +542,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Koleksi casing premium tertata rapi di gantungan display toko dengan latar belakang pencahayaan hangat dan smartphone di sampingnya.",
     "caption": "Sering kali casing murah yang terlalu tebal tanpa sirkulasi membuat hawa panas smartphone terperangkap di dalam bodi, memicu penurunan performa dan mempercepat ausnya baterai 🔥\n\nPilihlah casing presisi yang memberikan perlindungan benturan optimal tanpa menghambat pelepasan panas alami bodi smartphone. Temukan koleksi casing terbaik di toko kami!\n\nWa admin : 088272202241",
     "id": "konten-42",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-11",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 43,
@@ -555,10 +555,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Car charger Xiaomi terpasang di soket konsol interior mobil modern dengan lampu cincin LED menyala elegan dan dua kabel Type-C terhubung rapi ke smartphone di dashboard.",
     "caption": "Pernah kehabisan baterai saat mengandalkan Google Maps di perjalanan luar kota? Jangan biarkan perjalananmu terganggu! 🚗 Xiaomi Travel Adapter Mobil Dual Port 37W hadir dengan harga terjangkau Rp100.000, mampu mengisi daya dua perangkat sekaligus dengan aman dan cepat.\n\nKompatibel dengan semua jenis mobil. Dapatkan aksesoris resminya langsung di Eldorado Semarang Cell!\n\nWa admin : 088272202241",
     "id": "konten-43",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-12",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 44,
@@ -568,10 +568,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Tablet berdiri elegan dengan keyboard fisik terpasang di atas meja kafe kayu, menampilkan dokumen teks yang sedang diketik di samping segelas es kopi.",
     "caption": "Membawa laptop berat setiap hari ke kampus atau kantor sering kali membuat punggung lelah 🎒 Kombinasi tablet dengan keyboard fisik magnetik adalah alternatif masa kini yang jauh lebih ringkas, hemat daya, dan fleksibel untuk mengetik tugas maupun meeting virtual.\n\nKatalog kami menyediakan Xiaomi Pad 8 paket lengkap keyboard serta aksesoris keyboard Infinix. Coba langsung kenyamanan mengetiknya di store kami!\n\nWa admin : 088272202241",
     "id": "konten-44",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-13",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 45,
@@ -581,10 +581,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Foto hangat seorang bapak dan ibu tersenyum bahagia memegang smartphone dengan layar menampilkan panggilan video bersama cucunya.",
     "caption": "Memberikan smartphone untuk orang tua bukan soal mencari spek gaming yang rumit, melainkan kemudahan pemakaian, layar yang terang terbaca, dan baterai yang awet 👵👴 Rekomendasi 2 jutaan kami seperti Redmi A7 Pro, Tecno Spark Go 3, dan Samsung A07 adalah pilihan sempurna yang simpel dan tahan lama.\n\nStaf kami siap membantu mengatur ukuran huruf besar dan memindahkan kontak lama secara gratis di toko! 💙\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-45",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-14",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 46,
@@ -594,10 +594,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Meja belajar rapi dengan tumpukan buku pelajaran sekolah, tempat pensil warna-warni, dan smartphone yang membuka aplikasi materi belajar digital.",
     "caption": "Membelikan smartphone untuk anak sekolah tidak harus mahal, asalkan memiliki kapasitas penyimpanan yang cukup untuk menyimpan dokumen tugas, modul PDF, dan aplikasi belajar online 🎒 Varian memori 128 GB di rentang 2.2 hingga 2.4 juta dari Tecno, Xiaomi, Realme, dan Infinix adalah solusi paling cerdas bagi para orang tua bijak.\n\nSemua unit bergaransi resmi Indonesia. Yuk konsultasikan kebutuhan putra-putri Anda bersama kami!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-46",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-15",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 47,
@@ -607,10 +607,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Smartphone terpasang kokoh pada holder stang sepeda motor dengan latar suasana jalan raya kota yang cerah, menampilkan rute peta GPS aktif.",
     "caption": "Bagi rekan-rekan pengemudi online dan kurir ekspedisi, smartphone adalah alat mencari nafkah utama 🛵 Dibutuhkan perangkat yang memiliki daya tahan baterai ekstra awet saat menjalankan aplikasi peta terus-menerus dan layar yang tetap terbaca di bawah sinar matahari terik.\n\nPilihan 2 jutaan dari Vivo Y05, Tecno Spark 50, dan Infinix Hot 70 siap menjadi partner kerja lapangan yang tangguh. Mampir ke toko yuk!\n\nWa admin : 088272202241",
     "id": "konten-47",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-16",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 48,
@@ -620,10 +620,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Suasana meja kerja online shop dengan tumpukan paket pesanan berlabel resi, printer thermal mini, dan smartphone yang menampilkan banyak notifikasi chat masuk.",
     "caption": "Kecepatan membalas pesan calon pembeli menentukan closing penjualan! 📦 Smartphone dengan RAM 6 GB atau 8 GB memastikan admin bisa berpindah cepat antara aplikasi WhatsApp Business, aplikasi marketplace, dan m-banking tanpa hambatan reloading.\n\nInvestasikan perangkat terbaik untuk kelancaran bisnismu di Eldorado Semarang Cell. Pilihan lengkap dan bergaransi resmi!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-48",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-17",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 49,
@@ -633,10 +633,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Smartphone terpasang pada tripod mini ring light di atas meja kamar kreatif, menampilkan pratinjau rekaman video konten dengan kualitas gambar jernih.",
     "caption": "Kualitas visual video yang stabil dan jernih adalah kunci agar penonton betah menonton kontenmu sampai habis 🎥 Dengan memilih smartphone yang memiliki stabilisasi gambar optik (OIS) dan algoritma kamera andal, kamu bisa merekam video jalan santai tanpa gambar bergetar.\n\nKoleksi smartphone kreator dari Tecno, Samsung, dan Oppo ready stock di toko kami lengkap dengan penawaran cashback. Mulai langkah kreatifmu sekarang!\n\nWa admin : 088272202241",
     "id": "konten-49",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-18",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 50,
@@ -646,10 +646,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Spanduk promosi digital elegan di etalase toko bertuliskan 'Official Cashback Program' dengan jajaran box smartphone dari berbagai brand di depannya.",
     "caption": "Mau beli smartphone baru dengan potongan harga resmi yang menguntungkan? 🎁 Di Eldorado Semarang Cell, kami menyalurkan langsung program cashback resmi dari brand terkemuka seperti Samsung, Xiaomi, Oppo, Vivo, Realme, Infinix, dan Tecno.\n\nSemua unit dijamin original, segel resmi pabrik, dan bergaransi penuh. Jangan sampai kehabisan kuota cashback, langsung hubungi admin kami ya!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-50",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-19",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 51,
@@ -659,10 +659,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Dua smartphone berada di atas meja counter toko: smartphone lama yang sedang diperiksa kondisinya oleh teknisi dan smartphone baru yang masih tersegel rapi di sampingnya.",
     "caption": "Daripada smartphone lama kamu dibiarkan menganggur di laci dan nilainya terus turun, manfaatkan program Tukar Tambah resmi di Eldorado Semarang Cell! 🔄 Bawa unit lamamu beserta kelengkapannya, tim kami akan menaksir kondisinya secara transparan dan jujur.\n\nSelisih biayanya bisa langsung kamu bayarkan untuk membawa pulang smartphone idamanmu. Cepat, aman, dan tanpa ribet COD!\n\nWa admin : 088272202241",
     "id": "konten-51",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-12-20",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 52,
@@ -672,10 +672,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Papan ilustrasi alur proses tukar tambah dengan ikon langkah 1 sampai 5 yang tersusun rapi di samping kalkulator dan smartphone display.",
     "caption": "Upgrade smartphone impian kini tidak harus mengeluarkan uang tunai penuh 💡 Dengan sistem tukar tambah di toko fisik kami, nilai dari HP lamamu bisa langsung menjadi potongan biaya yang sangat signifikan.\n\nPenasaran HP lamamu bisa dihargai berapa? Bawa unitnya ke toko kami untuk pengecekan dan estimasi gratis tanpa kewajiban beli! 💙\n\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-52",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-21",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 53,
@@ -685,10 +685,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Smartphone baru yang berkilau di samping dompet kulit rapi dan kalender meja yang menunjukkan tanggal muda bernuansa hangat dan elegan.",
     "caption": "Kerja keras sebulan penuh pantas dirayakan dengan sesuatu yang menunjang kemudahan komunikasi dan produktivitas kerjamu sehari-hari ✨ Momen gajian adalah waktu yang tepat untuk mengganti smartphone lama yang sudah mulai lambat atau baterainya bocor.\n\nYuk mampir ke Eldorado Semarang Cell, pilih model incaranmu dan nikmati pelayanan ramah dari staf kami!\n\nWa admin : 088272202241",
     "id": "konten-53",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-22",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 54,
@@ -698,10 +698,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Meja counter penyerahan smartphone dengan kotak kemasan baru terbuka, ponsel baru terpasang pelindung layar berkilau rapi, dan senyum ramah staf toko melayani pelanggan.",
     "caption": "Beli smartphone baru tapi malas pusing memindahkan ribuan nomor kontak dan riwayat obrolan WhatsApp dari HP lama? Tenang, di Eldorado Semarang Cell kamu tidak perlu repot sendirian! 🤝\n\nStaf kami siap membantu proses transfer data dari HP lamamu sampai selesai dan memasangkan tempered glass secara rapi. Datang, pilih, dan bawa pulang HP yang sudah siap pakai 100%!\n\nWa admin : 088272202241\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-54",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-23",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 55,
@@ -711,10 +711,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Suasana toko Eldorado Semarang Cell yang terang, rapi, dengan etalase kaca berkilau dan staf melayani pelanggan dengan ramah di dalam ruangan ber-AC yang nyaman.",
     "caption": "Membeli barang elektronik bernilai jutaan rupiah membutuhkan ketenangan dan kepastian 🛡️ Di toko fisik kami, kamu bisa memastikan layar tidak ada dead pixel, kamera berfungsi sempurna, dan nomor IMEI cocok dengan kotak sebelum membayar sepeser pun.\n\nBila ada kendala di kemudian hari, pintu toko kami selalu terbuka untuk membantu. Kenyamanan dan kepercayaanmu adalah prioritas utama kami 💙\n\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-55",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-24",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 56,
@@ -724,10 +724,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Layar smartphone menampilkan angka IMEI resmi dengan tanda centang hijau verifikasi, berdampingan dengan nota jaminan toko fisik.",
     "caption": "Pasar HP second memang menggiurkan, tapi risiko unit bermasalah sinyal atau terkunci akun pemilik lama sering mengintai jika beli dari sumber yang tidak jelas ⚠️\n\nDi Eldorado Semarang Cell, setiap smartphone bekas yang kami jual telah melewati pengecekan menyeluruh oleh teknisi: mulai dari keabsahan IMEI, fungsi hardware, hingga kelengkapan dokumen. Transparan, aman, dan bergaransi toko!\n\nWa admin : 088272202241",
     "id": "konten-56",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Reels",
-    "targetDate": "2026-12-25",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 57,
@@ -737,10 +737,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Meja kerja teknisi dengan alat servis presisi, mikroskop perbaikan, lem khusus LCD, dan layar smartphone baru yang siap dipasang rapi.",
     "caption": "Retak tipis pada layar kaca sering dianggap sepele, padahal bisa menjadi celah masuknya kelembaban udara dan kotoran yang merusak motherboard di dalamnya 🔧 Segera perbaiki layar smartphone kesayanganmu di meja teknisi Eldorado Semarang Cell.\n\nPengerjaan cepat, rapi, menggunakan suku cadang berkualitas, dan pastinya bergaransi. Konsultasikan kerusakan layarmu sekarang!\n\nWa servis : 089614351864\n📍 Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro",
     "id": "konten-57",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-26",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 58,
@@ -750,10 +750,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Baterai smartphone baru berdampingan dengan alat ukur multitester voltase teknisi dan obeng presisi servis di atas matras antistatik.",
     "caption": "Baterai yang sudah aus tidak hanya membuat aktivitasmu terganggu karena harus terus berada di dekat colokan, tapi juga berisiko membahayakan jika dibiarkan sampai menggelembung dan menekan layar dari dalam 🔋\n\nCukup ganti dengan baterai baru berkualitas di counter servis kami, performa HP-mu akan kembali segar seperti baru tanpa perlu keluar biaya beli HP baru. Yuk cek kesehatan bateraimu!\n\nWa servis : 089614351864",
     "id": "konten-58",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Carousel",
-    "targetDate": "2026-12-27",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 59,
@@ -763,10 +763,10 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Formulir checklist pemeriksaan servis teknisi di atas meja counter servis yang bersih, dengan smartphone pelanggan yang sedang diperiksa secara profesional di depan pelanggan.",
     "caption": "Banyak orang ragu menyervis HP karena takut datanya diintip atau biayanya membengkak tiba-tiba 🤝 Di Eldorado Semarang Cell, kami memegang teguh prinsip kejujuran dan transparansi.\n\nSetiap diagnosa dan rincian biaya selalu kami sampaikan secara terbuka sebelum tindakan dilakukan. Percayakan perbaikan smartphone kamu kepada teknisi yang amanah dan berpengalaman!\n\nWa servis : 089614351864",
     "id": "konten-59",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-28",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
     "no": 60,
@@ -776,9 +776,9 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "ambience": "Foto arsitektur tampak depan toko Eldorado Semarang Cell yang modern, terang, dengan papan nama toko jelas, etalase rapi, dan suasana hangat menyambut kedatangan pelanggan.",
     "caption": "Butuh upgrade smartphone baru, cari unit second berkualitas, mau tukar tambah hemat, atau butuh servis cepat bergaransi? Cukup satu tujuan untuk semua kebutuhan gadgetmu: Eldorado Semarang Cell 💙\n\nKami siap memberikan pelayanan terbaik dengan harga transparan dan produk bergaransi resmi. Kunjungi kami hari ini!\n\n📍 Alamat: Jl. Soekarno Hatta No 43 Metro Barat, Kota Metro\n📱 WhatsApp Admin: 088272202241\n🔧 WhatsApp Servis: 089614351864",
     "id": "konten-60",
-    "status": "Draft",
+    "executed": false,
     "platform": "Instagram Feed",
-    "targetDate": "2026-12-29",
-    "updatedAt": "2026-10-28T04:06:15.499Z"
+    "targetDate": "",
+    "updatedAt": "2026-10-28T04:17:58.516Z"
   }
 ];

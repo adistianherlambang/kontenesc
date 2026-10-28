@@ -1,129 +1,153 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { 
-  Sparkles, 
   Database, 
   Download, 
   Plus, 
   Smartphone,
   RefreshCw,
   CheckCircle2,
-  AlertCircle
+  FileSpreadsheet,
+  FileCode,
+  ChevronDown
 } from "lucide-react";
 
 interface NavbarProps {
   firebaseStatus: "connected" | "offline" | "syncing";
   totalCount: number;
+  executedCount: number;
   onOpenCreate: () => void;
   onOpenSync: () => void;
-  onExport: () => void;
+  onExportJSON: () => void;
+  onExportCSV: () => void;
 }
 
 export default function Navbar({
   firebaseStatus,
   totalCount,
+  executedCount,
   onOpenCreate,
   onOpenSync,
-  onExport
+  onExportJSON,
+  onExportCSV
 }: NavbarProps) {
-  return (
-    <header className="sticky top-0 z-40 glass-header px-4 sm:px-6 py-3.5 transition-all">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        {/* Brand & Title */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1F6FB6] to-[#0E497C] flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <Smartphone className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">
-                  Semarang Cell
-                </h1>
-                <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-[#1F6FB6] border border-blue-200">
-                  Konten Hub
-                </span>
-              </div>
-              <p className="text-xs text-slate-500">
-                Eldorado Semarang Cell Metro • {totalCount} Ide Konten
-              </p>
-            </div>
-          </div>
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const percent = totalCount > 0 ? Math.round((executedCount / totalCount) * 100) : 0;
 
-          {/* Mobile Actions Toggle */}
-          <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={onOpenCreate}
-              className="w-9 h-9 rounded-lg bg-[#1F6FB6] text-white flex items-center justify-center shadow-sm"
-              title="Tambah Konten"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
+  return (
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E9E9E7] px-4 sm:px-6 py-2.5 transition-all">
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+        
+        {/* Left: Notion-Style Breadcrumb & Execution Progress */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-md bg-[#1F6FB6] flex items-center justify-center text-white font-bold text-xs shadow-xs">
+            📱
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 text-xs text-[#787774]">
+              <span>Eldorado Semarang Cell</span>
+              <span>/</span>
+              <span className="font-semibold text-[#37352F] flex items-center gap-1">
+                Konten Hub
+              </span>
+            </div>
+            
+            {/* Minimalist Progress Meter */}
+            <div className="flex items-center gap-2 mt-0.5">
+              <div className="w-24 sm:w-32 h-1.5 rounded-full bg-[#EFEFED] overflow-hidden">
+                <div 
+                  className="h-full bg-[#1F6FB6] rounded-full transition-all duration-300"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              <span className="text-[11px] font-medium text-[#787774]">
+                {executedCount}/{totalCount} dieksekusi ({percent}%)
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Actions & Status */}
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-between md:justify-end">
-          {/* Firebase Connection Status Badge */}
+        {/* Right: Actions (Notion Minimalist Buttons) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-between sm:justify-end">
+          
+          {/* Cloud Sync Status Pill */}
           <button
             onClick={onOpenSync}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
-              firebaseStatus === "connected"
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                : firebaseStatus === "syncing"
-                ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
-                : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
-            }`}
-            title="Klik untuk membuka pengaturan Firebase Firestore"
+            className="notion-btn notion-btn-default text-xs"
+            title="Pengaturan koneksi Firebase Firestore"
           >
             {firebaseStatus === "connected" ? (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Firebase Aktif</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[#2B7830] font-medium">Cloud Aktif</span>
               </>
             ) : firebaseStatus === "syncing" ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 text-amber-600 animate-spin" />
-                <span>Menyinkronkan...</span>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                <span className="text-amber-600 font-medium">Sinkron...</span>
               </>
             ) : (
               <>
-                <Database className="w-3.5 h-3.5 text-slate-500" />
-                <span>Penyimpanan Lokal (Klik Setup)</span>
+                <Database className="w-3.5 h-3.5 text-[#787774]" />
+                <span className="text-[#787774]">Lokal (Firestore)</span>
               </>
             )}
           </button>
 
-          {/* Export JSON Button */}
-          <button
-            onClick={onExport}
-            className="btn-secondary text-xs sm:text-sm py-1.5 px-3"
-            title="Unduh data brief saat ini dalam format JSON"
-          >
-            <Download className="w-4 h-4 text-slate-500" />
-            <span className="hidden sm:inline">Export JSON</span>
-          </button>
+          {/* Export Dropdown (JSON / CSV) */}
+          <div className="relative">
+            <button
+              onClick={() => setShowExportMenu(!showExportMenu)}
+              className="notion-btn notion-btn-bordered text-xs"
+            >
+              <Download className="w-3.5 h-3.5 text-[#787774]" />
+              <span>Export</span>
+              <ChevronDown className="w-3 h-3 text-[#9B9A97]" />
+            </button>
 
-          {/* Sync / Database Button */}
-          <button
-            onClick={onOpenSync}
-            className="btn-secondary text-xs sm:text-sm py-1.5 px-3 text-[#1F6FB6] border-blue-200 hover:bg-blue-50"
-            title="Sinkronisasi ke Firestore"
-          >
-            <RefreshCw className="w-4 h-4 text-[#1F6FB6]" />
-            <span className="hidden sm:inline">Sinkronisasi</span>
-          </button>
+            {showExportMenu && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowExportMenu(false)} 
+                />
+                <div className="absolute right-0 mt-1 w-44 bg-white border border-[#E9E9E7] rounded-lg shadow-lg z-50 py-1 text-xs">
+                  <button
+                    onClick={() => {
+                      onExportJSON();
+                      setShowExportMenu(false);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-[#F7F6F3] flex items-center gap-2 text-[#37352F]"
+                  >
+                    <FileCode className="w-3.5 h-3.5 text-[#1F6FB6]" />
+                    <span>Download JSON (.json)</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      onExportCSV();
+                      setShowExportMenu(false);
+                    }}
+                    className="w-full px-3 py-2 text-left hover:bg-[#F7F6F3] flex items-center gap-2 text-[#37352F]"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Download CSV (.csv)</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
 
-          {/* New Content Button */}
+          {/* New / Batch Add Content Button */}
           <button
             onClick={onOpenCreate}
-            className="hidden md:inline-flex btn-primary text-xs sm:text-sm py-1.5 px-3.5"
+            className="notion-btn notion-btn-primary text-xs"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
             <span>Tambah Konten</span>
           </button>
         </div>
+
       </div>
     </header>
   );

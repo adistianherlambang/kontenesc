@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertTriangle, Trash2, X } from "lucide-react";
+import { AlertCircle, Trash2, X } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 
 interface DeleteConfirmModalProps {
@@ -22,44 +22,44 @@ export default function DeleteConfirmModal({
   if (!isOpen || !item) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs modal-overlay">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl modal-content border border-slate-100 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4 border border-rose-100 shadow-xs">
-          <AlertTriangle className="w-6 h-6" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 notion-modal-overlay">
+      <div className="notion-modal max-w-sm w-full p-5 shadow-xl text-left">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#DF5452]">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>Hapus Konten #{item.no}?</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 text-[#9B9A97] hover:text-[#37352F] rounded"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        <h3 className="text-base font-bold text-slate-900 mb-1">
-          Hapus Ide Konten #{item.no}?
-        </h3>
-        <p className="text-xs text-slate-500 mb-4 px-2">
-          Apakah Anda yakin ingin menghapus konten <span className="font-semibold text-slate-700">"{item.judul}"</span>? Tindakan ini tidak dapat dibatalkan.
+        <p className="text-xs text-[#787774] mb-3 leading-relaxed">
+          Konten <span className="font-semibold text-[#37352F]">"{item.judul}"</span> akan dihapus permanen dari database.
         </p>
 
-        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-5 text-left text-xs text-slate-600 font-mono line-clamp-2">
+        <div className="bg-[#F7F6F3] p-2.5 rounded border border-[#E9E9E7] mb-4 text-[11.5px] font-mono text-[#787774] line-clamp-2">
           {item.copywriting}
         </div>
 
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
             disabled={isDeleting}
-            className="btn-secondary text-xs py-2 px-5 flex-1 justify-center"
+            className="notion-btn notion-btn-bordered text-xs"
           >
             Batal
           </button>
           <button
             onClick={onConfirm}
             disabled={isDeleting}
-            className="bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs py-2 px-5 rounded-lg flex-1 justify-center inline-flex items-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
+            className="notion-btn bg-[#DF5452] hover:bg-[#c94543] text-white text-xs disabled:opacity-50"
           >
-            {isDeleting ? (
-              <span>Menghapus...</span>
-            ) : (
-              <>
-                <Trash2 className="w-4 h-4" />
-                <span>Hapus Konten</span>
-              </>
-            )}
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>{isDeleting ? "Menghapus..." : "Hapus Permanen"}</span>
           </button>
         </div>
       </div>

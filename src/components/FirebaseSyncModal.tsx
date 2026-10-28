@@ -11,8 +11,7 @@ import {
   AlertCircle, 
   HelpCircle,
   ExternalLink,
-  RefreshCw,
-  Sparkles
+  RefreshCw
 } from "lucide-react";
 import { firebaseConfig } from "@/lib/firebase";
 
@@ -45,7 +44,7 @@ export default function FirebaseSyncModal({
       setLoadingAction("push");
       setMsg(null);
       await onPushToFirebase();
-      setMsg({ type: "success", text: "Berhasil mengunggah dan menyinkronkan data ke Cloud Firestore!" });
+      setMsg({ type: "success", text: "Berhasil mengunggah seluruh konten ke Cloud Firestore!" });
     } catch (err: any) {
       setMsg({ 
         type: "error", 
@@ -80,128 +79,123 @@ export default function FirebaseSyncModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs modal-overlay">
-      <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl modal-content border border-slate-100 max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 notion-modal-overlay">
+      <div className="notion-modal max-w-lg w-full p-5 max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1F6FB6] flex items-center justify-center border border-blue-100 shadow-xs">
-              <Database className="w-5 h-5" />
-            </div>
+        <div className="flex items-center justify-between pb-3 border-b border-[#E9E9E7] mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">☁️</span>
             <div>
-              <h3 className="text-base font-bold text-slate-900">
-                Pusat Sinkronisasi Firebase
+              <h3 className="text-sm font-semibold text-[#37352F]">
+                Koneksi Cloud Firestore
               </h3>
-              <p className="text-xs text-slate-500">
-                Project ID: <span className="font-mono font-semibold text-slate-700">{firebaseConfig.projectId}</span>
+              <p className="text-[11px] text-[#787774]">
+                Project: <span className="font-mono">{firebaseConfig.projectId}</span>
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 text-[#9B9A97] hover:text-[#37352F] rounded"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Status Alert */}
-        <div className={`p-4 rounded-2xl mb-4 border flex items-start gap-3 ${
+        {/* Status Notice */}
+        <div className={`p-3 rounded border mb-3.5 text-xs flex items-start gap-2.5 ${
           firebaseStatus === "connected"
-            ? "bg-emerald-50/70 border-emerald-200 text-emerald-800"
-            : "bg-amber-50/80 border-amber-200 text-amber-900"
+            ? "bg-[#E7F3E8] border-[#E9E9E7] text-[#2B7830]"
+            : "bg-[#FAEBDD] border-[#E9E9E7] text-[#D9730D]"
         }`}>
           {firebaseStatus === "connected" ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-[#2B7830]" />
           ) : (
-            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#D9730D]" />
           )}
-          <div className="text-xs space-y-1">
-            <p className="font-bold">
+          <div className="space-y-0.5">
+            <p className="font-semibold">
               {firebaseStatus === "connected"
                 ? "Cloud Firestore Terhubung"
-                : "Mode Penyimpanan Lokal & Menunggu Setup Firestore"}
+                : "Penyimpanan Lokal Aktif"}
             </p>
-            <p className="leading-relaxed opacity-90">
+            <p className="opacity-90 leading-relaxed text-[11.5px]">
               {firebaseStatus === "connected"
-                ? `Semua perubahan otomatis tersimpan di Cloud Firestore dan sinkron di semua perangkat. (${localCount} konten aktif)`
-                : `Aplikasi saat ini beroperasi penuh menggunakan penyimpanan lokal browser (${localCount} konten aktif).`}
+                ? `Perubahan otomatis tersimpan ke Cloud Firestore (${localCount} konten aktif).`
+                : `Aplikasi menyimpan perubahan di browser (${localCount} konten). Klik sinkronkan setelah database diaktifkan.`}
             </p>
           </div>
         </div>
 
         {msg && (
-          <div className={`p-3 rounded-xl mb-4 text-xs flex items-center gap-2 border ${
+          <div className={`p-2.5 rounded mb-3 text-xs flex items-center gap-2 border ${
             msg.type === "success" 
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700" 
-              : "bg-rose-50 border-rose-200 text-rose-700"
+              ? "bg-[#E7F3E8] border-[#E9E9E7] text-[#2B7830]" 
+              : "bg-[#FDEBEC] border-[#E9E9E7] text-[#DF5452]"
           }`}>
-            {msg.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+            {msg.type === "success" ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0 text-[#DF5452]" />}
             <span>{msg.text}</span>
           </div>
         )}
 
-        {/* Setup Guide Accordion */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-5 text-xs text-slate-600 space-y-2">
-          <div className="flex items-center gap-2 font-bold text-slate-800">
-            <HelpCircle className="w-4 h-4 text-[#1F6FB6]" />
-            <span>Panduan Singkat Aktivasi Firestore di Firebase Console:</span>
+        {/* Setup Accordion */}
+        <div className="bg-[#F7F6F3] border border-[#E9E9E7] rounded p-3 mb-4 text-xs text-[#787774] space-y-1.5">
+          <div className="flex items-center gap-1.5 font-semibold text-[#37352F]">
+            <HelpCircle className="w-3.5 h-3.5 text-[#1F6FB6]" />
+            <span>Cara Mengaktifkan Firestore di Firebase Console:</span>
           </div>
-          <ol className="list-decimal list-inside space-y-1 text-slate-600 leading-relaxed pl-1">
-            <li>Buka <a href="https://console.firebase.google.com/project/konten-semarang/firestore" target="_blank" rel="noreferrer" className="text-[#1F6FB6] font-semibold underline inline-flex items-center gap-0.5">Firebase Console <ExternalLink className="w-3 h-3" /></a></li>
-            <li>Klik menu <span className="font-semibold text-slate-800">Build ➔ Firestore Database</span>.</li>
-            <li>Klik tombol <span className="font-semibold text-slate-800">Create database</span> (pilih Mode Test atau Production).</li>
-            <li>Setelah database dibuat, kembali ke sini dan klik tombol <span className="font-semibold text-[#1F6FB6]">"Unggah Semua ke Firestore"</span> di bawah!</li>
+          <ol className="list-decimal list-inside space-y-0.5 text-[11.5px] leading-relaxed pl-1">
+            <li>Buka <a href="https://console.firebase.google.com/project/konten-semarang/firestore" target="_blank" rel="noreferrer" className="text-[#1F6FB6] underline inline-flex items-center gap-0.5">Firebase Console <ExternalLink className="w-2.5 h-2.5" /></a></li>
+            <li>Pilih menu <span className="font-medium text-[#37352F]">Firestore Database</span> lalu klik <span className="font-medium text-[#37352F]">Create database</span>.</li>
+            <li>Pilih mode pengujian (*Test mode*) atau *Production*.</li>
+            <li>Klik tombol <span className="font-medium text-[#1F6FB6]">"Unggah ke Firestore"</span> di bawah.</li>
           </ol>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-2.5">
-          {/* Push to Firestore */}
+        {/* Buttons */}
+        <div className="space-y-2">
           <button
             onClick={handlePush}
             disabled={loadingAction !== null}
-            className="w-full btn-primary py-2.5 px-4 justify-center text-xs sm:text-sm font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
+            className="w-full notion-btn notion-btn-primary py-2 justify-center text-xs"
           >
             {loadingAction === "push" ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                 <span>Mengunggah {localCount} Konten ke Firestore...</span>
               </>
             ) : (
               <>
-                <CloudUpload className="w-4 h-4" />
-                <span>Unggah & Sinkronkan Semua Konten ke Firestore</span>
+                <CloudUpload className="w-3.5 h-3.5" />
+                <span>Unggah & Sinkronkan {localCount} Konten ke Firestore</span>
               </>
             )}
           </button>
 
-          {/* Pull from Firestore */}
           <button
             onClick={handlePull}
             disabled={loadingAction !== null}
-            className="w-full btn-secondary py-2.5 px-4 justify-center text-xs sm:text-sm font-semibold border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-50 cursor-pointer"
+            className="w-full notion-btn notion-btn-bordered py-2 justify-center text-xs"
           >
             {loadingAction === "pull" ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin text-[#1F6FB6]" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#1F6FB6]" />
                 <span>Memuat dari Firestore...</span>
               </>
             ) : (
               <>
-                <CloudDownload className="w-4 h-4 text-[#1F6FB6]" />
+                <CloudDownload className="w-3.5 h-3.5 text-[#1F6FB6]" />
                 <span>Tarik Data Terbaru dari Firestore</span>
               </>
             )}
           </button>
 
-          {/* Reset to Default */}
           <button
             onClick={handleReset}
             disabled={loadingAction !== null}
-            className="w-full py-2 px-4 rounded-xl text-xs font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full py-1.5 text-xs text-[#787774] hover:text-[#DF5452] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-3 h-3" />
             <span>Reset Data ke 60 Ide Asli brief.json</span>
           </button>
         </div>

@@ -35,7 +35,7 @@ export interface ContentItem {
   copywriting: string;
   ambience: string;
   caption: string;
-  status?: "Draft" | "Siap Tayang" | "Terjadwal" | "Sudah Tayang";
+  executed?: boolean; // Notion-style checkbox: true = konten sudah dieksekusi/tayang
   platform?: "Instagram Feed" | "Instagram Carousel" | "Instagram Reels" | "Instagram Story";
   targetDate?: string;
   notes?: string;
@@ -103,7 +103,7 @@ export async function seedContentsToDb(items: ContentItem[], onProgress?: (curre
     batch.set(docRef, {
       ...item,
       id: docId,
-      status: item.status || "Siap Tayang",
+      executed: Boolean(item.executed),
       platform: item.platform || "Instagram Feed",
       updatedAt: new Date().toISOString()
     });
