@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import Sidebar from "@/components/Sidebar";
+import Sidebar, { StatusView } from "@/components/Sidebar";
 import ContentCard from "@/components/ContentCard";
 import ContentTable from "@/components/ContentTable";
 import InstagramPreviewModal from "@/components/InstagramPreviewModal";
@@ -34,7 +34,7 @@ export default function DashboardPage() {
   const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
 
   // View & Nav State
-  const [activeSidebarView, setActiveSidebarView] = useState("all");
+  const [activeSidebarView, setActiveSidebarView] = useState<StatusView>("all");
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -400,7 +400,8 @@ export default function DashboardPage() {
                   onToggleExecuted={handleToggleExecuted}
                   onEdit={handleOpenEdit}
                   onDelete={handleDeleteClick}
-                  onPreview={(it) => setPreviewItem(it)}
+                  onPreview={(it: ContentItem) => setPreviewItem(it)}
+                  onOpen={(it: ContentItem) => setPreviewItem(it)}
                 />
               ))}
             </div>
@@ -411,7 +412,7 @@ export default function DashboardPage() {
                 onToggleExecuted={handleToggleExecuted}
                 onEdit={handleOpenEdit}
                 onDelete={handleDeleteClick}
-                onPreview={(it) => setPreviewItem(it)}
+                onPreview={(it: ContentItem) => setPreviewItem(it)}
               />
             </div>
           )}

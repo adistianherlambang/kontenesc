@@ -1,123 +1,139 @@
 @import "tailwindcss";
 
-:root {
-  --font-sans: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-  
-  --primary: #1F6FB6;
-  --primary-hover: #185A94;
-  --primary-light: #EEF4FF;
+/* ==========================================================================
+   Design tokens — single source of truth.
+   Every component must use these (bg-surface, text-muted, border-line, ...)
+   instead of raw hex values.
+   ========================================================================== */
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
-  --border-subtle: #ECEBE8;
-  --text-main: #18181B;
-  --text-muted: #71717A;
-  --text-dim: #A1A1AA;
+  --color-canvas: #FFFFFF;
+  --color-surface: #FAFAF9;
+  --color-subtle: #F5F5F4;
+  --color-line: #E7E5E4;
+  --color-line-strong: #D6D3D1;
+
+  --color-ink: #1C1917;
+  --color-muted: #78716C;
+  --color-faint: #A8A29E;
+
+  --color-brand: #1F6FB6;
+  --color-brand-hover: #185A94;
+  --color-brand-soft: #EAF2FA;
+
+  --color-success: #15803D;
+  --color-success-soft: #ECFDF3;
+  --color-danger: #DC2626;
+  --color-danger-hover: #B91C1C;
+  --color-danger-soft: #FEF2F2;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  font-family: var(--font-sans);
-  color: var(--text-main);
-  background-color: #FFFFFF;
-  height: 100vh;
-  width: 100vw;
+html,
+body {
+  height: 100%;
   overflow: hidden;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle Modern Mac Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #D4D4D8;
+  background: var(--color-line-strong);
   border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #A1A1AA;
-}
+::-webkit-scrollbar-thumb:hover { background-color: var(--color-faint); }
 
-/* Checkbox Style */
-.notion-checkbox {
-  appearance: none;
-  width: 17px;
-  height: 17px;
-  border: 1.5px solid #D4D4D8;
-  border-radius: 5px;
-  outline: none;
-  cursor: pointer;
-  background-color: #FFFFFF;
-  position: relative;
-  transition: all 0.15s ease;
-  vertical-align: middle;
-  flex-shrink: 0;
-}
-.notion-checkbox:hover {
-  border-color: #A1A1AA;
-}
-.notion-checkbox:checked {
-  background-color: #2F7E41;
-  border-color: #2F7E41;
-}
-.notion-checkbox:checked::after {
-  content: "";
-  position: absolute;
-  left: 4.5px;
-  top: 1.5px;
-  width: 4.5px;
-  height: 9px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
+@layer components {
+  /* ---------- Buttons (all 32px tall) ---------- */
+  .btn {
+    @apply inline-flex h-8 shrink-0 cursor-pointer select-none items-center justify-center gap-1.5
+      whitespace-nowrap rounded-lg px-3 text-[13px] font-medium transition-colors
+      outline-none focus-visible:ring-3 focus-visible:ring-brand/25
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary { @apply bg-brand text-white hover:bg-brand-hover; }
+  .btn-secondary { @apply border border-line bg-canvas text-ink hover:bg-subtle; }
+  .btn-ghost { @apply text-muted hover:bg-subtle hover:text-ink; }
+  .btn-danger { @apply bg-danger text-white hover:bg-danger-hover; }
+  .btn-danger-ghost { @apply text-danger hover:bg-danger-soft; }
+  .btn-icon { @apply w-8 px-0; }
 
-/* Modals */
-.notion-modal-overlay {
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(6px);
-}
-.notion-modal {
-  background: #FFFFFF;
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
-}
+  /* ---------- Form fields ---------- */
+  .field-label { @apply mb-1.5 block text-xs font-medium text-muted; }
+  .input {
+    @apply h-8 w-full rounded-lg border border-line bg-canvas px-3 text-[13px] text-ink
+      outline-none transition placeholder:text-faint
+      focus:border-brand focus:ring-3 focus:ring-brand/15;
+  }
+  .textarea {
+    @apply w-full resize-y rounded-lg border border-line bg-canvas px-3 py-2 text-[13px] leading-relaxed
+      text-ink outline-none transition placeholder:text-faint
+      focus:border-brand focus:ring-3 focus:ring-brand/15;
+  }
 
-/* Table View */
-.notion-th {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-  background: #F8F8F9;
-}
-.notion-td {
-  font-size: 12px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-main);
-  vertical-align: top;
-}
-.notion-row:hover td {
-  background: #F7F6F3;
-}
-.notion-row.is-executed td {
-  background: #FAFAFA;
-  opacity: 0.75;
-}
-.notion-row.is-executed .notion-title-text {
-  text-decoration: line-through;
-  color: var(--text-muted);
+  /* ---------- Checkbox ---------- */
+  .checkbox {
+    @apply relative size-4 shrink-0 cursor-pointer appearance-none rounded border-[1.5px]
+      border-line-strong bg-canvas transition-colors hover:border-faint
+      focus-visible:ring-3 focus-visible:ring-brand/25 outline-none
+      checked:border-brand checked:bg-brand;
+  }
+  .checkbox:checked::after {
+    content: "";
+    position: absolute;
+    left: 4.5px;
+    top: 1.5px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* ---------- Badge ---------- */
+  .badge { @apply inline-flex h-5 items-center rounded-md px-1.5 text-[11px] font-medium whitespace-nowrap; }
+
+  /* ---------- Sidebar navigation ---------- */
+  .nav-item {
+    @apply flex h-8 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px]
+      text-muted transition-colors hover:bg-subtle hover:text-ink;
+  }
+  .nav-item[data-active="true"] { @apply bg-subtle font-medium text-ink; }
+  .nav-count { @apply ml-auto font-mono text-[11px] text-faint; }
+  .section-label { @apply mb-1 px-2.5 text-[11px] font-medium text-faint; }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-[2px]
+      sm:items-center sm:p-6;
+  }
+  .modal {
+    @apply flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-line
+      bg-canvas shadow-[0_24px_64px_rgba(28,25,23,0.18)] sm:rounded-2xl;
+  }
+  .modal-header { @apply flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line px-5; }
+  .modal-title { @apply truncate text-[15px] font-semibold text-ink; }
+  .modal-body { @apply flex-1 overflow-y-auto p-5; }
+  .modal-footer { @apply flex shrink-0 items-center justify-end gap-2 border-t border-line px-5 py-4; }
+
+  /* ---------- Callout / notice ---------- */
+  .notice { @apply flex items-start gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] leading-relaxed; }
+  .notice-info { @apply border-line bg-surface text-muted; }
+  .notice-success { @apply border-success/20 bg-success-soft text-success; }
+  .notice-danger { @apply border-danger/20 bg-danger-soft text-danger; }
+
+  /* ---------- Data table ---------- */
+  .th {
+    @apply sticky top-0 z-10 h-9 border-b border-line bg-surface px-3 text-left text-xs font-medium
+      text-muted whitespace-nowrap;
+  }
+  .td { @apply border-b border-line px-3 py-2.5 align-top text-[13px] text-ink; }
 }
