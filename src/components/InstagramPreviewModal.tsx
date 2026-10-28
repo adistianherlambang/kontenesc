@@ -83,7 +83,7 @@ export default function InstagramPreviewModal({
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 bg-[#F7F6F3] flex justify-center">
           <div className="w-full max-w-[310px] bg-white rounded-[24px] border-[5px] border-[#1E293B] shadow-xl overflow-hidden flex flex-col">
             {/* Phone Top Notch Bar */}
-            <div className="bg-[#1E293B] text-white text-[9px] px-4 py-1 flex items-center justify-between font-mono">
+            <div className="bg-[#1E293B] text-white text-[9px] px-4 py-1 flex items-center justify-between">
               <span>09:41</span>
               <div className="w-10 h-2 bg-slate-900 rounded-full" />
               <span>5G 100%</span>
@@ -121,7 +121,7 @@ export default function InstagramPreviewModal({
                 <h3 className="text-xs font-extrabold text-amber-300 mb-1.5 uppercase tracking-wide">
                   {item.judul}
                 </h3>
-                <p className="text-[11px] font-mono text-white/95 whitespace-pre-wrap leading-relaxed drop-shadow-xs">
+                <p className="text-[11px] text-white/95 whitespace-pre-wrap leading-relaxed drop-shadow-xs">
                   {item.copywriting}
                 </p>
               </div>

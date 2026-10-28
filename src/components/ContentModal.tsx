@@ -531,7 +531,7 @@ export default function ContentModal({
                   value={jsonInput}
                   onChange={(e) => setJsonInput(e.target.value)}
                   placeholder='[ { "no": 61, "kategori": "Edukasi & Spesifikasi", "judul": "Judul konten...", "copywriting": "Teks feed...", "caption": "Caption..." } ]'
-                  className="textarea font-mono text-xs"
+                  className="textarea text-xs"
                 />
               </div>
 
@@ -594,7 +594,7 @@ export default function ContentModal({
                 <div>
                   <p className="text-xs font-semibold text-ink">Import Data CSV / Excel</p>
                   <p className="text-xs text-muted">
-                    Kolom: <span className="font-mono text-ink">no, kategori, judul, copywriting, ambience, caption, executed</span>
+                    Kolom: <span className="text-ink">kategori, judul, copywriting, ambience, caption, executed</span>
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -659,7 +659,7 @@ export default function ContentModal({
                   value={csvInput}
                   onChange={(e) => setCsvInput(e.target.value)}
                   placeholder="no,kategori,judul,copywriting,ambience,caption,platform,executed"
-                  className="textarea font-mono text-xs"
+                  className="textarea text-xs"
                 />
               </div>
 

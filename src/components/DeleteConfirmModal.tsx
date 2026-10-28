@@ -52,7 +52,7 @@ export default function DeleteConfirmModal({
             Konten <strong className="font-semibold text-ink">"{item.judul}"</strong> akan dihapus permanen dari database.
           </p>
 
-          <div className="rounded-lg border border-line bg-surface p-3 font-mono text-xs text-muted line-clamp-3">
+          <div className="rounded-lg border border-line bg-surface p-3 text-xs text-muted line-clamp-3">
             {item.copywriting}
           </div>
         </div>

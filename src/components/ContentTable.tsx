@@ -94,7 +94,7 @@ export default function ContentTable({
               <th className="th min-w-[280px]">Teks Visual (Copywriting)</th>
               <th className="th min-w-[200px]">Arahan Visual</th>
               <th className="th min-w-[130px]">Format</th>
-              <th className="th w-24 text-center">Aksi</th>
+              {/* <th className="th w-24 text-center">Aksi</th> */}
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
@@ -121,8 +121,8 @@ export default function ContentTable({
                     >
                       <span
                         className={`flex size-5 items-center justify-center rounded-md border-[1.5px] transition-colors ${isDone
-                            ? "border-success bg-success text-white"
-                            : "border-line-strong bg-white text-transparent hover:border-brand"
+                          ? "border-success bg-success text-white"
+                          : "border-line-strong bg-white text-transparent hover:border-brand"
                           }`}
                       >
                         <Check className="size-3.5 stroke-[2.75]" />
@@ -157,7 +157,7 @@ export default function ContentTable({
                   {/* Copywriting */}
                   <td className="td">
                     <div className="flex items-start justify-between gap-2 group/copy">
-                      <p className="line-clamp-2 text-muted font-mono text-[11px] leading-relaxed">
+                      <p className="line-clamp-2 text-muted text-[11px] leading-relaxed">
                         {item.copywriting}
                       </p>
                       <button
@@ -190,7 +190,7 @@ export default function ContentTable({
                   </td>
 
                   {/* Actions */}
-                  <td className="td text-center align-middle">
+                  {/* <td className="td text-center align-middle">
                     <div className="flex items-center justify-center gap-1.5">
                       <button
                         type="button"
@@ -217,7 +217,7 @@ export default function ContentTable({
                         <Trash2 className="size-4" />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               );
             })}

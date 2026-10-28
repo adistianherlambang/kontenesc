@@ -133,7 +133,7 @@ export default function Sidebar({
           <div className="px-2.5">
             <div className="mb-2 flex items-baseline justify-between">
               <span className="text-xs font-medium text-muted">Progres eksekusi</span>
-              <span className="font-mono text-xs text-ink">
+              <span className="text-xs text-ink">
                 {executedCount}/{totalCount}
               </span>
             </div>

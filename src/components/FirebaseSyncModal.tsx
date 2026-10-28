@@ -92,7 +92,7 @@ export default function FirebaseSyncModal({
             <Cloud className="size-4 text-brand" />
             <div>
               <h3 className="modal-title">Koneksi Cloud Firestore</h3>
-              <p className="font-mono text-[11px] text-faint">
+              <p className="text-[11px] text-faint">
                 Project: {firebaseConfig.projectId}
               </p>
             </div>

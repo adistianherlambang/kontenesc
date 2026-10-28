@@ -7,7 +7,7 @@
    ========================================================================== */
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-mono: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --color-canvas: #FFFFFF;
   --color-surface: #FAFAF9;
@@ -193,7 +193,7 @@ label {
       text-muted transition-colors hover:bg-subtle hover:text-ink active:bg-subtle;
   }
   .nav-item[data-active="true"] { @apply bg-subtle font-semibold text-ink; }
-  .nav-count { @apply ml-auto font-mono text-xs sm:text-[11px] text-faint; }
+  .nav-count { @apply ml-auto text-xs sm:text-[11px] text-faint; }
   .section-label { @apply mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-faint; }
 
   /* ---------- Modal ---------- */

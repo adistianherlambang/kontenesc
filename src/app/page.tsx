@@ -388,7 +388,7 @@ export default function DashboardPage() {
             <h2 className="text-sm sm:text-base font-bold text-[#18181B] truncate">
               {viewTitle}
             </h2>
-            <span className="text-xs text-gray-400 font-mono shrink-0">
+            <span className="text-xs text-gray-400 shrink-0">
               ({filteredItems.length})
             </span>
           </div>
