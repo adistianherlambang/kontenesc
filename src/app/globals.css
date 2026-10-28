@@ -22,23 +22,18 @@
 html, body {
   font-family: var(--font-sans);
   color: var(--text-main);
-  min-height: 100vh;
+  background-color: #FFFFFF;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  /* Scenic Coastal Dune & Blue Sky Blurred Wallpaper Matching Screenshot */
-  background: 
-    radial-gradient(circle at 50% 12%, rgba(200, 225, 245, 0.85) 0%, rgba(225, 238, 248, 0.6) 35%, transparent 65%),
-    radial-gradient(circle at 85% 85%, rgba(215, 198, 170, 0.75) 0%, rgba(195, 178, 150, 0.4) 40%, transparent 65%),
-    radial-gradient(circle at 15% 90%, rgba(145, 165, 135, 0.6) 0%, rgba(165, 185, 150, 0.35) 30%, transparent 55%),
-    linear-gradient(180deg, #A8C8E2 0%, #D4E5F2 38%, #E5DDD0 68%, #CBB99F 100%);
-  background-attachment: fixed;
 }
 
 /* Subtle Modern Mac Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -54,8 +49,8 @@ html, body {
 /* Checkbox Style */
 .notion-checkbox {
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
   border: 1.5px solid #D4D4D8;
   border-radius: 5px;
   outline: none;
@@ -77,9 +72,9 @@ html, body {
   content: "";
   position: absolute;
   left: 4.5px;
-  top: 1px;
-  width: 4px;
-  height: 8.5px;
+  top: 1.5px;
+  width: 4.5px;
+  height: 9px;
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
@@ -104,13 +99,13 @@ html, body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 9px 12px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border-subtle);
   background: #F8F8F9;
 }
 .notion-td {
   font-size: 12px;
-  padding: 9px 12px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-main);
   vertical-align: top;
