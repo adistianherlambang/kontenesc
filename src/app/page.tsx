@@ -372,7 +372,7 @@ export default function DashboardPage() {
       <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
 
         {/* Top Header: Clean, purposeful, mobile-friendly touch targets */}
-        <header className="min-h-[60px] sm:h-[62px] px-4 sm:px-8 py-2.5 border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 bg-white">
+        <header className="min-h-[60px] sm:min-h-[62px] px-4 sm:px-8 py-2.5 border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 bg-white">
 
           {/* Left Title */}
           <div className="flex items-center gap-2.5 min-w-0">
@@ -416,7 +416,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Actions: Cloud Sync (Mobile), View switch & Tambah Konten */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 w-full">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
 
             {/* Cloud Sync Status Button (Mobile shortcut) */}
             {/* <button
@@ -461,7 +461,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={handleOpenCreate}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer w-full"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:px-4 sm:py-2 min-h-[40px] sm:min-h-[36px] rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] active:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer w-full sm:w-auto"
             >
               <Plus className="w-4 h-4 shrink-0" />
               <span>Tambah Konten</span>
