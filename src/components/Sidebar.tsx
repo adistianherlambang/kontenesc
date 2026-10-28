@@ -2,14 +2,9 @@
 
 import React from "react";
 import { 
-  PenLine, 
-  Bookmark, 
+  FileText, 
   Clock, 
-  Tag, 
-  BookOpen, 
-  LayoutGrid, 
-  Share2, 
-  Settings as SettingsIcon, 
+  CheckSquare, 
   Cloud, 
   X
 } from "lucide-react";
@@ -24,6 +19,9 @@ interface SidebarProps {
   onOpenSyncModal: () => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  categories: { name: string; count: number }[];
+  selectedCategory: string;
+  onSelectCategory: (cat: string) => void;
 }
 
 export default function Sidebar({
@@ -35,51 +33,33 @@ export default function Sidebar({
   firebaseStatus,
   onOpenSyncModal,
   isOpenMobile,
-  onCloseMobile
+  onCloseMobile,
+  categories,
+  selectedCategory,
+  onSelectCategory
 }: SidebarProps) {
   const percent = totalCount > 0 ? Math.round((executedCount / totalCount) * 100) : 0;
 
-  const mainNav = [
+  const views = [
     {
       id: "all",
-      label: "All notes",
-      icon: PenLine,
+      label: "Semua Konten",
+      icon: FileText,
       count: totalCount
     },
     {
-      id: "favorites",
-      label: "Favorites",
-      icon: Bookmark
-    },
-    {
       id: "pending",
-      label: "Recent notes",
+      label: "Belum Eksekusi",
       icon: Clock,
-      count: pendingCount
+      count: pendingCount,
+      color: "text-amber-600"
     },
     {
-      id: "tags",
-      label: "Tags",
-      icon: Tag
-    }
-  ];
-
-  const orderNav = [
-    {
-      id: "notebooks",
-      label: "Notebooks",
-      icon: BookOpen
-    },
-    {
-      id: "projects",
-      label: "Projects",
-      icon: LayoutGrid
-    },
-    {
-      id: "shared",
-      label: "Shared",
-      icon: Share2,
-      count: executedCount
+      id: "executed",
+      label: "Sudah Eksekusi",
+      icon: CheckSquare,
+      count: executedCount,
+      color: "text-emerald-600"
     }
   ];
 
@@ -95,19 +75,23 @@ export default function Sidebar({
 
       <aside className={`
         fixed md:static inset-y-0 left-0 z-50
-        w-[220px] bg-[#FAFAFA] border-r border-[#ECEBE8]
+        w-60 bg-[#FAFAFA] border-r border-[#ECEBE8]
         flex flex-col justify-between shrink-0 h-full
         transition-transform duration-200 ease-in-out
         ${isOpenMobile ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}>
         {/* Top Controls & Navigation */}
-        <div className="p-4 sm:p-5 overflow-y-auto">
-          {/* macOS Traffic Lights */}
-          <div className="flex items-center justify-between mb-5 px-0.5">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-[#E0443E] inline-block shadow-2xs" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-[#DEA123] inline-block shadow-2xs" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-[#1AAB29] inline-block shadow-2xs" />
+        <div className="p-5 overflow-y-auto">
+          
+          {/* Brand Header */}
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#ECEBE8]">
+            <div>
+              <h1 className="text-sm font-bold text-[#18181B] tracking-tight">
+                Semarang Cell
+              </h1>
+              <p className="text-[11px] text-[#A1A1AA]">
+                Konten Hub & Brief
+              </p>
             </div>
 
             <button 
@@ -118,156 +102,126 @@ export default function Sidebar({
             </button>
           </div>
 
-          {/* User Profile matching reference */}
-          <div className="flex items-center gap-2.5 px-0.5 mb-6 select-none">
-            <div className="w-9 h-9 rounded-xl bg-white border border-black/5 flex items-center justify-center text-lg shadow-2xs shrink-0">
-              🐼
-            </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-[13.5px] font-bold text-[#18181B] truncate tracking-tight leading-snug">
-                Anastasia
-              </h2>
-              <p className="text-[11px] text-[#A1A1AA] truncate font-normal">
-                anastasia@icylab.co
+          {/* Status Nav */}
+          <div className="mb-6">
+            <p className="text-[10px] font-bold text-[#A1A1AA] tracking-wider uppercase px-2 mb-2">
+              Status Konten
+            </p>
+            <nav className="space-y-1">
+              {views.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeView === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onSelectView(item.id);
+                      onCloseMobile();
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-colors select-none cursor-pointer ${
+                      isActive 
+                        ? "bg-[#18181B] text-white font-semibold shadow-2xs" 
+                        : "text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? "text-white" : item.color || "text-[#71717A]"}`} />
+                      <span>{item.label}</span>
+                    </div>
+                    {typeof item.count === "number" && (
+                      <span className={`text-[10.5px] font-mono px-1.5 py-0.2 rounded-md ${
+                        isActive ? "bg-white/20 text-white" : "text-gray-400 bg-gray-100"
+                      }`}>
+                        {item.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Categories Nav */}
+          {categories.length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold text-[#A1A1AA] tracking-wider uppercase px-2 mb-2">
+                Kategori
               </p>
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => {
+                    onSelectCategory("Semua");
+                    onCloseMobile();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors select-none cursor-pointer ${
+                    selectedCategory === "Semua" 
+                      ? "bg-gray-200 text-[#18181B] font-semibold" 
+                      : "text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B]"
+                  }`}
+                >
+                  <span className="truncate">Semua Kategori</span>
+                  <span className="text-[10px] text-gray-400 font-mono">{totalCount}</span>
+                </button>
+                {categories.map((c) => {
+                  const isActive = selectedCategory === c.name;
+                  return (
+                    <button
+                      key={c.name}
+                      onClick={() => {
+                        onSelectCategory(c.name);
+                        onCloseMobile();
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs transition-colors select-none cursor-pointer ${
+                        isActive 
+                          ? "bg-gray-200 text-[#18181B] font-semibold" 
+                          : "text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B]"
+                      }`}
+                    >
+                      <span className="truncate">{c.name}</span>
+                      <span className="text-[10px] text-gray-400 font-mono">{c.count}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-
-          {/* MAIN Section */}
-          <div className="mb-5">
-            <p className="text-[10px] font-bold text-[#A1A1AA] tracking-wider uppercase px-2.5 mb-1.5">
-              MAIN
-            </p>
-            <nav className="space-y-0.5">
-              {mainNav.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeView === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onSelectView(item.id);
-                      onCloseMobile();
-                    }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[13px] font-medium transition-colors select-none cursor-pointer ${
-                      isActive 
-                        ? "bg-[#EAEAEA] text-[#18181B] font-semibold shadow-2xs" 
-                        : "text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#18181B]" : "text-[#71717A]"}`} />
-                      <span>{item.label}</span>
-                    </div>
-                    {typeof item.count === "number" && (
-                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                        isActive ? "bg-white text-gray-900 shadow-2xs" : "text-gray-400"
-                      }`}>
-                        {item.count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* ORDER Section */}
-          <div className="mb-5">
-            <p className="text-[10px] font-bold text-[#A1A1AA] tracking-wider uppercase px-2.5 mb-1.5">
-              ORDER
-            </p>
-            <nav className="space-y-0.5">
-              {orderNav.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeView === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      onSelectView(item.id);
-                      onCloseMobile();
-                    }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[13px] font-medium transition-colors select-none cursor-pointer ${
-                      isActive 
-                        ? "bg-[#EAEAEA] text-[#18181B] font-semibold shadow-2xs" 
-                        : "text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#18181B]" : "text-[#71717A]"}`} />
-                      <span>{item.label}</span>
-                    </div>
-                    {typeof item.count === "number" && (
-                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                        isActive ? "bg-white text-gray-900 shadow-2xs" : "text-gray-400"
-                      }`}>
-                        {item.count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
+          )}
         </div>
 
-        {/* SETTINGS Section */}
-        <div className="p-4 pt-3 border-t border-[#ECEBE8] bg-[#FAFAFA]">
+        {/* Bottom Section */}
+        <div className="p-4 border-t border-[#ECEBE8] bg-[#FAFAFA]">
           {/* Progress Indicator */}
-          <div className="mb-3 px-2.5 py-2 rounded-lg bg-white border border-[#ECEBE8]">
+          <div className="mb-3 px-3 py-2 rounded-xl bg-white border border-[#ECEBE8]">
             <div className="flex items-center justify-between text-[11px] font-semibold text-[#71717A] mb-1">
-              <span>Progress Eksekusi</span>
+              <span>Eksekusi</span>
               <span className="font-mono text-[#18181B]">{percent}%</span>
             </div>
-            <div className="w-full h-1 rounded-full bg-gray-200 overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-gray-200 overflow-hidden">
               <div 
-                className="h-full bg-[#1F6FB6] rounded-full transition-all duration-300"
+                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                 style={{ width: `${percent}%` }}
               />
             </div>
-            <p className="text-[9.5px] text-[#A1A1AA] mt-1 font-medium">
-              {executedCount} dari {totalCount} selesai
+            <p className="text-[10px] text-[#A1A1AA] mt-1 font-medium">
+              {executedCount} dari {totalCount} tuntas
             </p>
           </div>
 
-          <p className="text-[10px] font-bold text-[#A1A1AA] tracking-wider uppercase px-2.5 mb-1">
-            SETTINGS
-          </p>
-          <div className="space-y-0.5">
-            <button
-              onClick={onOpenSyncModal}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[12.5px] font-medium text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B] transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <SettingsIcon className="w-3.5 h-3.5 text-[#71717A]" />
-                <span>Settings</span>
-              </div>
-            </button>
-
-            <button
-              onClick={onOpenSyncModal}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[12.5px] font-medium text-[#71717A] hover:bg-[#F2F2F4] hover:text-[#18181B] transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <Cloud className="w-3.5 h-3.5 text-[#71717A]" />
-                <span>Sync Status</span>
-              </div>
-              <span className="flex items-center gap-1.5 text-[9.5px] font-mono">
-                {firebaseStatus === "connected" ? (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span className="text-emerald-700">Cloud</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    <span className="text-amber-700">Lokal</span>
-                  </>
-                )}
-              </span>
-            </button>
-          </div>
+          <button
+            onClick={onOpenSyncModal}
+            className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium text-[#71717A] hover:bg-white hover:text-[#18181B] transition-colors border border-transparent hover:border-gray-200 cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <Cloud className="w-3.5 h-3.5 text-[#71717A]" />
+              <span>Status Cloud Firebase</span>
+            </div>
+            <span className="flex items-center gap-1.5 text-[9.5px] font-mono">
+              {firebaseStatus === "connected" ? (
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              ) : (
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+              )}
+            </span>
+          </button>
         </div>
       </aside>
     </>

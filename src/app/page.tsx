@@ -17,14 +17,11 @@ import {
   checkFirestoreHealth 
 } from "@/lib/firebase";
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
-import { contentItemsToCSV } from "@/lib/csvHelper";
 import { 
   Search, 
-  Filter, 
   LayoutGrid, 
   AlignJustify, 
-  ChevronLeft, 
-  Download, 
+  Plus, 
   Menu, 
   X
 } from "lucide-react";
@@ -45,7 +42,6 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [selectedPlatform, setSelectedPlatform] = useState("Semua");
-  const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false);
 
   // Modals
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
@@ -125,16 +121,7 @@ export default function DashboardPage() {
     return items.filter((item) => {
       // Sidebar filter
       if (activeSidebarView === "pending" && item.executed) return false;
-      if (activeSidebarView === "shared" && !item.executed) return false;
-      if (activeSidebarView === "favorites" && !item.judul.toLowerCase().includes("promo") && !item.kategori.toLowerCase().includes("promo")) {
-        return false;
-      }
-      if (activeSidebarView === "notebooks" && (item.platform || "").includes("Reels")) {
-        return false;
-      }
-      if (activeSidebarView === "projects" && !(item.platform || "").includes("Reels") && !(item.platform || "").includes("Carousel")) {
-        return false;
-      }
+      if (activeSidebarView === "executed" && !item.executed) return false;
 
       // Search Query
       if (searchQuery.trim()) {
@@ -249,30 +236,6 @@ export default function DashboardPage() {
     }
   };
 
-  // Exports
-  const handleExportJSON = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `brief_konten_${new Date().toISOString().split("T")[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
-  const handleExportCSV = () => {
-    const csvContent = contentItemsToCSV(items);
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", url);
-    downloadAnchor.setAttribute("download", `brief_konten_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-    URL.revokeObjectURL(url);
-  };
-
   const handlePushToFirebase = async () => {
     setFirebaseStatus("syncing");
     await seedContentsToDb(items);
@@ -299,28 +262,19 @@ export default function DashboardPage() {
 
   const viewTitle = useMemo(() => {
     switch (activeSidebarView) {
-      case "pending": return "Recent notes";
-      case "shared": return "Shared";
-      case "favorites": return "Favorites";
-      case "tags": return "Tags";
-      case "notebooks": return "Notebooks";
-      case "projects": return "Projects";
-      default: return "All notes";
+      case "pending": return "Belum Eksekusi";
+      case "executed": return "Sudah Eksekusi";
+      default: return "Semua Konten";
     }
   }, [activeSidebarView]);
 
   return (
     <div className="h-screen w-screen overflow-hidden flex bg-white text-[#18181B] font-sans">
       
-      {/* Left Sidebar (Edge to edge full height) */}
+      {/* Left Sidebar */}
       <Sidebar
         activeView={activeSidebarView}
-        onSelectView={(v) => {
-          setActiveSidebarView(v);
-          if (v === "tags") {
-            setIsFilterPopoverOpen(true);
-          }
-        }}
+        onSelectView={setActiveSidebarView}
         totalCount={items.length}
         pendingCount={pendingCount}
         executedCount={executedCount}
@@ -328,15 +282,18 @@ export default function DashboardPage() {
         onOpenSyncModal={() => setIsSyncModalOpen(true)}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        categories={categoriesWithCounts}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
       />
 
-      {/* Right Main Content Area (Edge to edge full height & width) */}
+      {/* Right Main Content Area */}
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-white">
         
-        {/* Top Header Navigation */}
-        <header className="h-[56px] px-8 border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0 bg-white">
+        {/* Top Header: Clean, purposeful */}
+        <header className="h-[54px] px-8 border-b border-[#ECEBE8] flex items-center justify-between gap-4 shrink-0 bg-white">
           
-          {/* Left: Breadcrumbs (< Home / All notes) */}
+          {/* Left Title */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsMobileSidebarOpen(true)}
@@ -345,66 +302,45 @@ export default function DashboardPage() {
               <Menu className="w-5 h-5" />
             </button>
 
-            <div className="flex items-center gap-1.5 text-[13.5px] font-medium text-[#71717A] select-none">
-              <button 
-                onClick={() => setActiveSidebarView("all")}
-                className="flex items-center gap-1 hover:text-[#18181B] transition-colors cursor-pointer"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Home</span>
-              </button>
-              <span className="text-[#D4D4D8] mx-0.5">/</span>
-              <span className="text-[#18181B] font-bold">{viewTitle}</span>
-            </div>
+            <h2 className="text-sm font-bold text-[#18181B]">
+              {viewTitle}
+            </h2>
+            <span className="text-xs text-gray-400 font-mono">
+              ({filteredItems.length})
+            </span>
           </div>
 
-          {/* Center: Search input */}
-          <div className="relative flex-1 max-w-sm mx-4 hidden sm:block">
-            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          {/* Center Search Input */}
+          <div className="relative flex-1 max-w-sm hidden sm:block">
+            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search a note"
-              className="w-full pl-10 pr-8 py-2 rounded-xl text-[13px] bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              placeholder="Cari konten, judul, topik..."
+              className="w-full pl-9 pr-7 py-1.5 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A1A1AA] hover:text-[#18181B]"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A1A1AA] hover:text-[#18181B]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          {/* Right Tools: Filtres + [|||] [▦] */}
+          {/* Right Actions: View switch & Tambah Konten */}
           <div className="flex items-center gap-3">
             
-            {/* Filtres Button */}
-            <button
-              onClick={() => setIsFilterPopoverOpen(!isFilterPopoverOpen)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-colors select-none cursor-pointer ${
-                selectedCategory !== "Semua" || selectedPlatform !== "Semua"
-                  ? "bg-[#1F6FB6]/10 border-[#1F6FB6] text-[#1F6FB6]"
-                  : "bg-white border-[#E4E4E7] text-[#18181B] hover:bg-[#F4F4F5] shadow-2xs"
-              }`}
-            >
-              <Filter className="w-3.5 h-3.5 text-[#71717A]" />
-              <span>Filtres</span>
-              {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1F6FB6]" />
-              )}
-            </button>
-
-            {/* View Mode Toggle Capsule ([|||] and [▦]) */}
+            {/* View Mode Toggle ([|||] and [▦]) */}
             <div className="flex items-center p-0.5 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
               <button
                 onClick={() => setViewMode("table")}
                 className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
                   viewMode === "table" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
                 }`}
-                title="Tampilan Tabel (|||)"
+                title="Tampilan Tabel"
               >
                 <AlignJustify className="w-3.5 h-3.5" />
               </button>
@@ -413,90 +349,24 @@ export default function DashboardPage() {
                 className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
                   viewMode === "grid" ? "bg-white text-[#18181B] shadow-2xs font-semibold" : "text-[#71717A] hover:text-[#18181B]"
                 }`}
-                title="Tampilan Kartu Pastel (▦)"
+                title="Tampilan Kartu"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
             </div>
+
+            {/* Tambah Konten (Manual, Batch CSV, Batch JSON) */}
+            <button
+              onClick={handleOpenCreate}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#1F6FB6] hover:bg-[#185A94] text-white shadow-xs transition-colors select-none cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Tambah Konten</span>
+            </button>
           </div>
         </header>
 
-        {/* Filter Popover Toolbar */}
-        {isFilterPopoverOpen && (
-          <div className="px-8 py-3 bg-[#FAFAFA] border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-[#71717A]">Kategori:</span>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  onClick={() => setSelectedCategory("Semua")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    selectedCategory === "Semua" ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
-                  }`}
-                >
-                  Semua ({items.length})
-                </button>
-                {categoriesWithCounts.map(c => (
-                  <button
-                    key={c.name}
-                    onClick={() => setSelectedCategory(c.name)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      selectedCategory === c.name ? "bg-[#18181B] text-white font-semibold" : "bg-[#F4F4F6] text-[#52525B] hover:bg-gray-200"
-                    }`}
-                  >
-                    {c.name} ({c.count})
-                  </button>
-                ))}
-              </div>
-
-              <div className="h-4 w-px bg-gray-200 hidden sm:block mx-1.5" />
-
-              <span className="font-semibold text-[#71717A]">Format:</span>
-              <select
-                value={selectedPlatform}
-                onChange={(e) => setSelectedPlatform(e.target.value)}
-                className="bg-[#F4F4F6] border border-transparent rounded-lg px-3 py-1.5 text-xs text-[#18181B] focus:bg-white focus:outline-none"
-              >
-                <option value="Semua">Semua Format</option>
-                <option value="Instagram Carousel">Instagram Carousel</option>
-                <option value="Instagram Feed">Instagram Feed</option>
-                <option value="Instagram Reels">Instagram Reels</option>
-                <option value="Instagram Story">Instagram Story</option>
-              </select>
-
-              {(selectedCategory !== "Semua" || selectedPlatform !== "Semua") && (
-                <button
-                  onClick={() => {
-                    setSelectedCategory("Semua");
-                    setSelectedPlatform("Semua");
-                  }}
-                  className="text-rose-600 hover:underline font-medium"
-                >
-                  Reset Filter
-                </button>
-              )}
-            </div>
-
-            {/* Quick Export options */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleExportCSV}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium flex items-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5 text-gray-500" />
-                <span>Unduh CSV</span>
-              </button>
-              <button
-                onClick={handleExportJSON}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium flex items-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5 text-gray-500" />
-                <span>Unduh JSON</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Scrollable Content Body (Full width responsive grid) */}
+        {/* Scrollable Content Body */}
         <div className="flex-1 overflow-y-auto px-8 py-6">
           {filteredItems.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-12 text-gray-400">
@@ -504,10 +374,10 @@ export default function DashboardPage() {
                 🔍
               </div>
               <h3 className="text-sm font-bold text-[#18181B] mb-1.5">
-                Tidak ada catatan ditemukan
+                Tidak ada konten ditemukan
               </h3>
               <p className="text-xs max-w-sm text-[#71717A] mb-5">
-                Ubah kata kunci pencarian atau reset filter untuk menampilkan catatan brief kembali.
+                Ubah kata kunci pencarian atau reset filter kategori untuk menampilkan data kembali.
               </p>
               <button
                 onClick={() => {
@@ -518,11 +388,10 @@ export default function DashboardPage() {
                 }}
                 className="px-5 py-2 rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black cursor-pointer"
               >
-                Tampilkan Semua Catatan
+                Tampilkan Semua Konten
               </button>
             </div>
           ) : viewMode === "grid" ? (
-            /* Responsive Clean Grid Filling the Content Pane */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
               {filteredItems.map((item) => (
                 <ContentCard
@@ -532,12 +401,10 @@ export default function DashboardPage() {
                   onEdit={handleOpenEdit}
                   onDelete={handleDeleteClick}
                   onPreview={(it) => setPreviewItem(it)}
-                  onAddContent={handleOpenCreate}
                 />
               ))}
             </div>
           ) : (
-            /* Table View */
             <div className="pb-20">
               <ContentTable
                 items={filteredItems}
