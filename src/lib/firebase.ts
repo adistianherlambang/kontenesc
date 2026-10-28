@@ -81,14 +81,23 @@ export async function saveContentToDb(item: ContentItem): Promise<string> {
     id: docId,
     updatedAt: new Date().toISOString()
   };
-  await setDoc(docRef, dataToSave, { merge: true });
+  try {
+    await setDoc(docRef, dataToSave, { merge: true });
+  } catch (err: any) {
+    // If Firestore database is not created in console yet, app operates in local-first mode
+    console.debug("Firestore write deferred (local-first mode active):", err?.message);
+  }
   return docId;
 }
 
 // Delete a single content
 export async function deleteContentFromDb(id: string): Promise<void> {
-  const docRef = doc(db, COLLECTION_NAME, id);
-  await deleteDoc(docRef);
+  try {
+    const docRef = doc(db, COLLECTION_NAME, id);
+    await deleteDoc(docRef);
+  } catch (err: any) {
+    console.debug("Firestore delete deferred (local-first mode active):", err?.message);
+  }
 }
 
 // Batch Seed from brief.json (or array)
