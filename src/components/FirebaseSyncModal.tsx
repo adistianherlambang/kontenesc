@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  X, 
-  CloudUpload, 
-  CloudDownload, 
-  RotateCcw, 
-  CheckCircle2, 
-  AlertCircle, 
-  HelpCircle,
-  ExternalLink,
+import {
+  X,
+  CloudUpload,
+  CloudDownload,
+  RotateCcw,
+  CheckCircle2,
+  AlertCircle,
   RefreshCw,
   Cloud
 } from "lucide-react";
@@ -18,7 +16,7 @@ import { firebaseConfig } from "@/lib/firebase";
 interface FirebaseSyncModalProps {
   isOpen: boolean;
   onClose: () => void;
-  firebaseStatus: "connected" | "offline" | "syncing";
+  firebaseStatus?: "connected" | "offline" | "syncing";
   onPushToFirebase: () => Promise<void>;
   onPullFromFirebase: () => Promise<void>;
   onResetToDefault: () => void;
@@ -28,7 +26,6 @@ interface FirebaseSyncModalProps {
 export default function FirebaseSyncModal({
   isOpen,
   onClose,
-  firebaseStatus,
   onPushToFirebase,
   onPullFromFirebase,
   onResetToDefault,
@@ -54,9 +51,9 @@ export default function FirebaseSyncModal({
       await onPushToFirebase();
       setMsg({ type: "success", text: "Berhasil mengunggah seluruh konten ke Cloud Firestore!" });
     } catch (err: any) {
-      setMsg({ 
-        type: "error", 
-        text: `Gagal mengunggah: ${err?.message || "Pastikan Firestore Database telah dibuat di Firebase Console."}` 
+      setMsg({
+        type: "error",
+        text: `Gagal mengunggah: ${err?.message || "Pastikan Firestore Database telah dibuat di Firebase Console."}`
       });
     } finally {
       setLoadingAction(null);
@@ -70,9 +67,9 @@ export default function FirebaseSyncModal({
       await onPullFromFirebase();
       setMsg({ type: "success", text: "Berhasil memuat data terbaru dari Cloud Firestore!" });
     } catch (err: any) {
-      setMsg({ 
-        type: "error", 
-        text: `Gagal memuat: ${err?.message || "Pastikan Firestore Database telah dibuat di Firebase Console."}` 
+      setMsg({
+        type: "error",
+        text: `Gagal memuat: ${err?.message || "Pastikan Firestore Database telah dibuat di Firebase Console."}`
       });
     } finally {
       setLoadingAction(null);
@@ -112,40 +109,10 @@ export default function FirebaseSyncModal({
 
         {/* Body */}
         <div className="modal-body space-y-4">
-          {/* Status Notice */}
-          <div
-            className={`notice ${
-              firebaseStatus === "connected" ? "notice-success" : "notice-info"
-            }`}
-          >
-            {firebaseStatus === "connected" ? (
-              <CheckCircle2 className="size-4 shrink-0 text-success" />
-            ) : (
-              <AlertCircle className="size-4 shrink-0 text-muted" />
-            )}
-            <div className="space-y-0.5">
-              <p className="font-semibold text-ink">
-                {firebaseStatus === "connected"
-                  ? "Cloud Firestore Terhubung"
-                  : firebaseStatus === "syncing"
-                  ? "Menyinkronkan ke Cloud..."
-                  : "Mode Offline (Menunggu Koneksi)"}
-              </p>
-              <p className="text-xs text-muted leading-relaxed">
-                {firebaseStatus === "connected"
-                  ? `Perubahan otomatis langsung tersimpan di Cloud Firestore (${localCount} konten aktif).`
-                  : firebaseStatus === "syncing"
-                  ? `Sedang mengunggah perubahan tertunda ke Cloud Firestore...`
-                  : `Koneksi internet tidak tersedia (${localCount} konten aktif). Anda tetap bisa mengedit secara bebas, dan perubahan akan otomatis diunggah ke Firestore begitu koneksi kembali.`}
-              </p>
-            </div>
-          </div>
-
           {msg && (
             <div
-              className={`notice ${
-                msg.type === "success" ? "notice-success" : "notice-danger"
-              }`}
+              className={`notice ${msg.type === "success" ? "notice-success" : "notice-danger"
+                }`}
             >
               {msg.type === "success" ? (
                 <CheckCircle2 className="size-4 shrink-0" />
@@ -155,42 +122,6 @@ export default function FirebaseSyncModal({
               <span>{msg.text}</span>
             </div>
           )}
-
-          {/* Guide Box */}
-          <div className="rounded-xl border border-line bg-surface p-3.5 text-xs text-muted space-y-2">
-            <div className="flex items-center gap-1.5 font-medium text-ink">
-              <HelpCircle className="size-3.5 text-brand" />
-              <span>Langkah Mengatasi "Missing or insufficient permissions":</span>
-            </div>
-            <ol className="list-decimal list-inside space-y-1.5 text-xs leading-relaxed pl-1">
-              <li>
-                Buka tab{" "}
-                <a
-                  href="https://console.firebase.google.com/project/konten-semarang/firestore/rules"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-brand underline font-medium inline-flex items-center gap-0.5"
-                >
-                  Firestore Rules di Firebase Console <ExternalLink className="size-2.5" />
-                </a>
-              </li>
-              <li>
-                Ubah aturan keamanan menjadi:
-                <pre className="mt-1 p-2 rounded-lg bg-subtle text-[11px] font-mono text-ink overflow-x-auto select-all">
-{`rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}`}
-                </pre>
-              </li>
-              <li>Klik tombol <strong>Publish</strong> (Publikasikan).</li>
-              <li>Kembali ke sini dan klik tombol <strong>Unggah & Sinkronkan</strong> di bawah.</li>
-            </ol>
-          </div>
 
           {/* Action Buttons */}
           <div className="space-y-2 pt-1">
