@@ -83,6 +83,60 @@ function mergeWithBaseData(incoming: ContentItem[], deletedSet: Set<number>): Co
   return Array.from(map.values()).sort((a, b) => a.no - b.no);
 }
 
+/**
+ * Merges local cached items with remote Firestore items using Last-Write-Wins (LWW)
+ * conflict resolution based on `updatedAt` timestamp.
+ * Guarantees that:
+ * 1. Base brief data (60 items) is preserved as foundation.
+ * 2. Deleted items are never restored.
+ * 3. Recent local modifications (edits or checklists) take precedence over older remote reads.
+ * 4. Strictly newer remote updates are incorporated.
+ */
+function mergeLocalAndRemote(
+  localList: ContentItem[],
+  remoteList: ContentItem[],
+  deletedSet: Set<number>
+): ContentItem[] {
+  const map = new Map<number, ContentItem>();
+
+  // 1. Seed with base brief data
+  for (const base of INITIAL_BRIEF_DATA) {
+    if (!deletedSet.has(base.no)) {
+      map.set(base.no, { ...base });
+    }
+  }
+
+  // 2. Overlay local items (guarantees local state is foundation)
+  for (const local of localList) {
+    if (!local || typeof local.no !== "number") continue;
+    if (deletedSet.has(local.no)) continue;
+    const existing = map.get(local.no);
+    map.set(local.no, existing ? { ...existing, ...local } : { ...local });
+  }
+
+  // 3. Merge remote items using timestamp comparison (Last-Write-Wins)
+  for (const remote of remoteList) {
+    if (!remote || typeof remote.no !== "number") continue;
+    if (deletedSet.has(remote.no)) continue;
+
+    const existing = map.get(remote.no);
+    if (!existing) {
+      map.set(remote.no, { ...remote });
+      continue;
+    }
+
+    const remoteTime = remote.updatedAt ? new Date(remote.updatedAt).getTime() : 0;
+    const localTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+
+    // Remote only overwrites if strictly newer than local
+    if (remoteTime > localTime) {
+      map.set(remote.no, { ...existing, ...remote });
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.no - b.no);
+}
+
 export default function DashboardPage() {
   const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -108,16 +162,18 @@ export default function DashboardPage() {
 
   // 1. Initial Load
   useEffect(() => {
+    let currentData: ContentItem[] = [];
     try {
       const deletedSet = getDeletedNos();
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const merged = mergeWithBaseData(parsed, deletedSet);
-          setItems(merged);
+          currentData = mergeWithBaseData(parsed, deletedSet);
+          setItems(currentData);
         } else {
-          setItems(mergeWithBaseData([], deletedSet));
+          currentData = mergeWithBaseData([], deletedSet);
+          setItems(currentData);
         }
       } else {
         // Also check v2 cache in case the user made edits in v2
@@ -125,21 +181,25 @@ export default function DashboardPage() {
         if (v2Cached) {
           const parsedV2 = JSON.parse(v2Cached);
           if (Array.isArray(parsedV2) && parsedV2.length > 0) {
-            const merged = mergeWithBaseData(parsedV2, deletedSet);
-            setItems(merged);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            currentData = mergeWithBaseData(parsedV2, deletedSet);
+            setItems(currentData);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
           }
+        } else {
+          currentData = mergeWithBaseData([], deletedSet);
+          setItems(currentData);
         }
       }
     } catch (e) {
       console.warn("Could not read local cache", e);
+      currentData = INITIAL_BRIEF_DATA;
     }
     setIsLoaded(true);
 
-    checkFirestore();
+    checkFirestore(currentData);
   }, []);
 
-  const checkFirestore = async () => {
+  const checkFirestore = async (localSnapshot?: ContentItem[]) => {
     try {
       const health = await checkFirestoreHealth();
       if (health.ok) {
@@ -148,7 +208,8 @@ export default function DashboardPage() {
           const remoteItems = await getContentsFromDb();
           if (remoteItems.length > 0) {
             const deletedSet = getDeletedNos();
-            const merged = mergeWithBaseData(remoteItems, deletedSet);
+            const currentLocal = localSnapshot && localSnapshot.length > 0 ? localSnapshot : items;
+            const merged = mergeLocalAndRemote(currentLocal, remoteItems, deletedSet);
             updateItemsState(merged);
           }
         }
@@ -223,9 +284,14 @@ export default function DashboardPage() {
   }, [items, activeSidebarView, searchQuery, selectedCategory, selectedPlatform]);
 
   // Toggle execution checkbox
-  const handleToggleExecuted = async (item: ContentItem) => {
-    const newExecuted = !Boolean(item.executed);
-    const updated = { ...item, executed: newExecuted, updatedAt: new Date().toISOString() };
+  const handleToggleExecuted = async (item: ContentItem, explicitExecuted?: boolean) => {
+    const newExecuted = typeof explicitExecuted === "boolean" ? explicitExecuted : !Boolean(item.executed);
+    const now = new Date().toISOString();
+    const updated: ContentItem = { 
+      ...item, 
+      executed: newExecuted, 
+      updatedAt: now 
+    };
     const nextList = items.map(i => (i.no === item.no ? updated : i));
     updateItemsState(nextList);
 
@@ -252,20 +318,28 @@ export default function DashboardPage() {
   };
 
   const handleSaveSingle = async (savedItem: ContentItem) => {
+    const itemToSave: ContentItem = {
+      ...savedItem,
+      updatedAt: savedItem.updatedAt || new Date().toISOString()
+    };
     let nextList: ContentItem[];
-    const existingIndex = items.findIndex(i => (i.id && i.id === savedItem.id) || i.no === savedItem.no);
+    const existingIndex = items.findIndex(i => (i.id && i.id === itemToSave.id) || i.no === itemToSave.no);
 
     if (existingIndex >= 0) {
       nextList = [...items];
-      nextList[existingIndex] = { ...savedItem };
+      nextList[existingIndex] = { ...itemToSave };
     } else {
-      nextList = [...items, savedItem];
+      nextList = [...items, itemToSave];
     }
 
     updateItemsState(nextList);
 
+    if (previewItem && ((previewItem.id && previewItem.id === itemToSave.id) || previewItem.no === itemToSave.no)) {
+      setPreviewItem(itemToSave);
+    }
+
     try {
-      await saveContentToDb(savedItem);
+      await saveContentToDb(itemToSave);
       setFirebaseStatus("connected");
     } catch (err) {
       console.warn("Save remote error", err);
@@ -327,7 +401,7 @@ export default function DashboardPage() {
     const remote = await getContentsFromDb();
     if (remote.length > 0) {
       const deletedSet = getDeletedNos();
-      const merged = mergeWithBaseData(remote, deletedSet);
+      const merged = mergeLocalAndRemote(items, remote, deletedSet);
       updateItemsState(merged);
     }
     setFirebaseStatus("connected");

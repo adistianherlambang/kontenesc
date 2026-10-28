@@ -7,7 +7,7 @@ import { getCategoryTone } from "@/lib/categoryTone";
 
 interface ContentCardProps {
   item: ContentItem;
-  onToggleExecuted: (item: ContentItem) => Promise<void> | void;
+  onToggleExecuted: (item: ContentItem, explicitExecuted?: boolean) => Promise<void> | void;
   onOpen?: (item: ContentItem) => void;
   onPreview?: (item: ContentItem) => void;
   onEdit?: (item: ContentItem) => void;
@@ -37,9 +37,10 @@ export default function ContentCard({
   const handleToggle = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     if (isSavingExec) return;
+    const nextDone = !done;
     try {
       setIsSavingExec(true);
-      await onToggleExecuted(item);
+      await onToggleExecuted(item, nextDone);
     } finally {
       setIsSavingExec(false);
     }

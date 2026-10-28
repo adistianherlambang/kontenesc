@@ -79,7 +79,7 @@ export async function saveContentToDb(item: ContentItem): Promise<string> {
   const dataToSave = {
     ...item,
     id: docId,
-    updatedAt: new Date().toISOString()
+    updatedAt: item.updatedAt || new Date().toISOString()
   };
   try {
     await setDoc(docRef, dataToSave, { merge: true });

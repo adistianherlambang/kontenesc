@@ -22,7 +22,7 @@ interface ContentDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedItem: ContentItem) => Promise<void>;
-  onToggleExecuted?: (item: ContentItem) => Promise<void> | void;
+  onToggleExecuted?: (item: ContentItem, explicitExecuted?: boolean) => Promise<void> | void;
   onDelete?: (item: ContentItem) => void;
   existingCategories?: string[];
 }
@@ -135,7 +135,11 @@ export default function ContentDetailModal({
   const handleToggleExecution = async () => {
     if (!draft || isTogglingExecution) return;
     const nextExec = !Boolean(draft.executed);
-    const updated = { ...draft, executed: nextExec, updatedAt: new Date().toISOString() };
+    const updated: ContentItem = { 
+      ...draft, 
+      executed: nextExec, 
+      updatedAt: new Date().toISOString() 
+    };
 
     setDraft(updated);
     setIsTogglingExecution(true);
@@ -143,7 +147,7 @@ export default function ContentDetailModal({
 
     try {
       if (onToggleExecuted) {
-        await onToggleExecuted(updated);
+        await onToggleExecuted(draft, nextExec);
       } else {
         await onSave(updated);
       }
@@ -160,15 +164,17 @@ export default function ContentDetailModal({
     if (!draft) return;
     try {
       setIsSaving(true);
-      await onSave({
+      const updated: ContentItem = {
         ...draft,
         judul: draft.judul.trim(),
         copywriting: draft.copywriting.trim(),
         ambience: draft.ambience?.trim() || "",
         caption: draft.caption?.trim() || "",
+        executed: Boolean(draft.executed),
         updatedAt: new Date().toISOString()
-      });
-      // Close or keep open based on UX
+      };
+      await onSave(updated);
+      setDraft(updated);
     } catch (err) {
       console.error("Save error", err);
     } finally {

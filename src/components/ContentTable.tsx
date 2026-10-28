@@ -15,7 +15,7 @@ import { getCategoryTone } from "@/lib/categoryTone";
 
 interface ContentTableProps {
   items: ContentItem[];
-  onToggleExecuted: (item: ContentItem) => Promise<void> | void;
+  onToggleExecuted: (item: ContentItem, explicitExecuted?: boolean) => Promise<void> | void;
   onEdit: (item: ContentItem) => void;
   onDelete: (item: ContentItem) => void;
   onPreview: (item: ContentItem) => void;
@@ -42,9 +42,10 @@ export default function ContentTable({
   };
 
   const handleToggleExecution = async (item: ContentItem) => {
+    const nextDone = !Boolean(item.executed);
     setSavingNos(prev => new Set(prev).add(item.no));
     try {
-      await onToggleExecuted(item);
+      await onToggleExecuted(item, nextDone);
     } finally {
       setSavingNos(prev => {
         const next = new Set(prev);
