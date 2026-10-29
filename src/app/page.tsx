@@ -8,6 +8,7 @@ import ContentTable from "@/components/ContentTable";
 import ContentDetailModal from "@/components/ContentDetailModal";
 import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
+import HargaExtractorModal from "@/components/HargaExtractorModal";
 import {
   ContentItem,
   saveContentToDb,
@@ -63,6 +64,7 @@ export default function DashboardPage() {
 
   // Modals
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
+  const [isHargaExtractorOpen, setIsHargaExtractorOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [previewItem, setPreviewItem] = useState<ContentItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<ContentItem | null>(null);
@@ -370,6 +372,7 @@ export default function DashboardPage() {
         categories={categoriesWithCounts}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
+        onOpenHargaExtractor={() => setIsHargaExtractorOpen(true)}
       />
 
       {/* Right Main Content Area */}
@@ -617,6 +620,13 @@ export default function DashboardPage() {
           isDeleting={isDeleting}
           onConfirm={handleConfirmDelete}
           onClose={() => setDeletingItem(null)}
+        />
+      )}
+
+      {isHargaExtractorOpen && (
+        <HargaExtractorModal
+          isOpen={isHargaExtractorOpen}
+          onClose={() => setIsHargaExtractorOpen(false)}
         />
       )}
     </div>

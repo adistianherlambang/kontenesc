@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X } from "lucide-react";
+import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2 } from "lucide-react";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 export type StatusView = "all" | "pending" | "executed" | "priority";
@@ -16,6 +16,7 @@ interface SidebarProps {
   categories: { name: string; count: number }[];
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
+  onOpenHargaExtractor?: () => void;
   firebaseStatus: "connected" | "offline" | "syncing";
   isOpenMobile: boolean;
   onCloseMobile: () => void;
@@ -31,6 +32,7 @@ export default function Sidebar({
   categories,
   selectedCategory,
   onSelectCategory,
+  onOpenHargaExtractor,
   firebaseStatus,
   isOpenMobile,
   onCloseMobile,
@@ -123,6 +125,21 @@ export default function Sidebar({
                   <span className="nav-count">{c.count}</span>
                 </button>
               ))}
+            </div>
+          </nav>
+
+          <nav>
+            <p className="section-label">Tools</p>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={pick(() => onOpenHargaExtractor?.())}
+                className="nav-item group"
+              >
+                <FileCode2 className="size-4 shrink-0 text-muted group-hover:text-brand transition-colors" />
+                <span className="truncate">Harga to JSON</span>
+                <span className="ml-auto text-[10px] font-semibold text-brand bg-brand-soft px-1.5 py-0.5 rounded">.doc/.docx</span>
+              </button>
             </div>
           </nav>
         </div>
