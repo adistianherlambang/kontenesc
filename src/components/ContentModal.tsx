@@ -423,12 +423,12 @@ export default function ContentModal({
           <div className="flex flex-1 flex-col overflow-hidden">
             <div className="modal-body space-y-4">
               {/* Helper Bar */}
-              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5">
+                <div className="w-full">
                   <p className="text-xs font-semibold text-ink">Import Sekaligus via JSON</p>
-                  <p className="text-xs text-muted">Upload berkas .json atau tempel array objek di bawah.</p>
+                  <p className="text-xs text-muted mt-0.5">Upload berkas .json atau tempel array objek di bawah.</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                   <button
                     type="button"
                     onClick={() => {
@@ -436,12 +436,12 @@ export default function ContentModal({
                       setCopiedJsonTemplate(true);
                       setTimeout(() => setCopiedJsonTemplate(false), 2000);
                     }}
-                    className="btn btn-secondary text-xs"
+                    className="btn btn-secondary text-xs w-full justify-center"
                   >
                     {copiedJsonTemplate ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
                     <span>Gunakan Contoh</span>
                   </button>
-                  <label className="btn btn-secondary cursor-pointer text-xs">
+                  <label className="btn btn-secondary cursor-pointer text-xs w-full justify-center">
                     <Upload className="size-3.5 text-brand" />
                     <span>Pilih Berkas .json</span>
                     <input
@@ -537,18 +537,18 @@ export default function ContentModal({
           <div className="flex flex-1 flex-col overflow-hidden">
             <div className="modal-body space-y-4">
               {/* Helper Bar */}
-              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5">
+                <div className="w-full">
                   <p className="text-xs font-semibold text-ink">Import Data CSV / Excel</p>
-                  <p className="text-xs text-muted">
+                  <p className="text-xs text-muted mt-0.5">
                     Kolom: <span className="text-ink">kategori, judul, copywriting, ambience, caption, executed</span>
                   </p>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full">
                   <button
                     type="button"
                     onClick={handleDownloadSampleCSV}
-                    className="btn btn-secondary text-xs"
+                    className="btn btn-secondary text-xs w-full justify-center"
                     title="Unduh file template CSV"
                   >
                     <Download className="size-3.5 text-success" />
@@ -561,12 +561,12 @@ export default function ContentModal({
                       setCopiedCsvTemplate(true);
                       setTimeout(() => setCopiedCsvTemplate(false), 2000);
                     }}
-                    className="btn btn-secondary text-xs"
+                    className="btn btn-secondary text-xs w-full justify-center"
                   >
                     {copiedCsvTemplate ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
                     <span>Gunakan Contoh</span>
                   </button>
-                  <label className="btn btn-secondary cursor-pointer text-xs">
+                  <label className="btn btn-secondary cursor-pointer text-xs w-full justify-center">
                     <Upload className="size-3.5 text-brand" />
                     <span>Pilih Berkas .csv</span>
                     <input
