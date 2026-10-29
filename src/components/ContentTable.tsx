@@ -85,6 +85,28 @@ export default function ContentTable({
     }
   };
 
+  const handleTogglePriorityItem = (item: ContentItem) => {
+    if (exitingNos.has(item.no)) return;
+    const nextPriority = !Boolean(item.priority);
+    const supportsVT =
+      typeof document !== "undefined" &&
+      typeof (document as any).startViewTransition === "function";
+
+    if (supportsVT) {
+      onTogglePriority?.(item, nextPriority);
+    } else {
+      setExitingNos((prev) => new Set(prev).add(item.no));
+      setTimeout(() => {
+        onTogglePriority?.(item, nextPriority);
+        setExitingNos((prev) => {
+          const next = new Set(prev);
+          next.delete(item.no);
+          return next;
+        });
+      }, 250);
+    }
+  };
+
   return (
     <div className="rounded-xl border border-line bg-canvas overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
@@ -109,7 +131,7 @@ export default function ContentTable({
               return (
                 <tr
                   key={item.id || item.no}
-                  style={{ viewTransitionName: `table-row-${isDone ? "done" : "active"}-${item.no}` }}
+                  style={{ viewTransitionName: `table-row-${item.no}` }}
                   className={`content-card-vt hover:bg-subtle/50 transition-all duration-250 ${isDone ? "bg-subtle/20" : ""
                     } ${isExiting ? "-translate-x-20 opacity-0 pointer-events-none" : ""}`}
                 >
@@ -136,7 +158,7 @@ export default function ContentTable({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onTogglePriority?.(item, !Boolean(item.priority));
+                          handleTogglePriorityItem(item);
                         }}
                         aria-pressed={Boolean(item.priority)}
                         aria-label={item.priority ? "Hapus dari prioritas" : "Tandai prioritas"}

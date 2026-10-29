@@ -22,7 +22,7 @@ export default function ContentCard({
   onTogglePriority,
   onOpen,
   onPreview,
-  transitionPrefix = "active-card",
+  transitionPrefix = "content-card",
 }: ContentCardProps) {
   const done = Boolean(item.executed);
   const isPriority = Boolean(item.priority);
@@ -59,8 +59,21 @@ export default function ContentCard({
 
   const handleTogglePriority = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    if (onTogglePriority) {
-      onTogglePriority(item, !isPriority);
+    if (isExiting) return;
+    const nextPriority = !isPriority;
+
+    const supportsVT =
+      typeof document !== "undefined" &&
+      typeof (document as any).startViewTransition === "function";
+
+    if (supportsVT) {
+      onTogglePriority?.(item, nextPriority);
+    } else {
+      setIsExiting(true);
+      setTimeout(() => {
+        onTogglePriority?.(item, nextPriority);
+        setIsExiting(false);
+      }, 260);
     }
   };
 
@@ -68,7 +81,7 @@ export default function ContentCard({
     <article
       style={{ viewTransitionName: `${transitionPrefix}-${item.no}` }}
       className={`content-card-vt flex flex-col rounded-2xl border p-2 sm:p-1.5 transition-all duration-280 ease-out hover:shadow-sm ${tone.card
-        } ${isExiting ? "-translate-x-24 opacity-0 scale-95 pointer-events-none" : "translate-x-0 opacity-100 scale-100"}`}
+        } ${done ? "opacity-80 hover:opacity-100" : ""} ${isExiting ? "-translate-x-24 opacity-0 scale-95 pointer-events-none" : "translate-x-0 scale-100"}`}
     >
       {/* Category row: clickable title + execution & priority toggle select boxes */}
       <header className="flex min-h-11 sm:min-h-10 items-center justify-between gap-2 pl-3 pr-1 pb-3">

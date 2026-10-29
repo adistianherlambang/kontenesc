@@ -206,7 +206,15 @@ export default function DashboardPage() {
       }
 
       return true;
-    }).sort((a, b) => a.no - b.no);
+    }).sort((a, b) => {
+      // Urutan: 1. Prioritas, 2. Belum di eksekusi, 3. Sudah di eksekusi
+      const rankA = a.executed ? 2 : (a.priority ? 0 : 1);
+      const rankB = b.executed ? 2 : (b.priority ? 0 : 1);
+      if (rankA !== rankB) {
+        return rankA - rankB;
+      }
+      return a.no - b.no;
+    });
   }, [items, activeSidebarView, searchQuery, selectedCategory, selectedPlatform]);
 
   // Toggle execution checkbox with View Transition (fade out left + shift neighbors up/left)
@@ -255,10 +263,10 @@ export default function DashboardPage() {
       }
     };
 
-    if (activeSidebarView === "priority" && !previewItem) {
-      runWithViewTransition(applyToggle);
-    } else {
+    if (previewItem) {
       applyToggle();
+    } else {
+      runWithViewTransition(applyToggle);
     }
 
     // Save directly to Firestore
@@ -544,86 +552,25 @@ export default function DashboardPage() {
               </button>
             </div>
           ) : viewMode === "grid" ? (
-            activeSidebarView === "all" ? (
-              <div className="space-y-8 pb-24">
-                {/* Active / Unexecuted Cards */}
-                {filteredItems.filter((i) => !i.executed).length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6">
-                    {filteredItems
-                      .filter((i) => !i.executed)
-                      .map((item) => (
-                        <ContentCard
-                          key={`active-${item.id || item.no}`}
-                          item={item}
-                          transitionPrefix="active-card"
-                          onToggleExecuted={handleToggleExecuted}
-                          onTogglePriority={handleTogglePriority}
-                          onEdit={handleOpenEdit}
-                          onDelete={handleDeleteClick}
-                          onPreview={(it: ContentItem) => setPreviewItem(it)}
-                          onOpen={(it: ContentItem) => setPreviewItem(it)}
-                        />
-                      ))}
-                  </div>
-                )}
-
-                {/* Completed / Executed Cards Section */}
-                {filteredItems.filter((i) => Boolean(i.executed)).length > 0 && (
-                  <section className="space-y-4 pt-2 border-t border-[#ECEBE8]">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-[#71717A]">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>
-                        Sudah Dieksekusi ({filteredItems.filter((i) => Boolean(i.executed)).length})
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 opacity-80">
-                      {filteredItems
-                        .filter((i) => Boolean(i.executed))
-                        .map((item) => (
-                          <ContentCard
-                            key={`done-${item.id || item.no}`}
-                            item={item}
-                            transitionPrefix="done-card"
-                            onToggleExecuted={handleToggleExecuted}
-                            onTogglePriority={handleTogglePriority}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleDeleteClick}
-                            onPreview={(it: ContentItem) => setPreviewItem(it)}
-                            onOpen={(it: ContentItem) => setPreviewItem(it)}
-                          />
-                        ))}
-                    </div>
-                  </section>
-                )}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
-                {filteredItems.map((item) => (
-                  <ContentCard
-                    key={item.id || item.no}
-                    item={item}
-                    transitionPrefix={activeSidebarView === "executed" ? "done-card" : "active-card"}
-                    onToggleExecuted={handleToggleExecuted}
-                    onTogglePriority={handleTogglePriority}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleDeleteClick}
-                    onPreview={(it: ContentItem) => setPreviewItem(it)}
-                    onOpen={(it: ContentItem) => setPreviewItem(it)}
-                  />
-                ))}
-              </div>
-            )
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
+              {filteredItems.map((item) => (
+                <ContentCard
+                  key={item.id || item.no}
+                  item={item}
+                  transitionPrefix="content-card"
+                  onToggleExecuted={handleToggleExecuted}
+                  onTogglePriority={handleTogglePriority}
+                  onEdit={handleOpenEdit}
+                  onDelete={handleDeleteClick}
+                  onPreview={(it: ContentItem) => setPreviewItem(it)}
+                  onOpen={(it: ContentItem) => setPreviewItem(it)}
+                />
+              ))}
+            </div>
           ) : (
             <div className="pb-24">
               <ContentTable
-                items={
-                  activeSidebarView === "all"
-                    ? [
-                      ...filteredItems.filter((i) => !i.executed),
-                      ...filteredItems.filter((i) => Boolean(i.executed)),
-                    ]
-                    : filteredItems
-                }
+                items={filteredItems}
                 onToggleExecuted={handleToggleExecuted}
                 onTogglePriority={handleTogglePriority}
                 onEdit={handleOpenEdit}
