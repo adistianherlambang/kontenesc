@@ -123,24 +123,13 @@ export default function PromptModal({
             </label>
             <input
               type="text"
-              list="prompt-category-options"
               value={kategori}
               onChange={(e) => setKategori(e.target.value)}
               placeholder="Contoh: Edukasi, Tablet, Servis..."
               className="input"
+              autoComplete="off"
               required
             />
-            <datalist id="prompt-category-options">
-              {existingCategories.map((cat) => (
-                <option key={cat} value={cat} />
-              ))}
-              <option value="Edukasi & Spesifikasi" />
-              <option value="Tablet & Aksesoris" />
-              <option value="Rekomendasi HP" />
-              <option value="Tips & Perawatan" />
-              <option value="Promo & Tukar Tambah" />
-              <option value="Trust & Brand" />
-            </datalist>
           </div>
 
           <div className="sm:col-span-3">
