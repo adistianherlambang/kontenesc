@@ -4,19 +4,16 @@ export interface PromptOptions {
   kategori: string;
   format: "json" | "csv";
   count: number;
-  startNo: number;
   priceData?: ExtractResult | null;
 }
 
 export function generateContentPrompt(options: PromptOptions): string {
-  const { kategori, format, count, startNo, priceData } = options;
+  const { kategori, format, count, priceData } = options;
   const targetCategory = kategori.trim() || "Edukasi & Spesifikasi";
   const targetCount = count > 0 ? count : 10;
-  const targetStartNo = startNo > 0 ? startNo : 1;
 
   const jsonExample = `[
   {
-    "no": 61,
     "kategori": "Edukasi & Spesifikasi",
     "judul": "Perbedaan Kamera OIS vs EIS",
     "copywriting": "kamera stabil tanpa tripod?\\nkenali ois vs eis:\\n• ois: stabilisasi lensa fisik\\n• eis: stabilisasi sensor digital",
@@ -27,40 +24,66 @@ export function generateContentPrompt(options: PromptOptions): string {
   }
 ]`;
 
-  const csvExample = `no,kategori,judul,copywriting,ambience,caption,platform,executed
-61,Edukasi & Spesifikasi,Perbedaan Kamera OIS vs EIS,"kamera stabil tanpa tripod?
+  const csvExample = `kategori,judul,copywriting,ambience,caption,platform,executed
+"Edukasi & Spesifikasi","Perbedaan Kamera OIS vs EIS","kamera stabil tanpa tripod?
 kenali ois vs eis:
 • ois: stabilisasi lensa fisik
 • eis: stabilisasi sensor digital","Close-up modul lensa kamera bergerak halus","Kamera goyang saat jalan santai? OIS jawabannya! Cek koleksi kamera stabil kami.","Instagram Feed",false
-62,Tips & Perawatan,Tips Bersihkan Layar HP,"layar kotor jangan asal semprot!
+"Tips & Perawatan","Tips Bersihkan Layar HP","layar kotor jangan asal semprot!
 1. pakai kain microfiber
 2. hindari alkohol keras
 3. lap searah perlahan","Tangan membersihkan layar smartphone berkilau bersih","Layar jernih bikin nyaman dipakai kerja seharian. Mampir pasang tempered glass rapi di store!","Instagram Carousel",false`;
 
+  // Opsi 1 (Ada Berkas Harga) vs Opsi 2 (Tanpa Berkas Harga / Opsional)
   const priceSection = priceData
-    ? `### DATA HARGA & STOK UNIT TERBARU DARI STORE (Berkas: ${priceData.fileName}):
-Gunakan data tipe dan harga gadget resmi dari store berikut ini sebagai referensi produk riil:
+    ? `### DATA HARGA & STOK UNIT TERBARU STORE (${priceData.fileName}):
+Gunakan data tipe dan harga gadget resmi dari toko berikut ini sebagai referensi produk riil:
 \`\`\`json
 ${JSON.stringify(priceData.data, null, 2)}
 \`\`\`
-`
-    : `### DATA HARGA & PRODUK:
-Gunakan referensi produk smartphone/tablet dan aksesoris yang relevan dan terkini di Indonesia tahun 2026.`;
+- Untuk konten rekomendasi produk, promo, atau harga, WAJIB mengacu pada tipe dan harga yang ada di daftar di atas.`
+    : `### PANDUAN PRODUK (OPSI TANPA BERKAS HARGA TOKO):
+- Pada sesi ini tidak dilampirkan berkas daftar harga internal toko.
+- Fokuskan materi pada edukasi teknologi, tips & perawatan, panduan memilih gadget, solusi masalah/servis HP, atau rekomendasi fitur unggulan.
+- Jika menyebutkan kategori rentang harga (misal: "HP 2-3 jutaan"), gunakan estimasi harga pasar resmi Indonesia tahun 2026 tanpa mencantumkan harga promo toko yang mengikat. Arahkan audiens untuk cek stok dan harga promo langsung ke WhatsApp admin store.`;
 
   const formatInstruction =
     format === "json"
       ? `### FORMAT OUTPUT WAJIB (JSON):
-Berikan output berupa SATU array JSON valid tanpa teks pembuka atau penutup tambahan, dengan skema:
+Berikan output berupa SATU array JSON valid tanpa teks pembuka atau penutup tambahan, tanpa kolom "no", dengan skema:
 ${jsonExample}`
       : `### FORMAT OUTPUT WAJIB (CSV):
-Berikan output berupa data teks CSV yang valid (gunakan tanda kutip dua untuk teks multibaris/berkoma), dengan header dan format persis seperti ini:
+Berikan output berupa data teks CSV yang valid (gunakan tanda kutip dua untuk teks multibaris/berkoma), tanpa kolom "no", dengan header dan format persis seperti ini:
 ${csvExample}`;
 
-  return `Bertindaklah sebagai Senior Social Media Strategist & Content Creator untuk "Eldorado Semarang Cell", toko gadget dan servis terpercaya di Kota Metro (melayani penjualan HP Android/iPhone baru, jual-beli HP bekas bergaransi, servis teknisi profesional, dan aksesoris gadget lengkap).
+  return `Bertindaklah sebagai Senior Social Media Strategist & Content Creator profesional untuk "Eldorado Semarang Cell", toko gadget dan servis terpercaya di Kota Metro (melayani penjualan HP Android/iPhone baru, jual-beli HP bekas bergaransi, servis teknisi profesional, dan aksesoris gadget lengkap).
 
 TUGAS UTAMA:
 Buatkan ${targetCount} ide konten Instagram feed/carousel berkualitas tinggi untuk kategori: "${targetCategory}".
-Nomor urut (kolom "no") harus berurutan dimulai dari angka: ${targetStartNo}.
+CATATAN PENTING: DILARANG menggunakan kolom nomor urut ("no") di dalam hasil output (tanpa properti "no").
+
+---
+
+ATURAN KOMPARASI DAN PEMILIHAN BRAND (SANGAT KETAT):
+1. **Dilarang Komparasi Lintas Brand Secara Parsial / Terbatas**:
+   - Jika membuat konten perbandingan (versus / adu spesifikasi), HANYA boleh membandingkan produk di dalam 1 BRAND YANG SAMA (contoh: Samsung Galaxy A55 vs Galaxy A35, atau iPhone 13 vs iPhone 15).
+   - DILARANG KERAS membandingkan hanya 2 atau 3 brand secara acak/parsial (misal: "Samsung vs Xiaomi" atau "Oppo vs Vivo") karena memicu bias dan perdebatan tidak sehat.
+2. **Jika Komparasi / Rekomendasi Lintas Brand, SEMUA Brand Harus Masuk**:
+   - JIKA ingin membuat konten rekomendasi atau perbandingan lintas brand (misal: "Rekomendasi HP 2-3 Jutaan Terbaik 2026"), maka SEMUA brand utama yang dijual di toko HARUS dimasukkan secara adil dan lengkap (Samsung, Xiaomi/Redmi, Oppo, Vivo, Realme, Infinix, Tecno, Apple/iPhone). Dilarang hanya memasukkan sebagian brand saja.
+3. **Kesesuaian Kategori dengan Lini Brand**:
+   - Jika membuat konten untuk kategori produk spesifik (misal: kategori "Tablet"), HANYA masukkan brand-brand yang memang memiliki lini produk tersebut di pasaran (misal: Samsung Galaxy Tab, Apple iPad, Xiaomi/Redmi Pad, Huawei MatePad). JANGAN pernah memasukkan brand yang tidak memproduksi lini produk tersebut.
+
+---
+
+ATURAN RISET SPESIFIKASI DETAIL BARANG (WAJIB & AKURAT):
+- Setiap kali menyebutkan produk gadget atau aksesoris, WAJIB melakukan riset spesifikasi teknis yang detail, akurat, dan faktual sesuai spesifikasi resmi yang beredar di Indonesia.
+- DILARANG HALUSINASI ATAU MENGARANG SPESIFIKASI:
+  - Chipset: Sebutkan tipe prosesor yang benar (misal: Snapdragon 7s Gen 2, Dimensity 7050, Helio G99).
+  - Layar: Cantumkan tipe panel (AMOLED/Super AMOLED/IPS), refresh rate (90Hz/120Hz), dan resolusi yang sesuai.
+  - Kamera: Sebutkan sensor utama (MP), keberadaan OIS/EIS, dan fitur kamera yang sebenarnya.
+  - Baterai & Daya: Sebutkan kapasitas baterai (mAh) dan kecepatan charging (Watt) yang tepat.
+  - Memori: Sebutkan konfigurasi RAM dan storage (ROM) resmi yang dirilis di Indonesia.
+- Informasi spesifikasi yang akurat wajib dijaga untuk membangun reputasi profesional dan kepercayaan calon pembeli Eldorado Semarang Cell.
 
 ---
 
@@ -84,7 +107,7 @@ PANDUAN GAYA & FORMULA KONTEN ELDORADO SEMARANG CELL:
 
 ---
 
-CONTOH KONTEN SEBELUMNYA (GAYA REFERENSI):
+CONTOH GAYA KONTEN SEBELUMNYA:
 
 Contoh 1 (Layanan & Edukasi Store):
 - Copywriting:
@@ -136,6 +159,5 @@ ${priceSection}
 ---
 
 ${formatInstruction}
-Pastikan seluruh ${targetCount} konten selesai dibuat secara lengkap tanpa terpotong.`;
+Pastikan seluruh ${targetCount} konten selesai dibuat secara lengkap tanpa terpotong dan tanpa kolom 'no'.`;
 }
-

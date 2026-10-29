@@ -18,12 +18,10 @@ export default function PromptModal({
   isOpen,
   onClose,
   existingCategories = [],
-  nextSuggestedNo = 61
 }: PromptModalProps) {
   const [kategori, setKategori] = useState("");
   const [format, setFormat] = useState<"json" | "csv">("json");
   const [count, setCount] = useState<number | "">(10);
-  const [startNo, setStartNo] = useState<number>(nextSuggestedNo);
 
   const [priceResult, setPriceResult] = useState<ExtractResult | null>(null);
   const [isExtractingPrice, setIsExtractingPrice] = useState(false);
@@ -31,12 +29,6 @@ export default function PromptModal({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [copied, setCopied] = useState(false);
-
-  React.useEffect(() => {
-    if (nextSuggestedNo) {
-      setStartNo(nextSuggestedNo);
-    }
-  }, [nextSuggestedNo, isOpen]);
 
   const handlePriceFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -72,11 +64,11 @@ export default function PromptModal({
   };
 
   const numCount = typeof count === "number" ? count : parseInt(count as string) || 0;
+  // Kategori, format, dan jumlah konten wajib; harga terbaru opsional
   const isFormComplete = Boolean(
     kategori.trim().length > 0 &&
     Boolean(format) &&
-    numCount > 0 &&
-    priceResult !== null
+    numCount > 0
   );
 
   const promptOutput = useMemo(() => {
@@ -86,10 +78,9 @@ export default function PromptModal({
       kategori: kategori.trim(),
       format,
       count: numCount,
-      startNo: Number(startNo) || 1,
       priceData: priceResult
     });
-  }, [isFormComplete, kategori, format, numCount, startNo, priceResult]);
+  }, [isFormComplete, kategori, format, numCount, priceResult]);
 
   const handleCopyPrompt = async () => {
     if (!isFormComplete || !promptOutput) return;
@@ -188,9 +179,10 @@ export default function PromptModal({
 
         {/* Baris 2: [Upload Harga Terbaru (Lewat Tools Harga to JSON)] */}
         <div>
-          <label className="field-label">
-            Harga Terbaru (.doc / .docx) <span className="text-danger">*</span>
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="field-label mb-0">Harga Terbaru (.doc / .docx)</label>
+            <span className="text-xs text-muted">Opsional</span>
+          </div>
           <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-3.5 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               {priceResult ? (
