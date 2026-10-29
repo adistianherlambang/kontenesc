@@ -191,10 +191,10 @@ export default function ContentTable({
                     </button>
                   </td>
 
-                  {/* Kategori Pill */}
+                  {/* Kategori */}
                   <td className="td align-middle whitespace-nowrap">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border whitespace-nowrap ${tone.card} ${tone.title}`}>
-                      <span className={`size-1.5 rounded-full shrink-0 ${tone.dot}`} />
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap ${tone.title}`}>
+                      <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
                       <span className="whitespace-nowrap">{item.kategori}</span>
                     </span>
                   </td>
@@ -228,8 +228,8 @@ export default function ContentTable({
                   </td>
 
                   {/* Platform */}
-                  <td className="td align-middle">
-                    <span className="badge bg-subtle text-muted text-[11px]">
+                  <td className="td align-middle whitespace-nowrap">
+                    <span className="text-xs text-muted">
                       {item.platform || "Instagram Feed"}
                     </span>
                   </td>

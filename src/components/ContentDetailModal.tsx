@@ -284,7 +284,7 @@ export default function ContentDetailModal({
                 </button>
 
                 {justSavedExecution && (
-                  <span className="badge bg-success-soft text-success text-[11px] animate-in fade-in duration-150">
+                  <span className="text-xs font-medium text-success animate-in fade-in duration-150">
                     ✓ Tersimpan
                   </span>
                 )}

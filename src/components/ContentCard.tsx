@@ -133,18 +133,6 @@ export default function ContentCard({
         className="flex flex-1 cursor-pointer select-none flex-col rounded-xl border border-black/[0.04] bg-canvas p-4 text-left
           outline-none transition-colors hover:bg-surface/60 active:bg-subtle/70 focus-visible:ring-3 focus-visible:ring-brand/25"
       >
-        {/* <div className="mb-2 flex items-center gap-2 text-xs text-muted">
-          <span className="truncate">{item.platform || "Instagram Feed"}</span>
-          <div className="ml-auto flex items-center gap-1.5">
-            {isPriority && (
-              <span className="badge bg-amber-50 text-amber-700 border border-amber-200/60 font-medium">
-                Prioritas
-              </span>
-            )}
-            {done && <span className="badge bg-success-soft text-success">✓ Sudah Tayang</span>}
-          </div>
-        </div> */}
-
         <h4
           suppressHydrationWarning
           className={`mb-2 text-[15px] font-semibold leading-snug ${done ? "text-faint line-through decoration-faint/60" : "text-ink"

@@ -40,7 +40,6 @@ export interface ModalHeaderProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   icon?: React.ReactNode;
-  badge?: React.ReactNode;
   extra?: React.ReactNode;
   onClose?: () => void;
   showCloseButton?: boolean;
@@ -52,7 +51,6 @@ export function ModalHeader({
   title,
   subtitle,
   icon,
-  badge,
   extra,
   onClose,
   showCloseButton = true,
@@ -75,7 +73,6 @@ export function ModalHeader({
                 title
               )
             )}
-            {badge}
             {subtitle && <span className="text-xs text-muted truncate">{subtitle}</span>}
           </div>
 
@@ -127,7 +124,6 @@ export interface ModalProps {
   onClose: () => void;
   title?: React.ReactNode;
   titleIcon?: React.ReactNode;
-  titleBadge?: React.ReactNode;
   subtitle?: React.ReactNode;
   headerExtra?: React.ReactNode;
   headerClassName?: string;
@@ -152,7 +148,6 @@ export default function Modal({
   onClose,
   title,
   titleIcon,
-  titleBadge,
   subtitle,
   headerExtra,
   headerClassName = "",
@@ -212,7 +207,7 @@ export default function Modal({
     isPointerDownOnBackdrop.current = false;
   };
 
-  const shouldRenderHeader = !hideHeader && (title || titleIcon || titleBadge || headerExtra || showCloseButton);
+  const shouldRenderHeader = !hideHeader && (title || titleIcon || headerExtra || showCloseButton);
 
   return (
     <div
@@ -232,7 +227,6 @@ export default function Modal({
           <ModalHeader
             title={title}
             icon={titleIcon}
-            badge={titleBadge}
             subtitle={subtitle}
             extra={headerExtra}
             onClose={onClose}

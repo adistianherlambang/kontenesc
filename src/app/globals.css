@@ -184,9 +184,6 @@ label {
     transform: translate(-50%, -50%) rotate(45deg);
   }
 
-  /* ---------- Badge ---------- */
-  .badge { @apply inline-flex min-h-5 items-center rounded-md px-2 py-0.5 text-[11px] font-medium whitespace-nowrap; }
-
   /* ---------- Sidebar navigation ---------- */
   .nav-item {
     @apply flex min-h-11 sm:min-h-9 w-full cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 sm:px-3 sm:py-2 text-sm sm:text-[13px]

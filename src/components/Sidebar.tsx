@@ -134,11 +134,10 @@ export default function Sidebar({
               <button
                 type="button"
                 onClick={pick(() => onOpenHargaExtractor?.())}
-                className="nav-item group"
+                className="nav-item"
               >
-                <FileCode2 className="size-4 shrink-0 text-muted group-hover:text-brand transition-colors" />
+                <FileCode2 className="size-4 shrink-0" />
                 <span className="truncate">Harga to JSON</span>
-                <span className="ml-auto text-[10px] font-semibold text-brand bg-brand-soft px-1.5 py-0.5 rounded">.doc/.docx</span>
               </button>
             </div>
           </nav>

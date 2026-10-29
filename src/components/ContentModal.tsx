@@ -250,11 +250,6 @@ export default function ContentModal({
       onClose={onClose}
       maxWidth="2xl"
       title={isEditing ? "Edit Konten" : "Tambah Konten Baru"}
-      titleBadge={
-        <span className="badge bg-subtle text-muted">
-          {isEditing ? "Mode Edit" : activeMode === "manual" ? "1 Konten" : "Import Batch"}
-        </span>
-      }
       closeButtonAriaLabel="Tutup modal"
     >
       {/* Mode Tabs (Only when adding new content) */}
@@ -308,26 +303,6 @@ export default function ContentModal({
                   <span>{manualError}</span>
                 </div>
               )}
-
-              {/* Status Eksekusi Toggle */}
-              {/* <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-3">
-                <label className="flex cursor-pointer select-none items-center gap-2.5 text-xs font-medium text-ink">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(formData.executed)}
-                    onChange={(e) => setFormData({ ...formData, executed: e.target.checked })}
-                    className="checkbox"
-                  />
-                  <span>Tandai konten ini sudah dieksekusi / ditayangkan</span>
-                </label>
-                <span
-                  className={`badge ${
-                    formData.executed ? "bg-success-soft text-success" : "bg-subtle text-muted"
-                  }`}
-                >
-                  {formData.executed ? "Sudah Selesai" : "Belum Dieksekusi"}
-                </span>
-              </div> */}
 
               {/* Row 1: Kategori, Platform */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
@@ -486,14 +461,11 @@ export default function ContentModal({
                 </div>
               )}
               {parsedJsonItems.length > 0 && (
-                <div className="notice notice-success items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Check className="size-4 shrink-0" />
-                    <span className="font-medium">
-                      Terbaca {parsedJsonItems.length} ide konten valid siap diimpor.
-                    </span>
-                  </div>
-                  <span className="badge bg-success/20 text-success">Siap</span>
+                <div className="notice notice-success">
+                  <Check className="size-4 shrink-0" />
+                  <span className="font-medium">
+                    Terbaca {parsedJsonItems.length} ide konten valid siap diimpor.
+                  </span>
                 </div>
               )}
 
@@ -614,14 +586,11 @@ export default function ContentModal({
                 </div>
               )}
               {parsedCsvItems.length > 0 && (
-                <div className="notice notice-success items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Check className="size-4 shrink-0" />
-                    <span className="font-medium">
-                      Terbaca {parsedCsvItems.length} baris data valid siap diimpor.
-                    </span>
-                  </div>
-                  <span className="badge bg-success/20 text-success">Siap</span>
+                <div className="notice notice-success">
+                  <Check className="size-4 shrink-0" />
+                  <span className="font-medium">
+                    Terbaca {parsedCsvItems.length} baris data valid siap diimpor.
+                  </span>
                 </div>
               )}
 
