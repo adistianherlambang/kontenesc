@@ -124,19 +124,18 @@ export function contentItemsToCSV(items: ContentItem[]): string {
   return lines.join("\n");
 }
 
-export const SAMPLE_CSV_TEMPLATE = `no,kategori,judul,copywriting,ambience,caption,platform,executed
-61,Edukasi & Spesifikasi,Perbedaan Kamera OIS vs EIS,"kamera stabil tanpa tripod?
+export const SAMPLE_CSV_TEMPLATE = `kategori,judul,copywriting,ambience,caption,platform,executed
+"Edukasi & Spesifikasi","Perbedaan Kamera OIS vs EIS","kamera stabil tanpa tripod?
 kenali ois vs eis:
 • ois: stabilisasi lensa fisik
 • eis: stabilisasi sensor digital","Close-up modul lensa kamera bergerak halus","Kamera goyang saat jalan santai? OIS jawabannya! Cek koleksi kamera stabil kami.","Instagram Feed",false
-62,Tips & Perawatan,Tips Bersihkan Layar HP,"layar kotor jangan asal semprot!
+"Tips & Perawatan","Tips Bersihkan Layar HP","layar kotor jangan asal semprot!
 1. pakai kain microfiber
 2. hindari alkohol keras
 3. lap searah perlahan","Tangan membersihkan layar smartphone berkilau bersih","Layar jernih bikin nyaman dipakai kerja seharian. Mampir pasang tempered glass rapi di store!","Instagram Carousel",false`;
 
 export const SAMPLE_JSON_TEMPLATE = `[
   {
-    "no": 61,
     "kategori": "Edukasi & Spesifikasi",
     "judul": "Perbedaan Kamera OIS vs EIS",
     "copywriting": "kamera stabil tanpa tripod?\\nkenali ois vs eis:\\n• ois: stabilisasi lensa fisik\\n• eis: stabilisasi sensor digital",

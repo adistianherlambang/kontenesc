@@ -477,7 +477,7 @@ export default function ContentModal({
                   rows={6}
                   value={jsonInput}
                   onChange={(e) => setJsonInput(e.target.value)}
-                  placeholder='[ { "no": 61, "kategori": "Edukasi & Spesifikasi", "judul": "Judul konten...", "copywriting": "Teks feed...", "caption": "Caption..." } ]'
+                  placeholder='[ { "kategori": "Edukasi & Spesifikasi", "judul": "Judul konten...", "copywriting": "Teks feed...", "caption": "Caption..." } ]'
                   className="textarea text-xs"
                 />
               </div>
@@ -602,7 +602,7 @@ export default function ContentModal({
                   rows={6}
                   value={csvInput}
                   onChange={(e) => setCsvInput(e.target.value)}
-                  placeholder="no,kategori,judul,copywriting,ambience,caption,platform,executed"
+                  placeholder="kategori,judul,copywriting,ambience,caption,platform,executed"
                   className="textarea text-xs"
                 />
               </div>
