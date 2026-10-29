@@ -106,6 +106,7 @@ export default function ContentModal({
     try {
       const parsed = JSON.parse(jsonInput);
       const arr = Array.isArray(parsed) ? parsed : [parsed];
+      const now = new Date().toISOString();
       const valid = arr.map((x: any, idx: number) => ({
         id: `konten-${x.no || (nextSuggestedNo + idx)}`,
         no: Number(x.no) || (nextSuggestedNo + idx),
@@ -116,7 +117,8 @@ export default function ContentModal({
         caption: x.caption || "",
         executed: Boolean(x.executed),
         platform: x.platform || "Instagram Feed",
-        updatedAt: new Date().toISOString()
+        createdAt: x.createdAt || now,
+        updatedAt: now
       }));
       setParsedJsonItems(valid);
       setJsonError("");
@@ -165,6 +167,7 @@ export default function ContentModal({
 
     try {
       setIsSubmitting(true);
+      const now = new Date().toISOString();
       await onSaveSingle({
         ...formData,
         no: Number(formData.no) || nextSuggestedNo,
@@ -174,7 +177,9 @@ export default function ContentModal({
         ambience: formData.ambience?.trim() || "",
         caption: formData.caption?.trim() || "",
         executed: Boolean(formData.executed),
-        platform: formData.platform || "Instagram Feed"
+        platform: formData.platform || "Instagram Feed",
+        createdAt: formData.createdAt || now,
+        updatedAt: now
       } as ContentItem);
       onClose();
     } catch (err: any) {

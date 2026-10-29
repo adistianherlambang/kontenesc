@@ -58,6 +58,7 @@ export interface ContentItem {
   platform?: "Instagram Feed" | "Instagram Carousel" | "Instagram Reels" | "Instagram Story";
   targetDate?: string;
   notes?: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -69,6 +70,7 @@ const COLLECTION_NAME = "contents";
  */
 export function sanitizeContentItem(item: ContentItem, docId?: string): ContentItem & { id: string } {
   const finalId = item.id || docId || `konten-${item.no}`;
+  const now = new Date().toISOString();
   return {
     id: finalId,
     no: typeof item.no === "number" ? item.no : Number(item.no) || 0,
@@ -82,7 +84,8 @@ export function sanitizeContentItem(item: ContentItem, docId?: string): ContentI
     platform: item.platform || "Instagram Feed",
     targetDate: item.targetDate || "",
     notes: item.notes || "",
-    updatedAt: item.updatedAt || new Date().toISOString()
+    createdAt: item.createdAt || item.updatedAt || now,
+    updatedAt: item.updatedAt || now
   };
 }
 
@@ -100,7 +103,7 @@ export function subscribeToContents(
   onUpdate: (items: ContentItem[], info: SnapshotMetadataInfo) => void,
   onError?: (error: Error) => void
 ): () => void {
-  const q = query(collection(db, COLLECTION_NAME), orderBy("no", "asc"));
+  const q = query(collection(db, COLLECTION_NAME));
   return onSnapshot(
     q,
     { includeMetadataChanges: true },
@@ -136,7 +139,7 @@ export async function checkFirestoreHealth(): Promise<{ ok: boolean; count?: num
 // Fetch all contents from Firestore
 export async function getContentsFromDb(): Promise<ContentItem[]> {
   try {
-    const q = query(collection(db, COLLECTION_NAME), orderBy("no", "asc"));
+    const q = query(collection(db, COLLECTION_NAME));
     const snapshot = await getDocs(q);
     if (snapshot.empty) return [];
     

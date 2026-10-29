@@ -12,6 +12,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.515Z",
     "updatedAt": "2026-10-28T04:17:58.515Z"
   },
   {
@@ -25,6 +26,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -38,6 +40,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -51,6 +54,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -64,6 +68,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -77,6 +82,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -90,6 +96,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -103,6 +110,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -116,6 +124,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -129,6 +138,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -142,6 +152,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -155,6 +166,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -168,6 +180,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -181,6 +194,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -194,6 +208,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -207,6 +222,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -220,6 +236,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -233,6 +250,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -246,6 +264,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -259,6 +278,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -272,6 +292,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -285,6 +306,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -298,6 +320,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -311,6 +334,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -324,6 +348,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -337,6 +362,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -350,6 +376,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -363,6 +390,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -376,6 +404,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -389,6 +418,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -402,6 +432,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -415,6 +446,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -428,6 +460,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -441,6 +474,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -454,6 +488,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -467,6 +502,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -480,6 +516,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -493,6 +530,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -506,6 +544,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -519,6 +558,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -532,6 +572,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -545,6 +586,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -558,6 +600,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -571,6 +614,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -584,6 +628,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -597,6 +642,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -610,6 +656,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -623,6 +670,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -636,6 +684,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -649,6 +698,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -662,6 +712,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -675,6 +726,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -688,6 +740,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -701,6 +754,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -714,6 +768,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -727,6 +782,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Reels",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -740,6 +796,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -753,6 +810,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Carousel",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -766,6 +824,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   },
   {
@@ -779,6 +838,7 @@ export const INITIAL_BRIEF_DATA: ContentItem[] = [
     "executed": false,
     "platform": "Instagram Feed",
     "targetDate": "",
+    "createdAt": "2026-10-28T04:17:58.516Z",
     "updatedAt": "2026-10-28T04:17:58.516Z"
   }
 ];

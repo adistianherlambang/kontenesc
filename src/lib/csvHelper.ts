@@ -69,6 +69,7 @@ export function parseCSV(csvText: string): Record<string, string>[] {
  * Converts parsed CSV rows into ContentItem array.
  */
 export function convertRowsToContentItems(rows: Record<string, string>[], startingNo: number): ContentItem[] {
+  const now = new Date().toISOString();
   return rows.map((r, idx) => {
     const no = parseInt(r.no || r.nomor || "") || (startingNo + idx);
     const executedVal = (r.executed || r.dieksekusi || r.selesai || r.status || "").toLowerCase();
@@ -88,7 +89,8 @@ export function convertRowsToContentItems(rows: Record<string, string>[], starti
       priority: isPriority,
       platform: (r.platform as any) || "Instagram Feed",
       targetDate: r.targetdate || r.tanggal || "",
-      updatedAt: new Date().toISOString()
+      createdAt: r.createdat || now,
+      updatedAt: now
     };
   });
 }

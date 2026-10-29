@@ -217,7 +217,15 @@ export default function DashboardPage() {
       if (rankA !== rankB) {
         return rankA - rankB;
       }
-      return a.no - b.no;
+
+      // Konten terbaru (timestamp terbaru) ditaruh paling awal
+      const timeA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+      const timeB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+      if (timeB !== timeA) {
+        return timeB - timeA;
+      }
+
+      return (a.no || 0) - (b.no || 0);
     });
   }, [items, activeSidebarView, searchQuery, selectedCategory, selectedPlatform]);
 
@@ -290,10 +298,13 @@ export default function DashboardPage() {
   };
 
   const handleSaveSingle = async (savedItem: ContentItem) => {
+    const existing = items.find((i) => (i.id && i.id === savedItem.id) || i.no === savedItem.no);
+    const now = new Date().toISOString();
     const itemToSave: ContentItem = {
       ...savedItem,
       id: savedItem.id || `konten-${savedItem.no}`,
-      updatedAt: savedItem.updatedAt || new Date().toISOString()
+      createdAt: savedItem.createdAt || existing?.createdAt || now,
+      updatedAt: now
     };
 
     updateItemsState((prev) => {
@@ -303,7 +314,7 @@ export default function DashboardPage() {
         next[existingIndex] = { ...itemToSave };
         return next;
       }
-      return [...prev, itemToSave].sort((a, b) => a.no - b.no);
+      return [itemToSave, ...prev];
     });
 
     if (previewItem && ((previewItem.id && previewItem.id === itemToSave.id) || previewItem.no === itemToSave.no)) {
@@ -314,14 +325,26 @@ export default function DashboardPage() {
   };
 
   const handleSaveBatch = async (batchItems: ContentItem[]) => {
+    const now = new Date().toISOString();
+    const enrichedBatch = batchItems.map((it) => ({
+      ...it,
+      createdAt: it.createdAt || now,
+      updatedAt: it.updatedAt || now
+    }));
+
     updateItemsState((prev) => {
       const itemMap = new Map<number, ContentItem>();
-      prev.forEach((it) => itemMap.set(it.no, it));
-      batchItems.forEach((it) => itemMap.set(it.no, it));
-      return Array.from(itemMap.values()).sort((a, b) => a.no - b.no);
+      // Enriched batch items first
+      enrichedBatch.forEach((it) => itemMap.set(it.no, it));
+      prev.forEach((it) => {
+        if (!itemMap.has(it.no)) {
+          itemMap.set(it.no, it);
+        }
+      });
+      return Array.from(itemMap.values());
     });
 
-    await seedContentsToDb(batchItems);
+    await seedContentsToDb(enrichedBatch);
   };
 
   const handleDeleteClick = (item: ContentItem) => {
