@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from "react";
-import { Copy, Check, Upload, Trash2, AlertCircle, Loader2 } from "lucide-react";
+import { Copy, Check, Upload, Trash2, AlertCircle, Loader2, Sparkles, FileText } from "lucide-react";
 import Modal from "./Modal";
 import { extractHargaFromBuffer, ExtractResult } from "@/lib/extractHarga";
 import { generateContentPrompt } from "@/lib/promptHelper";
@@ -19,13 +19,13 @@ export default function PromptModal({
   existingCategories = [],
   nextSuggestedNo = 61
 }: PromptModalProps) {
-  // Section 1 State: [kategori target, format file, jumlah target konten]
-  const [kategori, setKategori] = useState("Edukasi & Spesifikasi");
+  // Section 1 State: [kategori target, format file, jumlah target konten] (Wajib)
+  const [kategori, setKategori] = useState("");
   const [format, setFormat] = useState<"json" | "csv">("json");
-  const [count, setCount] = useState<number>(10);
+  const [count, setCount] = useState<number | "">(10);
   const [startNo, setStartNo] = useState<number>(nextSuggestedNo);
 
-  // Section 2 State: [upload harga terbaru (lewat tools harga to json)]
+  // Section 2 State: [upload harga terbaru (lewat tools harga to json)] (Wajib)
   const [priceResult, setPriceResult] = useState<ExtractResult | null>(null);
   const [isExtractingPrice, setIsExtractingPrice] = useState(false);
   const [priceError, setPriceError] = useState<string | null>(null);
@@ -75,18 +75,31 @@ export default function PromptModal({
     }
   };
 
-  // Generate prompt string live based on current inputs
+  // Validation: Semua formulir wajib diisi
+  const numCount = typeof count === "number" ? count : parseInt(count as string) || 0;
+  const isFormComplete = Boolean(
+    kategori.trim().length > 0 &&
+    Boolean(format) &&
+    numCount > 0 &&
+    priceResult !== null
+  );
+
+  // Generate prompt string live based on current inputs (hanya bila form lengkap)
   const promptOutput = useMemo(() => {
+    if (!isFormComplete) return "";
+
     return generateContentPrompt({
-      kategori,
+      kategori: kategori.trim(),
       format,
-      count: Number(count) || 10,
+      count: numCount,
       startNo: Number(startNo) || 1,
       priceData: priceResult
     });
-  }, [kategori, format, count, startNo, priceResult]);
+  }, [isFormComplete, kategori, format, numCount, startNo, priceResult]);
 
   const handleCopyPrompt = async () => {
+    if (!isFormComplete || !promptOutput) return;
+
     try {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(promptOutput);
@@ -116,15 +129,20 @@ export default function PromptModal({
       title="Buat Prompt"
       closeButtonAriaLabel="Tutup modal"
     >
-      <Modal.Body className="space-y-5">
-        {/* SECTION 1: [Kategori Target, Format File, Jumlah Target Konten] */}
+      <Modal.Body className="space-y-4">
+        {/* SECTION 1: [Kategori Target, Format File, Jumlah Target Konten] (Wajib) */}
         <div className="space-y-3 rounded-xl border border-line bg-surface p-4">
-          <p className="text-xs font-semibold text-ink">1. Target Konten & Format</p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-ink">1. Target Konten & Format</p>
+            <span className="text-[11px] text-faint">Wajib diisi</span>
+          </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
             {/* Kategori Target */}
             <div className="sm:col-span-5">
-              <label className="field-label">Kategori Target</label>
+              <label className="field-label">
+                Kategori Target <span className="text-danger">*</span>
+              </label>
               <input
                 type="text"
                 list="prompt-category-options"
@@ -132,6 +150,7 @@ export default function PromptModal({
                 onChange={(e) => setKategori(e.target.value)}
                 placeholder="Misal: Edukasi, Tablet, Servis..."
                 className="input"
+                required
               />
               <datalist id="prompt-category-options">
                 {existingCategories.map((cat) => (
@@ -148,7 +167,9 @@ export default function PromptModal({
 
             {/* Format File (CSV atau JSON) */}
             <div className="sm:col-span-4">
-              <label className="field-label">Format Output</label>
+              <label className="field-label">
+                Format Output <span className="text-danger">*</span>
+              </label>
               <select
                 value={format}
                 onChange={(e) => setFormat(e.target.value as "json" | "csv")}
@@ -161,26 +182,36 @@ export default function PromptModal({
 
             {/* Jumlah Target Konten */}
             <div className="sm:col-span-3">
-              <label className="field-label">Jumlah Konten</label>
+              <label className="field-label">
+                Jumlah Konten <span className="text-danger">*</span>
+              </label>
               <input
                 type="number"
                 min={1}
                 max={50}
                 value={count}
-                onChange={(e) => setCount(Math.max(1, parseInt(e.target.value) || 1))}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setCount(val === "" ? "" : Math.max(1, parseInt(val) || 1));
+                }}
                 className="input"
+                placeholder="10"
+                required
               />
             </div>
           </div>
         </div>
 
-        {/* SECTION 2: [Upload Harga Terbaru (Lewat Tools Harga to JSON)] */}
+        {/* SECTION 2: [Upload Harga Terbaru (Lewat Tools Harga to JSON)] (Wajib) */}
         <div className="space-y-3 rounded-xl border border-line bg-surface p-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-semibold text-ink">2. Referensi Harga Terbaru (Opsional)</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-semibold text-ink">2. Upload Harga Terbaru</p>
+                <span className="text-danger text-xs font-bold">*</span>
+              </div>
               <p className="text-xs text-muted">
-                Sertakan dokumen .doc atau .docx daftar harga untuk disertakan ke dalam prompt.
+                Unggah berkas .doc atau .docx daftar harga untuk disertakan ke dalam prompt.
               </p>
             </div>
 
@@ -231,22 +262,36 @@ export default function PromptModal({
           )}
         </div>
 
-        {/* SECTION 3: Hasil Prompt Textarea */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="field-label mb-0">Teks Prompt Siap Salin</label>
-            <span className="text-xs text-muted">
-              {promptOutput.length} karakter
-            </span>
-          </div>
+        {/* SECTION 3: Teks Prompt Siap Salin (Hanya muncul jika SEMUA form wajib terisi) */}
+        {isFormComplete ? (
+          <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="flex items-center justify-between">
+              <label className="field-label mb-0 flex items-center gap-1.5 text-ink font-semibold">
+                <Sparkles className="size-3.5 text-brand" />
+                <span>Teks Prompt Siap Salin</span>
+              </label>
+              <span className="text-xs text-muted">
+                {promptOutput.length} karakter
+              </span>
+            </div>
 
-          <textarea
-            rows={10}
-            readOnly
-            value={promptOutput}
-            className="textarea text-xs leading-relaxed"
-          />
-        </div>
+            <textarea
+              rows={10}
+              readOnly
+              value={promptOutput}
+              className="textarea text-xs leading-relaxed"
+            />
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-line bg-surface/50 p-5 text-center">
+            <p className="text-xs font-medium text-ink">
+              Teks Prompt akan otomatis muncul di sini
+            </p>
+            <p className="text-[11px] text-muted mt-1 max-w-md mx-auto">
+              Lengkapi formulir di atas: isi <strong>kategori target</strong>, tentukan <strong>format & jumlah</strong>, serta <strong>upload berkas harga terbaru (.doc / .docx)</strong>.
+            </p>
+          </div>
+        )}
       </Modal.Body>
 
       <Modal.Footer>
@@ -260,6 +305,7 @@ export default function PromptModal({
         <button
           type="button"
           onClick={handleCopyPrompt}
+          disabled={!isFormComplete}
           className="btn btn-primary"
         >
           {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
@@ -269,4 +315,3 @@ export default function PromptModal({
     </Modal>
   );
 }
-
