@@ -9,6 +9,7 @@ import ContentDetailModal from "@/components/ContentDetailModal";
 import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import HargaExtractorModal from "@/components/HargaExtractorModal";
+import PromptModal from "@/components/PromptModal";
 import {
   ContentItem,
   saveContentToDb,
@@ -65,6 +66,7 @@ export default function DashboardPage() {
   // Modals
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [isHargaExtractorOpen, setIsHargaExtractorOpen] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [previewItem, setPreviewItem] = useState<ContentItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<ContentItem | null>(null);
@@ -373,6 +375,7 @@ export default function DashboardPage() {
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
         onOpenHargaExtractor={() => setIsHargaExtractorOpen(true)}
+        onOpenPromptModal={() => setIsPromptModalOpen(true)}
       />
 
       {/* Right Main Content Area */}
@@ -627,6 +630,15 @@ export default function DashboardPage() {
         <HargaExtractorModal
           isOpen={isHargaExtractorOpen}
           onClose={() => setIsHargaExtractorOpen(false)}
+        />
+      )}
+
+      {isPromptModalOpen && (
+        <PromptModal
+          isOpen={isPromptModalOpen}
+          onClose={() => setIsPromptModalOpen(false)}
+          existingCategories={categoriesWithCounts.map(c => c.name)}
+          nextSuggestedNo={nextSuggestedNo}
         />
       )}
     </div>
