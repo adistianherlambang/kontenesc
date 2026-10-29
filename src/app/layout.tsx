@@ -10,7 +10,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Semarang Cell - Konten Hub",
+  title: "Semarang Cell Konten",
   description: "Dashboard manajemen konten media sosial Eldorado Semarang Cell",
   icons: {
     icon: "/favicon.ico",

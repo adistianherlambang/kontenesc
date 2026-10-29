@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  X, 
-  Save, 
+import {
+  X,
+  Save,
   AlertCircle,
   FileCode,
   FileSpreadsheet,
@@ -15,11 +15,11 @@ import {
   PenLine
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
-import { 
-  parseCSV, 
-  convertRowsToContentItems, 
-  SAMPLE_CSV_TEMPLATE, 
-  SAMPLE_JSON_TEMPLATE 
+import {
+  parseCSV,
+  convertRowsToContentItems,
+  SAMPLE_CSV_TEMPLATE,
+  SAMPLE_JSON_TEMPLATE
 } from "@/lib/csvHelper";
 
 interface ContentModalProps {
@@ -256,8 +256,8 @@ export default function ContentModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div 
-        className="modal max-w-2xl max-h-[92dvh]" 
+      <div
+        className="modal max-w-2xl max-h-[92dvh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -287,11 +287,10 @@ export default function ContentModal({
               <button
                 type="button"
                 onClick={() => setActiveMode("manual")}
-                className={`btn px-2.5 py-2 text-xs ${
-                  activeMode === "manual"
+                className={`btn px-2.5 py-2 text-xs ${activeMode === "manual"
                     ? "bg-canvas text-ink shadow-xs"
                     : "btn-ghost text-muted hover:text-ink"
-                }`}
+                  }`}
               >
                 <PenLine className="size-3.5 shrink-0" />
                 <span className="truncate">Manual</span>
@@ -299,11 +298,10 @@ export default function ContentModal({
               <button
                 type="button"
                 onClick={() => setActiveMode("batch-json")}
-                className={`btn px-2.5 py-2 text-xs ${
-                  activeMode === "batch-json"
+                className={`btn px-2.5 py-2 text-xs ${activeMode === "batch-json"
                     ? "bg-canvas text-ink shadow-xs"
                     : "btn-ghost text-muted hover:text-ink"
-                }`}
+                  }`}
               >
                 <FileCode className="size-3.5 text-brand shrink-0" />
                 <span className="truncate">Batch JSON</span>
@@ -311,11 +309,10 @@ export default function ContentModal({
               <button
                 type="button"
                 onClick={() => setActiveMode("batch-csv")}
-                className={`btn px-2.5 py-2 text-xs ${
-                  activeMode === "batch-csv"
+                className={`btn px-2.5 py-2 text-xs ${activeMode === "batch-csv"
                     ? "bg-canvas text-ink shadow-xs"
                     : "btn-ghost text-muted hover:text-ink"
-                }`}
+                  }`}
               >
                 <FileSpreadsheet className="size-3.5 text-success shrink-0" />
                 <span className="truncate">Batch CSV</span>
@@ -336,7 +333,7 @@ export default function ContentModal({
               )}
 
               {/* Status Eksekusi Toggle */}
-              <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-3">
+              {/* <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-3">
                 <label className="flex cursor-pointer select-none items-center gap-2.5 text-xs font-medium text-ink">
                   <input
                     type="checkbox"
@@ -353,7 +350,7 @@ export default function ContentModal({
                 >
                   {formData.executed ? "Sudah Selesai" : "Belum Dieksekusi"}
                 </span>
-              </div>
+              </div> */}
 
               {/* Row 1: Kategori, Platform */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-12">
