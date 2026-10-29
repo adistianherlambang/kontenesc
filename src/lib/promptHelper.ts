@@ -138,3 +138,4 @@ ${priceSection}
 ${formatInstruction}
 Pastikan seluruh ${targetCount} konten selesai dibuat secara lengkap tanpa terpotong.`;
 }
+
