@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useRef } from "react";
 import { Copy, Check, Upload, Trash2, AlertCircle, Loader2 } from "lucide-react";
 import Modal from "./Modal";
+import CustomSelect from "./CustomSelect";
 import { extractHargaFromBuffer, ExtractResult } from "@/lib/extractHarga";
 import { generateContentPrompt } from "@/lib/promptHelper";
 
@@ -155,14 +156,14 @@ export default function PromptModal({
             <label className="field-label">
               Format File <span className="text-danger">*</span>
             </label>
-            <select
+            <CustomSelect
               value={format}
-              onChange={(e) => setFormat(e.target.value as "json" | "csv")}
-              className="input cursor-pointer"
-            >
-              <option value="json">JSON</option>
-              <option value="csv">CSV</option>
-            </select>
+              onChange={(val) => setFormat(val as "json" | "csv")}
+              options={[
+                { value: "json", label: "JSON" },
+                { value: "csv", label: "CSV" },
+              ]}
+            />
           </div>
 
           <div className="sm:col-span-3">

@@ -12,6 +12,7 @@ import {
   ListFilter,
   ArrowUpDown
 } from "lucide-react";
+import CustomSelect from "./CustomSelect";
 
 interface FilterBarProps {
   activeTab: "all" | "pending" | "executed" | "gallery" | "simulator";
@@ -155,44 +156,49 @@ export default function FilterBar({
         {/* Controls */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Category Dropdown */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => onSelectCategory(e.target.value)}
-            className="text-xs bg-[#F7F6F3] border border-[#E9E9E7] rounded px-2 py-1 text-[#37352F] focus:outline-none focus:border-[#1F6FB6] cursor-pointer"
-          >
-            <option value="Semua">Semua Kategori</option>
-            {categories.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name} ({c.count})
-              </option>
-            ))}
-          </select>
+          <div className="min-w-[140px]">
+            <CustomSelect
+              value={selectedCategory}
+              onChange={onSelectCategory}
+              options={[
+                { value: "Semua", label: "Semua Kategori" },
+                ...categories.map((c) => ({
+                  value: c.name,
+                  label: `${c.name} (${c.count})`,
+                })),
+              ]}
+              triggerClassName="py-1 px-2.5 min-h-[32px] sm:min-h-[32px] text-xs"
+            />
+          </div>
 
           {/* Platform Dropdown */}
-          <select
-            value={selectedPlatform}
-            onChange={(e) => onSelectPlatform(e.target.value)}
-            className="text-xs bg-[#F7F6F3] border border-[#E9E9E7] rounded px-2 py-1 text-[#37352F] focus:outline-none focus:border-[#1F6FB6] cursor-pointer"
-          >
-            <option value="Semua">Semua Format</option>
-            <option value="Instagram Feed">Instagram Feed</option>
-            <option value="Instagram Carousel">Instagram Carousel</option>
-            <option value="Instagram Reels">Instagram Reels</option>
-            <option value="Instagram Story">Instagram Story</option>
-          </select>
+          <div className="min-w-[140px]">
+            <CustomSelect
+              value={selectedPlatform}
+              onChange={onSelectPlatform}
+              options={[
+                { value: "Semua", label: "Semua Format" },
+                { value: "Instagram Feed", label: "Instagram Feed" },
+                { value: "Instagram Carousel", label: "Instagram Carousel" },
+                { value: "Instagram Reels", label: "Instagram Reels" },
+                { value: "Instagram Story", label: "Instagram Story" },
+              ]}
+              triggerClassName="py-1 px-2.5 min-h-[32px] sm:min-h-[32px] text-xs"
+            />
+          </div>
 
           {/* Sort */}
-          <div className="flex items-center gap-1 bg-[#F7F6F3] border border-[#E9E9E7] rounded px-2 py-1 text-xs text-[#37352F]">
-            <ArrowUpDown className="w-3 h-3 text-[#9B9A97]" />
-            <select
+          <div className="min-w-[130px]">
+            <CustomSelect
               value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as any)}
-              className="bg-transparent border-none text-xs text-[#37352F] focus:outline-none cursor-pointer"
-            >
-              <option value="no-asc">No: 1 → 60</option>
-              <option value="no-desc">No: 60 → 1</option>
-              <option value="title-asc">Judul: A → Z</option>
-            </select>
+              onChange={(val) => onSortChange(val as any)}
+              options={[
+                { value: "no-asc", label: "No: 1 → 60" },
+                { value: "no-desc", label: "No: 60 → 1" },
+                { value: "title-asc", label: "Judul: A → Z" },
+              ]}
+              triggerClassName="py-1 px-2.5 min-h-[32px] sm:min-h-[32px] text-xs"
+            />
           </div>
 
           {/* Reset Filters */}

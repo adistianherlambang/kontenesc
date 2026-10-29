@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 import Modal from "./Modal";
+import CustomSelect from "./CustomSelect";
 import {
   parseCSV,
   convertRowsToContentItems,
@@ -326,16 +327,16 @@ export default function ContentModal({
 
                 <div className="sm:col-span-5">
                   <label className="field-label">Format Media</label>
-                  <select
+                  <CustomSelect
                     value={formData.platform || "Instagram Feed"}
-                    onChange={(e) => setFormData({ ...formData, platform: e.target.value as any })}
-                    className="input cursor-pointer"
-                  >
-                    <option value="Instagram Feed">Instagram Feed</option>
-                    <option value="Instagram Carousel">Instagram Carousel</option>
-                    <option value="Instagram Reels">Instagram Reels</option>
-                    <option value="Instagram Story">Instagram Story</option>
-                  </select>
+                    onChange={(val) => setFormData({ ...formData, platform: val as any })}
+                    options={[
+                      { value: "Instagram Feed", label: "Instagram Feed" },
+                      { value: "Instagram Carousel", label: "Instagram Carousel" },
+                      { value: "Instagram Reels", label: "Instagram Reels" },
+                      { value: "Instagram Story", label: "Instagram Story" },
+                    ]}
+                  />
                 </div>
               </div>
 
