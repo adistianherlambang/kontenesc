@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { 
-  X, 
   Copy, 
   Check, 
   Heart, 
@@ -12,6 +11,7 @@ import {
   MoreHorizontal
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
+import Modal from "./Modal";
 
 interface InstagramPreviewModalProps {
   item: ContentItem | null;
@@ -62,22 +62,46 @@ export default function InstagramPreviewModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal max-w-md" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="modal-header">
-          <h2 className="modal-title">
-            Pratinjau Feed Instagram
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-ghost btn-icon"
-            aria-label="Tutup"
-          >
-            <X className="size-4" />
-          </button>
+    <Modal
+      isOpen={Boolean(item)}
+      onClose={onClose}
+      maxWidth="md"
+      title="Pratinjau Feed Instagram"
+      footer={
+        <div className="flex items-center justify-between w-full">
+          {onToggleExecuted ? (
+            <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={Boolean(item.executed)}
+                onChange={() => onToggleExecuted(item)}
+                className="checkbox"
+              />
+              <span>Sudah Dieksekusi</span>
+            </label>
+          ) : <div />}
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyCopywriting}
+              className="btn btn-secondary text-xs"
+            >
+              {copiedCopywriting ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
+              <span>Salin Teks</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleCopyCaption}
+              className="btn btn-primary text-xs"
+            >
+              {copiedCaption ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+              <span>Salin Caption</span>
+            </button>
+          </div>
         </div>
+      }
+    >
 
         {/* Smartphone Screen Mockup */}
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 bg-[#F7F6F3] flex justify-center">
@@ -159,40 +183,6 @@ export default function InstagramPreviewModal({
           </div>
         </div>
 
-        {/* Modal Footer */}
-        <div className="modal-footer justify-between">
-          {onToggleExecuted ? (
-            <label className="flex items-center gap-2 text-xs font-medium text-ink cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={Boolean(item.executed)}
-                onChange={() => onToggleExecuted(item)}
-                className="checkbox"
-              />
-              <span>Sudah Dieksekusi</span>
-            </label>
-          ) : <div />}
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCopyCopywriting}
-              className="btn btn-secondary text-xs"
-            >
-              {copiedCopywriting ? <Check className="size-3.5 text-success" /> : <Copy className="size-3.5" />}
-              <span>Salin Teks</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleCopyCaption}
-              className="btn btn-primary text-xs"
-            >
-              {copiedCaption ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-              <span>Salin Caption</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

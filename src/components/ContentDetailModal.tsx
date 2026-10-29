@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
 import { getCategoryTone } from "@/lib/categoryTone";
+import Modal from "./Modal";
 
 interface ContentDetailModalProps {
   item: ContentItem | null;
@@ -89,23 +90,6 @@ export default function ContentDetailModal({
       (draft.platform || "Instagram Feed") !== (item.platform || "Instagram Feed")
     );
   }, [item, draft]);
-
-  // Close on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        if (showUnsavedConfirm) {
-          setShowUnsavedConfirm(false);
-        } else if (isDirty) {
-          setShowUnsavedConfirm(true);
-        } else {
-          onClose();
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, showUnsavedConfirm, isDirty, onClose]);
 
   if (!isOpen || !draft || !item) return null;
 
@@ -233,54 +217,44 @@ export default function ContentDetailModal({
 
   return (
     <>
-      <div className="modal-overlay" onClick={handleAttemptClose}>
-        <div
-          className="modal max-w-2xl max-h-[92dvh] overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Top Header / Breadcrumb navigation */}
-          <div className="modal-header">
-            <div className="flex items-center gap-2 min-w-0 flex-wrap">
-              <span className={`inline-flex items-center gap-1.5 text-xs font-semibold truncate ${tone.title}`}>
-                <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
-                <span className="truncate">{draft.kategori}</span>
-              </span>
-              <span className="text-line-strong hidden sm:inline">·</span>
-              <span className="text-xs text-muted hidden sm:inline">
-                {draft.platform || "Instagram Feed"}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0">
-              {onDelete && (
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => {
-                    onClose();
-                    onDelete(item);
-                  }}
-                  className="btn btn-ghost btn-icon text-muted hover:text-danger"
-                  title="Hapus konten ini"
-                  aria-label="Hapus konten"
-                >
-                  <Trash2 className="size-4.5" />
-                </button>
-              )}
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={handleAttemptClose}
-                className="btn btn-ghost btn-icon"
-                aria-label="Tutup detail"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
+      <Modal
+        isOpen={isOpen}
+        onClose={handleAttemptClose}
+        closeOnEsc={!showUnsavedConfirm}
+        maxWidth="2xl"
+        className="max-h-[92dvh] overflow-hidden"
+        title={
+          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold truncate ${tone.title}`}>
+              <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
+              <span className="truncate">{draft.kategori}</span>
+            </span>
+            <span className="text-line-strong hidden sm:inline">·</span>
+            <span className="text-xs text-muted hidden sm:inline">
+              {draft.platform || "Instagram Feed"}
+            </span>
           </div>
-
-          {/* Scrollable Document Body */}
-          <div className="modal-body space-y-6 px-4 sm:px-6 py-4 sm:py-5">
+        }
+        headerExtra={
+          onDelete && (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                onClose();
+                onDelete(item);
+              }}
+              className="btn btn-ghost btn-icon text-muted hover:text-danger"
+              title="Hapus konten ini"
+              aria-label="Hapus konten"
+            >
+              <Trash2 className="size-4.5" />
+            </button>
+          )
+        }
+      >
+        {/* Scrollable Document Body */}
+        <div className="modal-body space-y-6 px-4 sm:px-6 py-4 sm:py-5">
             {/* Metadata Properties Row (Clean Document Style) */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4 text-xs">
               {/* Status Eksekusi Toggle */}
@@ -454,85 +428,52 @@ export default function ContentDetailModal({
               </div>
             </div>
           )}
-        </div>
-      </div>
+      </Modal>
 
       {/* Pop up konfirmasi perubahan belum disimpan */}
-      {showUnsavedConfirm && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-[2px] animate-in fade-in duration-150"
-          onClick={() => setShowUnsavedConfirm(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="unsaved-confirm-title"
-        >
-          <div
-            className="modal max-w-sm w-full bg-canvas border border-line shadow-[0_24px_64px_rgba(28,25,23,0.22)] rounded-2xl overflow-hidden animate-in zoom-in-95 duration-150"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <div className="flex items-center gap-2 font-semibold text-sm">
-                <span id="unsaved-confirm-title">Perubahan Belum Disimpan</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowUnsavedConfirm(false)}
-                className="btn btn-ghost btn-icon"
-                aria-label="Tutup dialog konfirmasi"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-
-            <div className="modal-body space-y-2 py-4">
-              <p className="text-[13px] font-medium text-ink leading-snug">
-                Ada perubahan yang belum disimpan. Yakin ingin menutup?
-              </p>
-            </div>
-
-            <div className="modal-footer flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 bg-subtle/40">
-              <button
-                type="button"
-                onClick={() => setShowUnsavedConfirm(false)}
-                className="btn btn-secondary text-xs w-full sm:w-auto"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveAndClose}
-                disabled={isSaving}
-                className="btn btn-primary text-xs flex-1 w-full sm:flex-initial"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="size-3.5 animate-spin" />
-                    <span>Menyimpan...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="size-3.5" />
-                    <span>Simpan & Tutup</span>
-                  </>
-                )}
-              </button>
-              {/* <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowUnsavedConfirm(false);
-                    onClose();
-                  }}
-                  className="btn btn-ghost text-danger hover:bg-danger-soft hover:text-danger text-xs flex-1 sm:flex-initial"
-                >
-                  Buang Perubahan
-                </button>
-
-              </div> */}
-            </div>
+      <Modal
+        isOpen={showUnsavedConfirm}
+        onClose={() => setShowUnsavedConfirm(false)}
+        maxWidth="sm"
+        zIndex="z-[60]"
+        title="Perubahan Belum Disimpan"
+        closeButtonAriaLabel="Tutup dialog konfirmasi"
+        footer={
+          <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2.5 w-full bg-subtle/40 -m-4 sm:-m-5 p-4 sm:p-5">
+            <button
+              type="button"
+              onClick={() => setShowUnsavedConfirm(false)}
+              className="btn btn-secondary text-xs w-full sm:w-auto"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveAndClose}
+              disabled={isSaving}
+              className="btn btn-primary text-xs flex-1 w-full sm:flex-initial"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="size-3.5 animate-spin" />
+                  <span>Menyimpan...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="size-3.5" />
+                  <span>Simpan & Tutup</span>
+                </>
+              )}
+            </button>
           </div>
+        }
+      >
+        <div className="modal-body space-y-2 py-4">
+          <p className="text-[13px] font-medium text-ink leading-snug">
+            Ada perubahan yang belum disimpan. Yakin ingin menutup?
+          </p>
         </div>
-      )}
+      </Modal>
     </>
   );
 }

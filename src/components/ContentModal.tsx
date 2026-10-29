@@ -15,6 +15,7 @@ import {
   PenLine
 } from "lucide-react";
 import { ContentItem } from "@/lib/firebase";
+import Modal from "./Modal";
 import {
   parseCSV,
   convertRowsToContentItems,
@@ -71,17 +72,6 @@ export default function ContentModal({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [manualError, setManualError] = useState("");
-
-  // Close on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (item) {
@@ -255,33 +245,20 @@ export default function ContentModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal max-w-2xl max-h-[92dvh]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="modal-header">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <h2 className="modal-title">
-              {isEditing ? "Edit Konten" : "Tambah Konten Baru"}
-            </h2>
-            <span className="badge bg-subtle text-muted">
-              {isEditing ? "Mode Edit" : activeMode === "manual" ? "1 Konten" : "Import Batch"}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-ghost btn-icon"
-            aria-label="Tutup modal"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
-
-        {/* Mode Tabs (Only when adding new content) */}
-        {!isEditing && (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      maxWidth="2xl"
+      title={isEditing ? "Edit Konten" : "Tambah Konten Baru"}
+      titleBadge={
+        <span className="badge bg-subtle text-muted">
+          {isEditing ? "Mode Edit" : activeMode === "manual" ? "1 Konten" : "Import Batch"}
+        </span>
+      }
+      closeButtonAriaLabel="Tutup modal"
+    >
+      {/* Mode Tabs (Only when adding new content) */}
+      {!isEditing && (
           <div className="shrink-0 border-b border-line bg-surface px-4 sm:px-5 py-2.5">
             <div className="grid grid-cols-3 gap-1.5 rounded-xl bg-subtle p-1">
               <button
@@ -709,7 +686,6 @@ export default function ContentModal({
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Modal>
   );
 }
