@@ -10,6 +10,7 @@ import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import HargaExtractorModal from "@/components/HargaExtractorModal";
 import PromptModal from "@/components/PromptModal";
+import CategoryColorModal from "@/components/CategoryColorModal";
 import {
   ContentItem,
   saveContentToDb,
@@ -67,6 +68,8 @@ export default function DashboardPage() {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [isHargaExtractorOpen, setIsHargaExtractorOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  const [colorPickerCategory, setColorPickerCategory] = useState<string | null>(null);
+  const [, setToneVersion] = useState(0);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [previewItem, setPreviewItem] = useState<ContentItem | null>(null);
   const [deletingItem, setDeletingItem] = useState<ContentItem | null>(null);
@@ -141,6 +144,13 @@ export default function DashboardPage() {
       window.removeEventListener("offline", handleOffline);
       unsubscribe();
     };
+  }, []);
+
+  // Listen for category tone customization to trigger reactive UI updates
+  useEffect(() => {
+    const handleToneChange = () => setToneVersion((v) => v + 1);
+    window.addEventListener("category_tone_change", handleToneChange);
+    return () => window.removeEventListener("category_tone_change", handleToneChange);
   }, []);
 
   const updateItemsState = (updater: ContentItem[] | ((prev: ContentItem[]) => ContentItem[])) => {
@@ -399,6 +409,7 @@ export default function DashboardPage() {
         onSelectCategory={setSelectedCategory}
         onOpenHargaExtractor={() => setIsHargaExtractorOpen(true)}
         onOpenPromptModal={() => setIsPromptModalOpen(true)}
+        onOpenColorPicker={(category) => setColorPickerCategory(category)}
       />
 
       {/* Right Main Content Area */}
@@ -421,9 +432,9 @@ export default function DashboardPage() {
             <h2 className="text-sm sm:text-base font-bold text-[#18181B] truncate">
               {viewTitle}
             </h2>
-            <span className="text-xs text-gray-400 shrink-0">
+            {/* <span className="text-xs text-gray-400 shrink-0">
               ({filteredItems.length})
-            </span>
+            </span> */}
           </div>
 
           {/* Center Search Input (Desktop) */}
@@ -662,6 +673,14 @@ export default function DashboardPage() {
           onClose={() => setIsPromptModalOpen(false)}
           existingCategories={categoriesWithCounts.map(c => c.name)}
           nextSuggestedNo={nextSuggestedNo}
+        />
+      )}
+
+      {colorPickerCategory && (
+        <CategoryColorModal
+          isOpen={Boolean(colorPickerCategory)}
+          onClose={() => setColorPickerCategory(null)}
+          categoryName={colorPickerCategory}
         />
       )}
     </div>

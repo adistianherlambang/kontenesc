@@ -225,8 +225,14 @@ export default function ContentDetailModal({
         className="max-h-[92dvh] overflow-hidden"
         title={
           <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold truncate ${tone.title}`}>
-              <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
+            <span
+              className={`inline-flex items-center gap-1.5 text-xs font-semibold truncate ${tone.title}`}
+              style={tone.textHex ? { color: tone.textHex } : undefined}
+            >
+              <span
+                className={`size-2 rounded-full shrink-0 ${tone.dot}`}
+                style={tone.dotHex ? { backgroundColor: tone.dotHex } : undefined}
+              />
               <span className="truncate">{draft.kategori}</span>
             </span>
             <span className="text-line-strong hidden sm:inline">·</span>

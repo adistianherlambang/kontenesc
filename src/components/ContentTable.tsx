@@ -193,8 +193,14 @@ export default function ContentTable({
 
                   {/* Kategori */}
                   <td className="td align-middle whitespace-nowrap">
-                    <span className={`inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap ${tone.title}`}>
-                      <span className={`size-2 rounded-full shrink-0 ${tone.dot}`} />
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap ${tone.title}`}
+                      style={tone.textHex ? { color: tone.textHex } : undefined}
+                    >
+                      <span
+                        className={`size-2 rounded-full shrink-0 ${tone.dot}`}
+                        style={tone.dotHex ? { backgroundColor: tone.dotHex } : undefined}
+                      />
                       <span className="whitespace-nowrap">{item.kategori}</span>
                     </span>
                   </td>

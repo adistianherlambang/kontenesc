@@ -79,7 +79,12 @@ export default function ContentCard({
 
   return (
     <article
-      style={{ viewTransitionName: `${transitionPrefix}-${item.no}` }}
+      style={{
+        viewTransitionName: `${transitionPrefix}-${item.no}`,
+        ...(tone.bgHex && tone.borderHex
+          ? { backgroundColor: tone.bgHex, borderColor: tone.borderHex }
+          : {})
+      }}
       className={`content-card-vt flex flex-col rounded-2xl border p-2 sm:p-1.5 transition-all duration-280 ease-out hover:shadow-sm ${tone.card
         } ${done ? "opacity-80 hover:opacity-100" : ""} ${isExiting ? "-translate-x-24 opacity-0 scale-95 pointer-events-none" : "translate-x-0 scale-100"}`}
     >
@@ -88,6 +93,7 @@ export default function ContentCard({
         <button
           type="button"
           onClick={handleOpen}
+          style={tone.textHex ? { color: tone.textHex } : undefined}
           className={`flex-1 min-w-0 py-2 text-left truncate text-[13px] font-semibold cursor-pointer select-none ${tone.title}`}
         >
           {item.kategori}

@@ -18,6 +18,7 @@ interface SidebarProps {
   onSelectCategory: (cat: string) => void;
   onOpenHargaExtractor?: () => void;
   onOpenPromptModal?: () => void;
+  onOpenColorPicker?: (category: string) => void;
   firebaseStatus: "connected" | "offline" | "syncing";
   isOpenMobile: boolean;
   onCloseMobile: () => void;
@@ -35,6 +36,7 @@ export default function Sidebar({
   onSelectCategory,
   onOpenHargaExtractor,
   onOpenPromptModal,
+  onOpenColorPicker,
   firebaseStatus,
   isOpenMobile,
   onCloseMobile,
@@ -113,20 +115,43 @@ export default function Sidebar({
                 <span className="truncate">Semua kategori</span>
                 <span className="nav-count">{totalCount}</span>
               </button>
-              {categories.map((c) => (
-                <button
-                  type="button"
-                  key={c.name}
-                  data-active={selectedCategory === c.name}
-                  onClick={pick(() => onSelectCategory(c.name))}
-                  className="nav-item"
-                  title={c.name}
-                >
-                  <span className={`size-2.5 shrink-0 rounded-full ${getCategoryTone(c.name).dot}`} />
-                  <span className="truncate">{c.name}</span>
-                  <span className="nav-count">{c.count}</span>
-                </button>
-              ))}
+              {categories.map((c) => {
+                const tone = getCategoryTone(c.name);
+                return (
+                  <div
+                    key={c.name}
+                    data-active={selectedCategory === c.name}
+                    onClick={pick(() => onSelectCategory(c.name))}
+                    className="nav-item group/cat cursor-pointer select-none"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        pick(() => onSelectCategory(c.name))();
+                      }
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenColorPicker?.(c.name);
+                      }}
+                      title={`Ubah warna kategori "${c.name}"`}
+                      aria-label={`Ubah warna kategori ${c.name}`}
+                      className="size-5 -ml-1 rounded-md flex items-center justify-center hover:bg-black/10 active:scale-90 transition-all cursor-pointer shrink-0"
+                    >
+                      <span
+                        className={`size-2.5 rounded-full ring-1 ring-black/10 transition-transform group-hover/cat:scale-110 ${tone.dot}`}
+                        style={tone.dotHex ? { backgroundColor: tone.dotHex } : undefined}
+                      />
+                    </button>
+                    <span className="truncate flex-1 text-left">{c.name}</span>
+                    <span className="nav-count">{c.count}</span>
+                  </div>
+                );
+              })}
             </div>
           </nav>
 
