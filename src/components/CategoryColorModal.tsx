@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Palette, Check, RotateCcw } from "lucide-react";
-import Modal, { ModalBody, ModalFooter } from "@/components/Modal";
+import { Check } from "lucide-react";
+import Modal from "@/components/Modal";
 import {
   CategoryTone,
   SWATCH_OPTIONS,
@@ -27,15 +27,14 @@ export default function CategoryColorModal({
   const [selectedTone, setSelectedTone] = useState<CategoryTone>(() =>
     getCategoryTone(categoryName)
   );
-  const [customHex, setCustomHex] = useState("#3B82F6");
+  const [customHex, setCustomHex] = useState("#6FA3DB");
   const [isCustomMode, setIsCustomMode] = useState(false);
 
-  // Sync state whenever modal opens or categoryName changes
   useEffect(() => {
     if (isOpen && categoryName) {
       const tone = getCategoryTone(categoryName);
       setSelectedTone(tone);
-      const hex = tone.dotHex || "#3B82F6";
+      const hex = tone.dotHex || "#6FA3DB";
       setCustomHex(hex);
       const isPreset = SWATCH_OPTIONS.some(
         (s) => s.dotHex.toLowerCase() === hex.toLowerCase()
@@ -49,9 +48,9 @@ export default function CategoryColorModal({
   const defaultTone = getDefaultCategoryTone(categoryName);
   const isDefaultSelected = Boolean(
     (selectedTone.id && selectedTone.id === defaultTone.id) ||
-    (selectedTone.dotHex &&
-      defaultTone.dotHex &&
-      selectedTone.dotHex.toLowerCase() === defaultTone.dotHex.toLowerCase())
+      (selectedTone.dotHex &&
+        defaultTone.dotHex &&
+        selectedTone.dotHex.toLowerCase() === defaultTone.dotHex.toLowerCase())
   );
 
   const handleSelectSwatch = (swatch: (typeof SWATCH_OPTIONS)[0]) => {
@@ -88,7 +87,6 @@ export default function CategoryColorModal({
     onClose();
   };
 
-  // Contrast checker for checkmark inside swatch circle
   const isLightColor = (hex: string) => {
     const clean = hex.replace("#", "");
     if (clean.length !== 6) return false;
@@ -103,90 +101,15 @@ export default function CategoryColorModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      maxWidth="sm"
       title="Ubah Warna Kategori"
       subtitle={categoryName}
-      titleIcon={<Palette className="size-4.5 text-brand" />}
-      maxWidth="md"
+      closeButtonAriaLabel="Tutup modal"
     >
-      <ModalBody className="space-y-5">
-        {/* Live Preview Box */}
-        <section aria-labelledby="preview-heading">
-          <p id="preview-heading" className="field-label">
-            Pratinjau Tampilan
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {/* Card Preview */}
-            <div
-              className={`rounded-xl border p-3 transition-colors ${selectedTone.card}`}
-              style={
-                selectedTone.bgHex && selectedTone.borderHex
-                  ? {
-                      backgroundColor: selectedTone.bgHex,
-                      borderColor: selectedTone.borderHex,
-                    }
-                  : undefined
-              }
-            >
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <span
-                  className={`size-2 rounded-full shrink-0 ${selectedTone.dot}`}
-                  style={
-                    selectedTone.dotHex
-                      ? { backgroundColor: selectedTone.dotHex }
-                      : undefined
-                  }
-                />
-                <span
-                  className={`text-xs font-semibold truncate ${selectedTone.title}`}
-                  style={
-                    selectedTone.textHex
-                      ? { color: selectedTone.textHex }
-                      : undefined
-                  }
-                >
-                  {categoryName}
-                </span>
-              </div>
-              <p className="text-[11px] text-muted line-clamp-2 leading-relaxed">
-                Visual card pada feed akan menggunakan palet warna ini.
-              </p>
-            </div>
-
-            {/* Sidebar Row Preview */}
-            <div className="rounded-xl border border-line bg-surface p-3 flex flex-col justify-center">
-              <span className="text-[10px] text-faint uppercase font-semibold tracking-wider mb-1.5">
-                Tampilan Sidebar
-              </span>
-              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-line/60">
-                <span
-                  className={`size-2.5 rounded-full shrink-0 ring-1 ring-black/10 ${selectedTone.dot}`}
-                  style={
-                    selectedTone.dotHex
-                      ? { backgroundColor: selectedTone.dotHex }
-                      : undefined
-                  }
-                />
-                <span className="truncate text-xs font-medium text-ink flex-1">
-                  {categoryName}
-                </span>
-                <span className="text-[11px] text-faint">12</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Color Swatch Picker Grid */}
-        <section aria-labelledby="swatch-heading">
-          <div className="flex items-center justify-between mb-2">
-            <p id="swatch-heading" className="field-label mb-0">
-              Pilihan Warna Preset
-            </p>
-            <span className="text-[11px] text-muted">
-              {SWATCH_OPTIONS.length} warna pilihan
-            </span>
-          </div>
-
-          <div className="grid grid-cols-6 gap-2 sm:gap-2.5 p-3 rounded-xl border border-line bg-surface/50">
+      <Modal.Body className="space-y-4">
+        <div>
+          <label className="field-label">Pilihan Warna</label>
+          <div className="grid grid-cols-6 gap-2">
             {SWATCH_OPTIONS.map((swatch) => {
               const isSelected =
                 !isCustomMode &&
@@ -201,80 +124,67 @@ export default function CategoryColorModal({
                   onClick={() => handleSelectSwatch(swatch)}
                   title={swatch.name}
                   aria-label={`Pilih warna ${swatch.name}`}
-                  className={`group relative size-10 sm:size-10.5 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                    isSelected
-                      ? "ring-2 ring-brand ring-offset-2 scale-105 shadow-xs"
-                      : "hover:scale-105 hover:shadow-xs"
+                  className={`h-9 rounded-lg border border-black/10 flex items-center justify-center transition-colors cursor-pointer ${
+                    isSelected ? "ring-2 ring-ink ring-offset-2" : "hover:opacity-90"
                   }`}
                   style={{ backgroundColor: swatch.dotHex }}
                 >
                   {isSelected && (
                     <Check
-                      className={`size-4 stroke-[2.5] ${
-                        light ? "text-ink" : "text-white"
-                      }`}
+                      className={`size-4 ${light ? "text-ink" : "text-white"}`}
                     />
                   )}
                 </button>
               );
             })}
           </div>
-        </section>
+        </div>
 
-        {/* Custom Hex Color Picker */}
-        <section aria-labelledby="custom-heading">
-          <p id="custom-heading" className="field-label">
-            Warna Kustom (Hex)
-          </p>
-          <div className="flex items-center gap-2.5">
-            {/* Color preview circle with hidden native input */}
+        <div>
+          <label className="field-label">Warna Kustom (Hex)</label>
+          <div className="flex items-center gap-2">
             <label
-              className="relative size-10 shrink-0 rounded-xl border border-line cursor-pointer overflow-hidden shadow-2xs hover:scale-105 transition-transform flex items-center justify-center"
+              className="relative size-10 sm:size-9 shrink-0 rounded-xl border border-line cursor-pointer overflow-hidden"
               style={{ backgroundColor: customHex }}
-              title="Buka pemilih warna sistem"
+              title="Pilih warna kustom"
             >
               <input
                 type="color"
                 value={
-                  /^#[0-9A-Fa-f]{6}$/.test(customHex) ? customHex : "#3B82F6"
+                  /^#[0-9A-Fa-f]{6}$/.test(customHex) ? customHex : "#6FA3DB"
                 }
                 onChange={(e) => handleCustomHexChange(e.target.value)}
                 className="opacity-0 absolute inset-0 size-full cursor-pointer"
-                aria-label="Pilih warna kustom dengan color picker"
+                aria-label="Pemilih warna"
               />
             </label>
 
-            {/* Hex input */}
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={customHex}
-                maxLength={7}
-                placeholder="#3B82F6"
-                onChange={(e) => handleCustomHexChange(e.target.value)}
-                className="input uppercase text-xs"
-              />
-            </div>
+            <input
+              type="text"
+              value={customHex}
+              maxLength={7}
+              placeholder="#6FA3DB"
+              onChange={(e) => handleCustomHexChange(e.target.value)}
+              className="input uppercase"
+            />
           </div>
-        </section>
-      </ModalBody>
+        </div>
+      </Modal.Body>
 
-      <ModalFooter>
+      <Modal.Footer>
         <button
           type="button"
           onClick={handleResetToDefault}
           disabled={isDefaultSelected}
-          className="btn btn-ghost mr-auto text-xs text-muted hover:text-ink disabled:opacity-40 disabled:hover:text-muted cursor-pointer"
-          title="Kembalikan ke warna bawaan sistem"
+          className="btn btn-ghost mr-auto"
         >
-          <RotateCcw className="size-3.5" />
-          <span>Reset ke Bawaan</span>
+          Reset
         </button>
 
         <button
           type="button"
           onClick={onClose}
-          className="btn btn-secondary text-xs"
+          className="btn btn-secondary"
         >
           Batal
         </button>
@@ -282,12 +192,11 @@ export default function CategoryColorModal({
         <button
           type="button"
           onClick={handleSave}
-          className="btn btn-primary text-xs"
+          className="btn btn-primary"
         >
-          <Check className="size-3.5" />
-          <span>Simpan Warna</span>
+          Simpan
         </button>
-      </ModalFooter>
+      </Modal.Footer>
     </Modal>
   );
 }
