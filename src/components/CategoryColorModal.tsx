@@ -48,9 +48,9 @@ export default function CategoryColorModal({
   const defaultTone = getDefaultCategoryTone(categoryName);
   const isDefaultSelected = Boolean(
     (selectedTone.id && selectedTone.id === defaultTone.id) ||
-      (selectedTone.dotHex &&
-        defaultTone.dotHex &&
-        selectedTone.dotHex.toLowerCase() === defaultTone.dotHex.toLowerCase())
+    (selectedTone.dotHex &&
+      defaultTone.dotHex &&
+      selectedTone.dotHex.toLowerCase() === defaultTone.dotHex.toLowerCase())
   );
 
   const handleSelectSwatch = (swatch: (typeof SWATCH_OPTIONS)[0]) => {
@@ -102,19 +102,19 @@ export default function CategoryColorModal({
       isOpen={isOpen}
       onClose={onClose}
       maxWidth="sm"
-      title="Ubah Warna Kategori"
-      subtitle={categoryName}
+      title="Ubah Warna"
+
       closeButtonAriaLabel="Tutup modal"
     >
       <Modal.Body className="space-y-4">
         <div>
-          <label className="field-label">Pilihan Warna</label>
+          {/* <label className="field-label">Pilihan Warna</label> */}
           <div className="grid grid-cols-6 gap-2">
             {SWATCH_OPTIONS.map((swatch) => {
               const isSelected =
                 !isCustomMode &&
                 selectedTone.dotHex?.toLowerCase() ===
-                  swatch.dotHex.toLowerCase();
+                swatch.dotHex.toLowerCase();
               const light = isLightColor(swatch.dotHex);
 
               return (
@@ -124,9 +124,8 @@ export default function CategoryColorModal({
                   onClick={() => handleSelectSwatch(swatch)}
                   title={swatch.name}
                   aria-label={`Pilih warna ${swatch.name}`}
-                  className={`h-9 rounded-lg border border-black/10 flex items-center justify-center transition-colors cursor-pointer ${
-                    isSelected ? "ring-2 ring-ink ring-offset-2" : "hover:opacity-90"
-                  }`}
+                  className={`h-9 rounded-lg border border-black/10 flex items-center justify-center transition-colors cursor-pointer ${isSelected ? "ring-2 ring-ink ring-offset-2" : "hover:opacity-90"
+                    }`}
                   style={{ backgroundColor: swatch.dotHex }}
                 >
                   {isSelected && (
@@ -141,7 +140,7 @@ export default function CategoryColorModal({
         </div>
 
         <div>
-          <label className="field-label">Warna Kustom (Hex)</label>
+          {/* <label className="field-label">Warna Kustom (Hex)</label> */}
           <div className="flex items-center gap-2">
             <label
               className="relative size-10 sm:size-9 shrink-0 rounded-xl border border-line cursor-pointer overflow-hidden"
