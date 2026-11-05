@@ -16,6 +16,7 @@ export interface CustomSelectProps<T extends string | number = string> {
   options: (CustomSelectOption<T> | string)[];
   placeholder?: string;
   disabled?: boolean;
+  size?: "sm" | "md";
   className?: string;
   triggerClassName?: string;
   dropdownClassName?: string;
@@ -30,6 +31,7 @@ export default function CustomSelect<T extends string | number = string>({
   options,
   placeholder = "Pilih...",
   disabled = false,
+  size = "md",
   className = "",
   triggerClassName = "",
   dropdownClassName = "",
@@ -158,10 +160,15 @@ export default function CustomSelect<T extends string | number = string>({
     triggerRef.current?.focus();
   };
 
+  const sizeClasses =
+    size === "sm"
+      ? "min-h-[38px] sm:min-h-[36px] px-3 py-1.5 text-xs"
+      : "min-h-10 sm:min-h-9 px-3.5 py-2 text-base sm:text-[13px]";
+
   return (
     <div
       ref={containerRef}
-      className={`relative w-full ${className}`}
+      className={`relative w-full ${isOpen ? "z-30" : "z-0"} ${className}`}
       onKeyDown={handleKeyDown}
     >
       {/* Hidden input for native form compatibility */}
@@ -177,7 +184,7 @@ export default function CustomSelect<T extends string | number = string>({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={ariaLabel || placeholder}
-        className={`flex min-h-10 sm:min-h-9 w-full items-center justify-between gap-2 rounded-xl border border-line bg-canvas px-3.5 py-2 text-left text-base sm:text-[13px] text-ink outline-none transition-all cursor-pointer select-none hover:border-line-strong focus:border-brand focus:ring-3 focus:ring-brand/15 disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-canvas text-left text-ink outline-none transition-all cursor-pointer select-none hover:border-line-strong focus:border-brand focus:ring-3 focus:ring-brand/15 disabled:cursor-not-allowed disabled:opacity-50 ${sizeClasses} ${
           isOpen ? "border-brand ring-3 ring-brand/15" : ""
         } ${triggerClassName}`}
       >

@@ -14,6 +14,7 @@ import {
   Plus,
 } from "lucide-react";
 import Modal from "./Modal";
+import CustomSelect from "./CustomSelect";
 import { generateTocoExcel, TocoProductRow } from "@/lib/tocoExcelHelper";
 
 interface ToccoExcelModalProps {
@@ -848,40 +849,34 @@ export default function ToccoExcelModal({
                           <label className="block text-[11px] font-medium text-muted mb-1">
                             Kondisi Barang
                           </label>
-                          <select
+                          <CustomSelect
                             value={unit.data["Kondisi Barang"] || "Baru"}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Kondisi Barang", e.target.value)}
-                            className="input text-xs"
-                          >
-                            <option value="Baru">Baru</option>
-                            <option value="Bekas">Bekas</option>
-                          </select>
+                            onChange={(val) => handleUpdateUnitField(uIdx, "Kondisi Barang", val)}
+                            options={["Baru", "Bekas"]}
+                            size="sm"
+                          />
                         </div>
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
                             Status Produk
                           </label>
-                          <select
+                          <CustomSelect
                             value={unit.data["Status Produk"] || "Aktif"}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Status Produk", e.target.value)}
-                            className="input text-xs"
-                          >
-                            <option value="Aktif">Aktif</option>
-                            <option value="Nonaktif">Nonaktif</option>
-                          </select>
+                            onChange={(val) => handleUpdateUnitField(uIdx, "Status Produk", val)}
+                            options={["Aktif", "Nonaktif"]}
+                            size="sm"
+                          />
                         </div>
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
                             Preorder
                           </label>
-                          <select
+                          <CustomSelect
                             value={unit.data.Preorder || "Tidak"}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Preorder", e.target.value)}
-                            className="input text-xs"
-                          >
-                            <option value="Tidak">Tidak</option>
-                            <option value="Ya">Ya</option>
-                          </select>
+                            onChange={(val) => handleUpdateUnitField(uIdx, "Preorder", val)}
+                            options={["Tidak", "Ya"]}
+                            size="sm"
+                          />
                         </div>
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
