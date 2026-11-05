@@ -40,3 +40,4 @@ export function sanitizeSkuForFilename(sku: string): string {
     .replace(/\s+/g, "_")
     .replace(/[^a-zA-Z0-9_\-\.]/g, "");
 }
+
