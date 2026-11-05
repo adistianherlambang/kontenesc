@@ -24,8 +24,10 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     const hargaNormal = toRupiahNumber(u.harga);
     const nominalCashback = toRupiahNumber(u.cashback);
     const hargaDiskon = nominalCashback > 0 ? Math.max(0, hargaNormal - nominalCashback) : "";
+    const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${u.ram ? `-${u.ram}` : ""}`;
     return {
       no_urut: idx + 1,
+      sku,
       merk: u.merk,
       tipe: u.tipe,
       nama_lengkap: u.nama ? `${u.merk} ${u.tipe} (${u.nama})` : `${u.merk} ${u.tipe}`,
@@ -45,7 +47,7 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     "Deskripsi": "Produk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi.",
     "Harga": 4599000,
     "Harga Diskon": "",
-    "SKU": "REALME-16-5G-12-256",
+    "SKU": "ANDROID-REALME-16 5G-12/256",
     "Jenis Produk": "Buy Now",
     "Total Stok": 10,
     "Kondisi Barang": "Baru",
@@ -114,10 +116,13 @@ ${JSON.stringify(formattedUnits, null, 2)}
    - Jika \`aksesoris-tablet\`: \`"keyboard-bluetooth"\`, \`"casing-cover-tablet"\`, \`"charger-tablet"\`.
    - Jika \`wearable-devices\`: \`"smart-watch-1"\`, \`"smart-band"\`, \`"aksesoris-wearable-devices"\`.
    - Jika \`power-bank\`: \`"portable-power-bank"\`.
-4. **Harga & Harga Diskon**:
+4. **SKU (WAJIB FORMAT BAKU)**:
+   - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A07 5G-4/128"\`).
+   - Gunakan langsung nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar unit pilihan di atas.
+5. **Harga & Harga Diskon**:
    - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`3499000\`).
    - Gunakan \`harga_rupiah\` dari daftar unit di atas untuk kolom \`"Harga"\`, dan \`harga_diskon_rupiah\` untuk kolom \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
-5. **Berat & Ukuran**:
+6. **Berat & Ukuran**:
    - \`"Berat Produk"\`: angka dalam gram tanpa satuan (contoh: \`500\` untuk HP, \`800\` untuk Tablet).
    - \`"Length"\`, \`"Height"\`, \`"Width"\`: angka dalam cm tanpa satuan (contoh: Length \`18\`, Height \`6\`, Width \`10\`).
    - \`"Jenis Produk"\`: \`"Buy Now"\`, \`"Kondisi Barang"\`: \`"Baru"\`, \`"Status Produk"\`: \`"Aktif"\`, \`"Total Stok"\`: \`10\`.
