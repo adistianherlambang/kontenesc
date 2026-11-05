@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles } from "lucide-react";
+import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag } from "lucide-react";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 export type StatusView = "all" | "pending" | "executed" | "priority";
@@ -18,6 +18,7 @@ interface SidebarProps {
   onSelectCategory: (cat: string) => void;
   onOpenHargaExtractor?: () => void;
   onOpenPromptModal?: () => void;
+  onOpenToccoModal?: () => void;
   onOpenColorPicker?: (category: string) => void;
   firebaseStatus: "connected" | "offline" | "syncing";
   isOpenMobile: boolean;
@@ -36,6 +37,7 @@ export default function Sidebar({
   onSelectCategory,
   onOpenHargaExtractor,
   onOpenPromptModal,
+  onOpenToccoModal,
   onOpenColorPicker,
   firebaseStatus,
   isOpenMobile,
@@ -165,6 +167,14 @@ export default function Sidebar({
               >
                 <Sparkles className="size-4 shrink-0" />
                 <span className="truncate">Buat Prompt</span>
+              </button>
+              <button
+                type="button"
+                onClick={pick(() => onOpenToccoModal?.())}
+                className="nav-item"
+              >
+                <ShoppingBag className="size-4 shrink-0" />
+                <span className="truncate">Prompt Tocco</span>
               </button>
               <button
                 type="button"

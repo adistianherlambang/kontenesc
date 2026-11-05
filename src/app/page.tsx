@@ -10,6 +10,7 @@ import ContentModal from "@/components/ContentModal";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
 import HargaExtractorModal from "@/components/HargaExtractorModal";
 import PromptModal from "@/components/PromptModal";
+import ToccoPromptModal from "@/components/ToccoPromptModal";
 import CategoryColorModal from "@/components/CategoryColorModal";
 import {
   ContentItem,
@@ -68,6 +69,7 @@ export default function DashboardPage() {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [isHargaExtractorOpen, setIsHargaExtractorOpen] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  const [isToccoModalOpen, setIsToccoModalOpen] = useState(false);
   const [colorPickerCategory, setColorPickerCategory] = useState<string | null>(null);
   const [, setToneVersion] = useState(0);
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
@@ -409,6 +411,7 @@ export default function DashboardPage() {
         onSelectCategory={setSelectedCategory}
         onOpenHargaExtractor={() => setIsHargaExtractorOpen(true)}
         onOpenPromptModal={() => setIsPromptModalOpen(true)}
+        onOpenToccoModal={() => setIsToccoModalOpen(true)}
         onOpenColorPicker={(category) => setColorPickerCategory(category)}
       />
 
@@ -673,6 +676,13 @@ export default function DashboardPage() {
           onClose={() => setIsPromptModalOpen(false)}
           existingCategories={categoriesWithCounts.map(c => c.name)}
           nextSuggestedNo={nextSuggestedNo}
+        />
+      )}
+
+      {isToccoModalOpen && (
+        <ToccoPromptModal
+          isOpen={isToccoModalOpen}
+          onClose={() => setIsToccoModalOpen(false)}
         />
       )}
 

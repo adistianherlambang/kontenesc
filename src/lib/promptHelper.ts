@@ -1,10 +1,191 @@
-import { ExtractResult } from "./extractHarga";
+import { ExtractResult, HargaItem } from "./extractHarga";
 
 export interface PromptOptions {
   kategori: string;
   format: "json" | "csv";
   count: number;
   priceData?: ExtractResult | null;
+}
+
+export interface SelectedToccoUnit extends HargaItem {
+  id: string;
+  merk: string;
+}
+
+function toRupiahNumber(val: number): number {
+  if (!val || isNaN(val)) return 0;
+  return val > 0 && val < 100000 ? val * 1000 : val;
+}
+
+export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
+  if (!units || units.length === 0) return "";
+
+  const formattedUnits = units.map((u, idx) => {
+    const hargaNormal = toRupiahNumber(u.harga);
+    const nominalCashback = toRupiahNumber(u.cashback);
+    const hargaDiskon = nominalCashback > 0 ? Math.max(0, hargaNormal - nominalCashback) : "";
+    return {
+      no_urut: idx + 1,
+      merk: u.merk,
+      tipe: u.tipe,
+      nama_lengkap: u.nama ? `${u.merk} ${u.tipe} (${u.nama})` : `${u.merk} ${u.tipe}`,
+      ram_rom: u.ram ? `${u.ram}GB` : "-",
+      harga_rupiah: hargaNormal,
+      cashback_rupiah: nominalCashback,
+      harga_diskon_rupiah: hargaDiskon,
+    };
+  });
+
+  const exampleOutput = `[
+  {
+    "Main Category": "handphone-tablet",
+    "Sub Category 1": "handphone",
+    "Sub Category 2": "android-os",
+    "Judul": "realme 16 5G 12/256GB Prosesor Dimensity 6400 Turbo Layar 6.57” AMOLED 120Hz Kamera 50MP Sony AI Baterai 7000mAh 60W Ultra Charge Garansi Resmi 1 Tahun",
+    "Deskripsi": "Produk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi.",
+    "Harga": 4599000,
+    "Harga Diskon": "",
+    "SKU": "REALME-16-5G-12-256",
+    "Jenis Produk": "Buy Now",
+    "Total Stok": 10,
+    "Kondisi Barang": "Baru",
+    "Berat Produk": 500,
+    "Status Produk": "Aktif",
+    "Length": 18,
+    "Height": 6,
+    "Width": 10,
+    "Preorder": "",
+    "Foto 1": "",
+    "Foto 2": "",
+    "Foto 3": "",
+    "Foto 4": "",
+    "Foto 5": "",
+    "Foto 6": "",
+    "Foto 7": "",
+    "Foto 8": "",
+    "Foto 9": "",
+    "Foto 10": "",
+    "poster": [
+      { "icon": "processor", "isi": "Dimensity 6400 Turbo" },
+      { "icon": "layar", "isi": "6.57\\" AMOLED 120Hz" },
+      { "icon": "kamera", "isi": "50MP Sony AI" },
+      { "icon": "baterai", "isi": "7000mAh 60W Ultra Charge" }
+    ],
+    "caption": [
+      "realme 16 5G 12/256GB Prosesor Dimensity 6400 Turbo Layar 6.57” AMOLED 120Hz Kamera 50MP Sony AI Baterai 7000mAh 60W Ultra Charge Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi."
+    ]
+  }
+]`;
+
+  return `Bertindaklah sebagai E-Commerce Product Specialist & Technical Researcher profesional untuk "Eldorado Semarang Cell".
+
+TUGAS UTAMA:
+Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan) dan array \`caption\` (sesuai template baku toko) untuk ${units.length} unit pilihan berikut ini:
+
+### DAFTAR UNIT PILIHAN DARI DAFTAR HARGA TOKO:
+\`\`\`json
+${JSON.stringify(formattedUnits, null, 2)}
+\`\`\`
+
+---
+
+### ATURAN RISET SPESIFIKASI RESMI (WAJIB AKURAT & DILARANG ASAL):
+1. **Wajib Riset Situs Resmi Brand**:
+   - Spesifikasi TIDAK BOLEH ASAL atau dikarang (no hallucination).
+   - WAJIB mengacu pada spesifikasi teknis resmi yang tertera di situs resmi / toko online resmi masing-masing brand di Indonesia (seperti Samsung Official Indonesia, Xiaomi/Mi.co.id, OPPO Indonesia, Vivo Indonesia, Realme Indonesia, Infinix Official, Tecno Official, Apple Official, serta GSMArena untuk validasi detail teknis).
+2. **Keakuratan Tiap Baris Spesifikasi**:
+   - Pastikan nama chipset/prosesor, ukuran layar, jenis panel & refresh rate & nits, resolusi layar, konfigurasi kamera belakang & depan (MP, Auto Fokus, OIS, Zoom, Video Resolusi), RAM (+ Extended/Dynamic RAM jika ada), jenis ROM (UFS/eMMC), SIM Tray, Jaringan (4G/5G), tipe port USB & versi USB, ketersediaan Earjack 3.5mm, versi Bluetooth, NFC (Yes/No), sistem Audio (Mono/Dual Stereo Speaker), kapasitas Baterai (mAh), kecepatan Fast Charging (Watt & nama teknologinya), sensor Keamanan, Sistem Operasi, Fitur Lainnya (IP rating, AI features, dll), varian Warna resmi di Indonesia, hingga **Isi dalam box** (apakah dapat adaptor charger atau hanya kabel di dalam box resmi Indonesia, misal Samsung seri tertentu tidak menyertakan kepala charger di dalam box) ditulis 100% sesuai fakta produk aslinya.
+
+---
+
+### ATURAN KOLOM \`toco_bulk_upload_template.xlsx\` (SHEET PRODUCT LISTING):
+1. **Main Category**: Gunakan \`"handphone-tablet"\` (atau \`"audio-kamera-elektronik-lainnya"\` jika TV/elektronik).
+2. **Sub Category 1**: Pilih yang sesuai dari daftar validasi Toco:
+   - \`"handphone"\` (untuk Smartphone)
+   - \`"tablet"\` (untuk Tablet / Pad)
+   - \`"aksesoris-handphone"\` (untuk Charger, Case, TWS, Kabel, dll)
+   - \`"aksesoris-tablet"\` (untuk Keyboard Tablet, Cover Tablet, Stylus)
+   - \`"wearable-devices"\` (untuk Smartwatch / Smartband)
+   - \`"power-bank"\` (untuk Powerbank)
+3. **Sub Category 2**: Pilih nilai validasi Toco yang sesuai dengan Sub Category 1:
+   - Jika \`handphone\`: \`"android-os"\` (HP Android), \`"ios"\` (iPhone), \`"harmonyos"\`, atau \`"feature-phone"\` (HP tombol seperti Nokia 105).
+   - Jika \`tablet\`: \`"android-os-1"\` (Tablet Android), \`"ios-1"\` (iPad), atau \`"harmonyos-1"\`.
+   - Jika \`aksesoris-handphone\`: \`"charger-handphone"\`, \`"charger-mobil"\`, \`"kabel-data"\`, \`"soft-case-handphone"\`, \`"hard-case-handphone"\`, \`"flip-cover-handphone"\`.
+   - Jika \`aksesoris-tablet\`: \`"keyboard-bluetooth"\`, \`"casing-cover-tablet"\`, \`"charger-tablet"\`.
+   - Jika \`wearable-devices\`: \`"smart-watch-1"\`, \`"smart-band"\`, \`"aksesoris-wearable-devices"\`.
+   - Jika \`power-bank\`: \`"portable-power-bank"\`.
+4. **Harga & Harga Diskon**:
+   - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`3499000\`).
+   - Gunakan \`harga_rupiah\` dari daftar unit di atas untuk kolom \`"Harga"\`, dan \`harga_diskon_rupiah\` untuk kolom \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
+5. **Berat & Ukuran**:
+   - \`"Berat Produk"\`: angka dalam gram tanpa satuan (contoh: \`500\` untuk HP, \`800\` untuk Tablet).
+   - \`"Length"\`, \`"Height"\`, \`"Width"\`: angka dalam cm tanpa satuan (contoh: Length \`18\`, Height \`6\`, Width \`10\`).
+   - \`"Jenis Produk"\`: \`"Buy Now"\`, \`"Kondisi Barang"\`: \`"Baru"\`, \`"Status Produk"\`: \`"Aktif"\`, \`"Total Stok"\`: \`10\`.
+
+---
+
+### ATURAN ARRAY \`poster\` (MAKSIMAL 4 ITEM):
+Setiap objek produk di dalam JSON WAJIB memiliki properti \`"poster"\` berupa array berisi maksimal 4 spesifikasi yang paling diunggulkan dari unit tersebut:
+\`\`\`json
+"poster": [
+  { "icon": "processor", "isi": "Snapdragon / Dimensity ..." },
+  { "icon": "baterai", "isi": "6000mAh 60W" },
+  { "icon": "layar", "isi": "6.57\\" AMOLED 120Hz" },
+  { "icon": "kamera", "isi": "50MP OIS" }
+]
+\`\`\`
+- \`icon\`: kategori ikon singkat (misal: \`processor\`, \`baterai\`, \`layar\`, \`kamera\`, \`ram\`, \`nfc\`, \`ketahanan\`, \`audio\`).
+- \`isi\`: teks spesifikasi unggulan yang ringkas, padat, dan siap dipasang pada poster produk.
+
+---
+
+### ATURAN TEMPLATE BAKU \`Deskripsi\` & ARRAY \`caption\`:
+Gunakan persis struktur dan urutan baris template baku kita di bawah ini untuk mengisi kolom \`"Deskripsi"\` dan array \`"caption"\` (sesuaikan nama MERK huruf kapital pada bagian Keterangan aktivasi garansi serta seluruh nilai spesifikasi sesuai riset resmi unit terkait):
+
+-----------------------------
+[Nama Unit] [RAM/ROM] Prosesor [Nama Chipset] Layar [Ukuran]” [Panel & Refresh Rate] Kamera [Kamera Utama] Baterai [Kapasitas mAh] [Fast Charging] Garansi Resmi 1 Tahun
+
+Deskripsi:
+Produk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.
+
+Keterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi [NAMA MERK KAPITAL], sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center [NAMA MERK KAPITAL] di Indonesia.
+
+Prosesor : [Nama Prosesor Lengkap]
+Ukuran : [Ukuran Layar]”
+Teknologi : [Tipe Panel, Refresh Rate, dan Tingkat Kecerahan nits]
+Resolusi : [Resolusi Layar Lengkap]
+Kamera Belakang : [Konfigurasi Semua Kamera Belakang]
+Kamera Utama Auto Fokus : [Yes / No]
+Kamera Belakang - OIS : [Yes / No]
+Kamera Belakang - Zoom : [Detail Zoom]
+Kamera Depan : [Resolusi Kamera Depan]
+Kamera Depan Auto Fokus : [Yes / No]
+Video Resolusi : [Resolusi Rekaman Video Maksimal & FPS]
+RAM : [Kapasitas RAM + Extended/Dynamic RAM]
+ROM : [Kapasitas ROM & Tipe Storage UFS/eMMC]
+SIM Tray : [Single-SIM / Dual-SIM / Hybrid]
+Jaringan : [2G / 4G / 5G]
+USB : [Tipe Port USB, misal USB Type-C]
+USB : [Versi USB, misal USB 2.0]
+Earjack : [3.5mm Stereo / No]
+Bluetooth : [Versi Bluetooth, misal Bluetooth v5.3]
+NFC : [Yes / No]
+AUDIO : [Konfigurasi Speaker, misal Dual stereo speaker / Mono speaker]
+Baterai : [Kapasitas mAh]
+Fast Charging : [Kecepatan Charging & Nama Teknologinya]
+Keamanan : [Jenis Fingerprint & Face Unlock]
+Sistem Operasi : [Android / iOS]
+Lainnya : [Fitur Unggulan Lainnya seperti IP Rating, AI Features, Bypass Charging, dll]
+Warna : [Daftar Pilihan Warna Resmi Indonesia]
+
+Isi dalam box : [Daftar isi kelengkapan resmi di dalam kotak penjualan Indonesia].
+------------------------------
+
+---
+
+### FORMAT OUTPUT WAJIB (JSON):
+Berikan output berupa SATU array JSON valid berisi seluruh ${units.length} unit yang dipilih tanpa terpotong, dengan skema persis seperti contoh berikut:
+${exampleOutput}`;
 }
 
 export function generateContentPrompt(options: PromptOptions): string {
