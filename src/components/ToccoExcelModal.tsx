@@ -8,11 +8,10 @@ import {
   Check,
   AlertCircle,
   Loader2,
-  Download,
-  ClipboardPaste,
   Image as ImageIcon,
   X,
   GripVertical,
+  Plus,
 } from "lucide-react";
 import Modal from "./Modal";
 import { generateTocoExcel, TocoProductRow } from "@/lib/tocoExcelHelper";
@@ -37,6 +36,16 @@ interface UnitState {
   judul: string;
   images: UnitImageItem[];
 }
+
+const NUMERIC_KEYS = new Set([
+  "Harga",
+  "Harga Diskon",
+  "Total Stok",
+  "Berat Produk",
+  "Length",
+  "Height",
+  "Width",
+]);
 
 const SAMPLE_JSON = `[
   {
@@ -69,6 +78,8 @@ export default function ToccoExcelModal({
   const [activeUnitPasteIdx, setActiveUnitPasteIdx] = useState<number | null>(null);
   const [draggedItem, setDraggedItem] = useState<{ unitIdx: number; imgIdx: number } | null>(null);
   const [dragOverItem, setDragOverItem] = useState<{ unitIdx: number; imgIdx: number } | null>(null);
+
+  const isTypingJsonRef = useRef(false);
   const lastPasteTimestampRef = useRef<number>(0);
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -76,11 +87,15 @@ export default function ToccoExcelModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Parse JSON input whenever it changes
+  // Parse JSON input whenever it changes via user typing or sample button
   useEffect(() => {
+    if (!isOpen) return;
+    if (!isTypingJsonRef.current) return;
+
     if (!jsonInput.trim()) {
       setUnits([]);
       setJsonError(null);
+      isTypingJsonRef.current = false;
       return;
     }
 
@@ -91,6 +106,7 @@ export default function ToccoExcelModal({
       if (arr.length === 0) {
         setJsonError("Array JSON kosong.");
         setUnits([]);
+        isTypingJsonRef.current = false;
         return;
       }
 
@@ -112,7 +128,23 @@ export default function ToccoExcelModal({
 
           return {
             index: idx,
-            data: item,
+            data: {
+              "Main Category": item["Main Category"] || "handphone-tablet",
+              "Sub Category 1": item["Sub Category 1"] || "handphone",
+              "Sub Category 2": item["Sub Category 2"] || "android-os",
+              "Jenis Produk": item["Jenis Produk"] || "Buy Now",
+              "Kondisi Barang": item["Kondisi Barang"] || "Baru",
+              "Status Produk": item["Status Produk"] || "Aktif",
+              Preorder: item.Preorder || "Tidak",
+              Length: item.Length ?? 18,
+              Width: item.Width ?? 10,
+              Height: item.Height ?? 6,
+              "Berat Produk": item["Berat Produk"] ?? 500,
+              "Total Stok": item["Total Stok"] ?? 10,
+              ...item,
+              SKU: sku,
+              Judul: judul,
+            },
             sku,
             judul,
             images,
@@ -123,10 +155,12 @@ export default function ToccoExcelModal({
     } catch (err: any) {
       setJsonError("Format JSON belum valid: " + err.message);
       setUnits([]);
+    } finally {
+      isTypingJsonRef.current = false;
     }
-  }, [jsonInput]);
+  }, [jsonInput, isOpen]);
 
-  // Global paste handler to capture pasted images for the active or first unit
+  // Global paste handler to capture pasted images for the active unit
   useEffect(() => {
     if (!isOpen) return;
 
@@ -137,7 +171,7 @@ export default function ToccoExcelModal({
         return;
       }
 
-      // If user is typing/pasting into an input or textarea, check if text is being pasted
+      // If user is pasting plain text into an input or textarea, let it pass through
       const activeEl = document.activeElement;
       if (
         activeEl instanceof HTMLTextAreaElement ||
@@ -145,7 +179,6 @@ export default function ToccoExcelModal({
       ) {
         const text = e.clipboardData?.getData("text/plain");
         if (text && text.trim().length > 0) {
-          // Allow normal text pasting into textarea/input
           return;
         }
       }
@@ -164,8 +197,6 @@ export default function ToccoExcelModal({
       }
 
       // 2. Fallback to clipboardData.items if no files found
-      // Note: A single clipboard copy often exposes multiple MIME types (e.g. image/png and image/jpeg).
-      // We must only take 1 image file to prevent duplicate entries!
       if (imageFiles.length === 0 && e.clipboardData?.items) {
         const items = e.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
@@ -200,7 +231,6 @@ export default function ToccoExcelModal({
   const addFilesToUnit = (unitIdx: number, newFiles: File[]) => {
     if (!newFiles || newFiles.length === 0) return;
 
-    // Create unique item representations outside setUnits (avoid duplicate createObjectURL calls)
     const newItems: UnitImageItem[] = newFiles.map((file) => ({
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       file,
@@ -216,7 +246,6 @@ export default function ToccoExcelModal({
 
       const itemsToAdd = newItems.slice(0, remainingSlots);
 
-      // Pure immutable update: never mutate target or prev
       return prev.map((u, i) => {
         if (i !== unitIdx) return u;
         return {
@@ -237,7 +266,6 @@ export default function ToccoExcelModal({
         URL.revokeObjectURL(removed.previewUrl);
       }
 
-      // Pure immutable update
       return prev.map((u, i) => {
         if (i !== unitIdx) return u;
         return {
@@ -266,7 +294,110 @@ export default function ToccoExcelModal({
     });
   };
 
+  const handleUpdateUnitField = (
+    unitIdx: number,
+    field: string,
+    value: any
+  ) => {
+    let formattedValue = value;
+    if (NUMERIC_KEYS.has(field)) {
+      if (value === "" || value === null || value === undefined) {
+        formattedValue = "";
+      } else {
+        const num = Number(value);
+        formattedValue = isNaN(num) ? value : num;
+      }
+    }
+
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const updatedData = { ...u.data, [field]: formattedValue };
+        return {
+          ...u,
+          sku: field === "SKU" ? String(formattedValue) : u.sku,
+          judul: field === "Judul" ? String(formattedValue) : u.judul,
+          data: updatedData,
+        };
+      });
+
+      // Keep jsonInput in sync without triggering re-parse loop
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+
+      return updated;
+    });
+  };
+
+  const handleRemoveUnit = (unitIdx: number) => {
+    setUnits((prev) => {
+      const target = prev[unitIdx];
+      if (target) {
+        target.images.forEach((img) => {
+          if (img.previewUrl?.startsWith("blob:")) {
+            URL.revokeObjectURL(img.previewUrl);
+          }
+        });
+      }
+
+      const updated = prev.filter((_, idx) => idx !== unitIdx);
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(updated.length > 0 ? JSON.stringify(updatedRaw, null, 2) : "");
+
+      if (activeUnitPasteIdx === unitIdx) {
+        setActiveUnitPasteIdx(null);
+      } else if (activeUnitPasteIdx !== null && activeUnitPasteIdx > unitIdx) {
+        setActiveUnitPasteIdx(activeUnitPasteIdx - 1);
+      }
+
+      return updated;
+    });
+  };
+
+  const handleAddUnit = () => {
+    const newIdx = units.length;
+    const newRow: TocoProductRow = {
+      "Main Category": "handphone-tablet",
+      "Sub Category 1": "handphone",
+      "Sub Category 2": "android-os",
+      Judul: `Unit ${newIdx + 1}`,
+      SKU: `ANDROID-BRAND-TIPE-${newIdx + 1}`,
+      Deskripsi: "",
+      Harga: 0,
+      "Harga Diskon": "",
+      "Jenis Produk": "Buy Now",
+      "Total Stok": 10,
+      "Kondisi Barang": "Baru",
+      "Berat Produk": 500,
+      "Status Produk": "Aktif",
+      Length: 18,
+      Height: 6,
+      Width: 10,
+      Preorder: "Tidak",
+    };
+
+    setUnits((prev) => {
+      const nextUnits = [
+        ...prev,
+        {
+          index: newIdx,
+          data: newRow,
+          sku: newRow.SKU!,
+          judul: newRow.Judul!,
+          images: [],
+        },
+      ];
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(nextUnits.map((u) => u.data), null, 2));
+      setActiveUnitPasteIdx(newIdx);
+      return nextUnits;
+    });
+  };
+
   const handleUseSample = () => {
+    isTypingJsonRef.current = true;
     setJsonInput(SAMPLE_JSON);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -331,6 +462,11 @@ export default function ToccoExcelModal({
           }
         }
 
+        // Clean up remaining unused photo slots in rowData
+        for (let emptySlot = unit.images.length + 1; emptySlot <= 10; emptySlot++) {
+          delete rowData[`Foto ${emptySlot}`];
+        }
+
         updatedRows.push(rowData);
       }
 
@@ -361,9 +497,7 @@ export default function ToccoExcelModal({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setSuccessMessage(
-        "Excel berhasil diunduh."
-      );
+      setSuccessMessage("Excel berhasil diunduh.");
     } catch (err: any) {
       console.error("Excel generation error:", err);
       setErrorMessage(
@@ -375,26 +509,39 @@ export default function ToccoExcelModal({
     }
   };
 
-  const totalImagesCount = useMemo(() => {
-    return units.reduce((acc, u) => acc + u.images.length, 0);
-  }, [units]);
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      maxWidth="2xl"
+      maxWidth="3xl"
       title="JSON ke Excel Toco"
       closeButtonAriaLabel="Tutup modal"
     >
       <Modal.Body className="space-y-4">
+        {/* Top: JSON Input */}
         <div>
-          <label className="field-label">JSON Hasil Prompt</label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-xs font-medium text-muted">
+              JSON Hasil Prompt
+            </label>
+            {units.length === 0 && (
+              <button
+                type="button"
+                onClick={handleUseSample}
+                className="text-xs text-brand hover:underline font-medium cursor-pointer"
+              >
+                Gunakan Contoh JSON
+              </button>
+            )}
+          </div>
           <textarea
-            rows={4}
+            rows={units.length > 0 ? 2 : 4}
             value={jsonInput}
-            onChange={(e) => setJsonInput(e.target.value)}
-            placeholder="Paste JSON di sini"
+            onChange={(e) => {
+              isTypingJsonRef.current = true;
+              setJsonInput(e.target.value);
+            }}
+            placeholder="Paste JSON hasil prompt di sini..."
             className="textarea text-xs"
           />
         </div>
@@ -406,14 +553,24 @@ export default function ToccoExcelModal({
           </div>
         )}
 
-        {/* Step 2: Input Gambar per Unit */}
+        {/* Product Cards with Full Editable Inputs */}
         {units.length > 0 && (
           <div className="space-y-3">
-            <label className="field-label mb-0">
-              {units.length} unit &middot; foto maks. 5 per unit
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-ink">
+                Daftar Produk ({units.length} unit)
+              </label>
+              <button
+                type="button"
+                onClick={handleAddUnit}
+                className="inline-flex items-center gap-1 text-xs text-brand hover:underline font-medium cursor-pointer"
+              >
+                <Plus className="size-3.5" />
+                Tambah Unit
+              </button>
+            </div>
 
-            <div className="space-y-3 max-h-[50dvh] overflow-y-auto pr-1">
+            <div className="space-y-4 max-h-[60dvh] overflow-y-auto pr-1">
               {units.map((unit, uIdx) => {
                 const isSelected = activeUnitPasteIdx === uIdx;
                 const canAddMore = unit.images.length < 5;
@@ -422,153 +579,418 @@ export default function ToccoExcelModal({
                   <div
                     key={uIdx}
                     onClick={() => setActiveUnitPasteIdx(uIdx)}
-                    className={`rounded-xl border p-3.5 transition-colors ${
+                    onFocus={() => setActiveUnitPasteIdx(uIdx)}
+                    className={`rounded-xl border p-4 transition-colors space-y-3.5 ${
                       isSelected
-                        ? "border-brand bg-brand-soft/20"
+                        ? "border-brand bg-brand-soft/10 ring-1 ring-brand/30"
                         : "border-line bg-surface"
                     }`}
                   >
-                    <p className="mb-2.5 truncate text-xs font-semibold text-ink">
-                      {unit.sku}
-                    </p>
+                    {/* Card Header */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-line">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="flex items-center justify-center size-5.5 rounded-md bg-brand text-white text-xs font-semibold shrink-0">
+                          {uIdx + 1}
+                        </span>
+                        <span className="text-xs font-semibold text-ink truncate">
+                          {unit.sku || `Unit ${uIdx + 1}`}
+                        </span>
+                        {isSelected && (
+                          <span className="text-[11px] text-brand font-medium shrink-0">
+                            (Aktif untuk paste foto)
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Slots Gambar 1-5 dengan Drag & Snap Reorder */}
-                    <div className="grid grid-cols-5 gap-2">
-                      {[0, 1, 2, 3, 4].map((slotIdx) => {
-                        const img = unit.images[slotIdx];
-                        const isSlotOccupied = Boolean(img);
-                        const isBeingDragged =
-                          draggedItem?.unitIdx === uIdx && draggedItem?.imgIdx === slotIdx;
-                        const isSnapTarget =
-                          dragOverItem?.unitIdx === uIdx &&
-                          dragOverItem?.imgIdx === slotIdx &&
-                          draggedItem?.imgIdx !== slotIdx;
-
-                        return (
-                          <div
-                            key={slotIdx}
-                            draggable={isSlotOccupied}
-                            onDragStart={(e) => {
-                              if (!isSlotOccupied) return;
-                              setDraggedItem({ unitIdx: uIdx, imgIdx: slotIdx });
-                              e.dataTransfer.effectAllowed = "move";
-                              e.dataTransfer.setData("text/plain", `${uIdx}:${slotIdx}`);
-                            }}
-                            onDragOver={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              if (draggedItem && draggedItem.unitIdx === uIdx) {
-                                e.dataTransfer.dropEffect = "move";
-                                if (
-                                  dragOverItem?.unitIdx !== uIdx ||
-                                  dragOverItem?.imgIdx !== slotIdx
-                                ) {
-                                  setDragOverItem({ unitIdx: uIdx, imgIdx: slotIdx });
-                                }
-                              }
-                            }}
-                            onDragLeave={(e) => {
-                              e.preventDefault();
-                              if (
-                                dragOverItem?.unitIdx === uIdx &&
-                                dragOverItem?.imgIdx === slotIdx
-                              ) {
-                                setDragOverItem(null);
-                              }
-                            }}
-                            onDrop={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-
-                              // Check if dropping an internal dragged image for reordering
-                              if (draggedItem && draggedItem.unitIdx === uIdx) {
-                                const fromIdx = draggedItem.imgIdx;
-                                const toIdx = Math.min(slotIdx, unit.images.length - 1);
-                                reorderImages(uIdx, fromIdx, toIdx);
-                                setDraggedItem(null);
-                                setDragOverItem(null);
-                                return;
-                              }
-
-                              // Check if dropping external files from desktop/folder
-                              const droppedFiles = Array.from(e.dataTransfer.files || []).filter((f) =>
-                                f.type.startsWith("image/")
-                              );
-                              if (droppedFiles.length > 0) {
-                                addFilesToUnit(uIdx, droppedFiles);
-                              }
-                              setDraggedItem(null);
-                              setDragOverItem(null);
-                            }}
-                            onDragEnd={() => {
-                              setDraggedItem(null);
-                              setDragOverItem(null);
-                            }}
-                            className={`relative aspect-square rounded-lg border transition-all duration-200 flex flex-col items-center justify-center p-1 overflow-hidden select-none group/slot ${
-                              isBeingDragged
-                                ? "opacity-30 scale-95 border-dashed border-brand bg-brand-soft/30 ring-2 ring-brand/40"
-                                : isSnapTarget
-                                ? "scale-105 border-brand ring-2 ring-brand shadow-md bg-brand-soft/50 z-10"
-                                : isSlotOccupied
-                                ? "border-line bg-canvas cursor-grab active:cursor-grabbing hover:border-brand/60 hover:shadow-xs"
-                                : "border-dashed border-line bg-canvas hover:border-brand/40"
-                            }`}
-                          >
-                            {img ? (
-                              <>
-                                <img
-                                  src={img.previewUrl}
-                                  alt={`Foto ${slotIdx + 1}`}
-                                  className="size-full object-cover rounded-md pointer-events-none"
-                                />
-                                <div
-                                  className="absolute top-1 left-1 p-0.5 rounded bg-black/60 text-white opacity-0 group-hover/slot:opacity-100 transition-opacity pointer-events-none"
-                                  title="Geser untuk ubah urutan"
-                                >
-                                  <GripVertical className="size-3" />
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeImageFromUnit(uIdx, slotIdx);
-                                  }}
-                                  className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-danger transition-colors cursor-pointer z-10"
-                                  title="Hapus foto"
-                                >
-                                  <X className="size-3" />
-                                </button>
-                                <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded text-[9px] bg-black/60 text-white font-medium pointer-events-none">
-                                  {slotIdx + 1}
-                                </span>
-                              </>
-                            ) : (
-                              <label
-                                className={`size-full flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-subtle ${
-                                  !canAddMore ? "opacity-30 cursor-not-allowed" : ""
-                                }`}
-                              >
-                                <ImageIcon className="size-4 text-faint" />
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  disabled={!canAddMore}
-                                  onChange={(e) => {
-                                    const files = Array.from(e.target.files || []);
-                                    if (files.length > 0) {
-                                      addFilesToUnit(uIdx, files);
-                                    }
-                                    e.target.value = "";
-                                  }}
-                                  className="hidden"
-                                />
-                              </label>
-                            )}
-                          </div>
-                        );
-                      })}
+                      {units.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveUnit(uIdx);
+                          }}
+                          className="p-1 rounded-lg text-muted hover:text-danger hover:bg-danger-soft transition-colors cursor-pointer"
+                          title="Hapus unit ini"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      )}
                     </div>
 
+                    {/* Section 1: Foto Produk (Maks 5) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-[11px] font-medium text-muted">
+                          Foto Produk ({unit.images.length}/5) &middot; Geser untuk atur urutan atau paste foto
+                        </label>
+                      </div>
+
+                      <div className="grid grid-cols-5 gap-2">
+                        {[0, 1, 2, 3, 4].map((slotIdx) => {
+                          const img = unit.images[slotIdx];
+                          const isSlotOccupied = Boolean(img);
+                          const isBeingDragged =
+                            draggedItem?.unitIdx === uIdx && draggedItem?.imgIdx === slotIdx;
+                          const isSnapTarget =
+                            dragOverItem?.unitIdx === uIdx &&
+                            dragOverItem?.imgIdx === slotIdx &&
+                            draggedItem?.imgIdx !== slotIdx;
+
+                          return (
+                            <div
+                              key={slotIdx}
+                              draggable={isSlotOccupied}
+                              onDragStart={(e) => {
+                                if (!isSlotOccupied) return;
+                                setDraggedItem({ unitIdx: uIdx, imgIdx: slotIdx });
+                                e.dataTransfer.effectAllowed = "move";
+                                e.dataTransfer.setData("text/plain", `${uIdx}:${slotIdx}`);
+                              }}
+                              onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (draggedItem && draggedItem.unitIdx === uIdx) {
+                                  e.dataTransfer.dropEffect = "move";
+                                  if (
+                                    dragOverItem?.unitIdx !== uIdx ||
+                                    dragOverItem?.imgIdx !== slotIdx
+                                  ) {
+                                    setDragOverItem({ unitIdx: uIdx, imgIdx: slotIdx });
+                                  }
+                                }
+                              }}
+                              onDragLeave={(e) => {
+                                e.preventDefault();
+                                if (
+                                  dragOverItem?.unitIdx === uIdx &&
+                                  dragOverItem?.imgIdx === slotIdx
+                                ) {
+                                  setDragOverItem(null);
+                                }
+                              }}
+                              onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                if (draggedItem && draggedItem.unitIdx === uIdx) {
+                                  const fromIdx = draggedItem.imgIdx;
+                                  const toIdx = Math.min(slotIdx, unit.images.length - 1);
+                                  reorderImages(uIdx, fromIdx, toIdx);
+                                  setDraggedItem(null);
+                                  setDragOverItem(null);
+                                  return;
+                                }
+
+                                const droppedFiles = Array.from(e.dataTransfer.files || []).filter((f) =>
+                                  f.type.startsWith("image/")
+                                );
+                                if (droppedFiles.length > 0) {
+                                  addFilesToUnit(uIdx, droppedFiles);
+                                }
+                                setDraggedItem(null);
+                                setDragOverItem(null);
+                              }}
+                              onDragEnd={() => {
+                                setDraggedItem(null);
+                                setDragOverItem(null);
+                              }}
+                              className={`relative aspect-square rounded-lg border transition-all duration-200 flex flex-col items-center justify-center p-1 overflow-hidden select-none group/slot ${
+                                isBeingDragged
+                                  ? "opacity-30 scale-95 border-dashed border-brand bg-brand-soft/30 ring-2 ring-brand/40"
+                                  : isSnapTarget
+                                  ? "scale-105 border-brand ring-2 ring-brand shadow-md bg-brand-soft/50 z-10"
+                                  : isSlotOccupied
+                                  ? "border-line bg-canvas cursor-grab active:cursor-grabbing hover:border-brand/60 hover:shadow-xs"
+                                  : "border-dashed border-line bg-canvas hover:border-brand/40"
+                              }`}
+                            >
+                              {img ? (
+                                <>
+                                  <img
+                                    src={img.previewUrl}
+                                    alt={`Foto ${slotIdx + 1}`}
+                                    className="size-full object-cover rounded-md pointer-events-none"
+                                  />
+                                  <div
+                                    className="absolute top-1 left-1 p-0.5 rounded bg-black/60 text-white opacity-0 group-hover/slot:opacity-100 transition-opacity pointer-events-none"
+                                    title="Geser untuk ubah urutan"
+                                  >
+                                    <GripVertical className="size-3" />
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      removeImageFromUnit(uIdx, slotIdx);
+                                    }}
+                                    className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-danger transition-colors cursor-pointer z-10"
+                                    title="Hapus foto"
+                                  >
+                                    <X className="size-3" />
+                                  </button>
+                                  <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded text-[9px] bg-black/60 text-white font-medium pointer-events-none">
+                                    {slotIdx + 1}
+                                  </span>
+                                </>
+                              ) : (
+                                <label
+                                  className={`size-full flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-subtle ${
+                                    !canAddMore ? "opacity-30 cursor-not-allowed" : ""
+                                  }`}
+                                >
+                                  <ImageIcon className="size-4 text-faint" />
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    disabled={!canAddMore}
+                                    onChange={(e) => {
+                                      const files = Array.from(e.target.files || []);
+                                      if (files.length > 0) {
+                                        addFilesToUnit(uIdx, files);
+                                      }
+                                      e.target.value = "";
+                                    }}
+                                    className="hidden"
+                                  />
+                                </label>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section 2: Full Editable Inputs */}
+                    <div className="space-y-3 pt-1 border-t border-line/70">
+                      {/* Judul Produk */}
+                      <div>
+                        <label className="block text-[11px] font-medium text-muted mb-1">
+                          Nama Produk / Judul
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={unit.data.Judul || ""}
+                          onChange={(e) => handleUpdateUnitField(uIdx, "Judul", e.target.value)}
+                          placeholder="Nama produk lengkap..."
+                          className="textarea text-xs resize-none"
+                        />
+                      </div>
+
+                      {/* SKU */}
+                      <div>
+                        <label className="block text-[11px] font-medium text-muted mb-1">
+                          SKU (Format: ANDROID-BRAND-TIPE-RAM/STORAGE)
+                        </label>
+                        <input
+                          type="text"
+                          value={unit.data.SKU || ""}
+                          onChange={(e) => handleUpdateUnitField(uIdx, "SKU", e.target.value)}
+                          placeholder="ANDROID-SAMSUNG-A07 5G-4/128"
+                          className="input text-xs"
+                        />
+                      </div>
+
+                      {/* Harga, Diskon, Stok, Berat */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Harga (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Harga ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Harga", e.target.value)}
+                            placeholder="2399000"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Harga Diskon (Rp)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data["Harga Diskon"] ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Harga Diskon", e.target.value)}
+                            placeholder="Opsional"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Total Stok
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data["Total Stok"] ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Total Stok", e.target.value)}
+                            placeholder="10"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Berat (gram)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data["Berat Produk"] ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Berat Produk", e.target.value)}
+                            placeholder="500"
+                            className="input text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Kondisi, Status, Preorder, Jenis Produk */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Kondisi Barang
+                          </label>
+                          <select
+                            value={unit.data["Kondisi Barang"] || "Baru"}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Kondisi Barang", e.target.value)}
+                            className="input text-xs"
+                          >
+                            <option value="Baru">Baru</option>
+                            <option value="Bekas">Bekas</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Status Produk
+                          </label>
+                          <select
+                            value={unit.data["Status Produk"] || "Aktif"}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Status Produk", e.target.value)}
+                            className="input text-xs"
+                          >
+                            <option value="Aktif">Aktif</option>
+                            <option value="Nonaktif">Nonaktif</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Preorder
+                          </label>
+                          <select
+                            value={unit.data.Preorder || "Tidak"}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Preorder", e.target.value)}
+                            className="input text-xs"
+                          >
+                            <option value="Tidak">Tidak</option>
+                            <option value="Ya">Ya</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Jenis Produk
+                          </label>
+                          <input
+                            type="text"
+                            value={unit.data["Jenis Produk"] || "Buy Now"}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Jenis Produk", e.target.value)}
+                            placeholder="Buy Now"
+                            className="input text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Dimensi Paket */}
+                      <div className="grid grid-cols-3 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Panjang / Length (cm)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Length ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Length", e.target.value)}
+                            placeholder="18"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Lebar / Width (cm)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Width ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Width", e.target.value)}
+                            placeholder="10"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Tinggi / Height (cm)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Height ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Height", e.target.value)}
+                            placeholder="6"
+                            className="input text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Kategori Toco */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Main Category
+                          </label>
+                          <input
+                            type="text"
+                            value={unit.data["Main Category"] || ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Main Category", e.target.value)}
+                            placeholder="handphone-tablet"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Sub Category 1
+                          </label>
+                          <input
+                            type="text"
+                            value={unit.data["Sub Category 1"] || ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Sub Category 1", e.target.value)}
+                            placeholder="handphone"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Sub Category 2
+                          </label>
+                          <input
+                            type="text"
+                            value={unit.data["Sub Category 2"] || ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Sub Category 2", e.target.value)}
+                            placeholder="android-os"
+                            className="input text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Deskripsi */}
+                      <div>
+                        <label className="block text-[11px] font-medium text-muted mb-1">
+                          Deskripsi Produk
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={unit.data.Deskripsi || ""}
+                          onChange={(e) => handleUpdateUnitField(uIdx, "Deskripsi", e.target.value)}
+                          placeholder="Deskripsi spesifikasi, garansi, kelengkapan box..."
+                          className="textarea text-xs"
+                        />
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -628,4 +1050,3 @@ export default function ToccoExcelModal({
     </Modal>
   );
 }
-
