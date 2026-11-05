@@ -362,7 +362,7 @@ export default function ToccoExcelModal({
       URL.revokeObjectURL(url);
 
       setSuccessMessage(
-        `Berhasil! File Excel dengan ${units.length} unit berhasil diunduh.`
+        "Excel berhasil diunduh."
       );
     } catch (err: any) {
       console.error("Excel generation error:", err);
@@ -383,30 +383,18 @@ export default function ToccoExcelModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      maxWidth="3xl"
+      maxWidth="2xl"
       title="JSON ke Excel Toco"
       closeButtonAriaLabel="Tutup modal"
     >
       <Modal.Body className="space-y-4">
-        {/* Step 1: Input JSON */}
         <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="field-label mb-0">
-              Paste JSON Hasil Prompt Tocco <span className="text-danger">*</span>
-            </label>
-            <button
-              type="button"
-              onClick={handleUseSample}
-              className="text-xs text-brand hover:underline cursor-pointer"
-            >
-              Gunakan Contoh JSON
-            </button>
-          </div>
+          <label className="field-label">JSON Hasil Prompt</label>
           <textarea
-            rows={5}
+            rows={4}
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
-            placeholder="Tempel (paste) array JSON produk tocco di sini..."
+            placeholder="Paste JSON di sini"
             className="textarea text-xs"
           />
         </div>
@@ -418,26 +406,12 @@ export default function ToccoExcelModal({
           </div>
         )}
 
-        {units.length > 0 && (
-          <div className="notice notice-success">
-            <Check className="size-4 shrink-0" />
-            <span className="font-medium">
-              Terdeteksi {units.length} unit produk siap diisi gambar.
-            </span>
-          </div>
-        )}
-
         {/* Step 2: Input Gambar per Unit */}
         {units.length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="field-label mb-0">
-                Gambar per Unit (Maks. 5 Foto per Unit)
-              </label>
-              <span className="text-xs text-muted">
-                {totalImagesCount} foto dipilih
-              </span>
-            </div>
+            <label className="field-label mb-0">
+              {units.length} unit &middot; foto maks. 5 per unit
+            </label>
 
             <div className="space-y-3 max-h-[50dvh] overflow-y-auto pr-1">
               {units.map((unit, uIdx) => {
@@ -454,49 +428,9 @@ export default function ToccoExcelModal({
                         : "border-line bg-surface"
                     }`}
                   >
-                    {/* Header Unit */}
-                    <div className="flex items-start justify-between gap-3 mb-2.5">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center justify-center size-5 rounded-full bg-ink text-white text-[11px] font-bold shrink-0">
-                            {uIdx + 1}
-                          </span>
-                          <p className="truncate text-xs font-semibold text-ink">
-                            {unit.judul}
-                          </p>
-                        </div>
-                        <p className="text-[11px] text-muted mt-0.5 truncate">
-                          SKU: <span className="font-medium text-ink">{unit.sku}</span>
-                          {unit.data.Harga ? ` • Rp ${Number(unit.data.Harga).toLocaleString("id-ID")}` : ""}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <label
-                          className={`btn btn-secondary text-xs py-1 px-2.5 min-h-[32px] cursor-pointer ${
-                            !canAddMore ? "opacity-50 pointer-events-none" : ""
-                          }`}
-                          title="Pilih berkas dari folder"
-                        >
-                          <Upload className="size-3.5 text-brand" />
-                          <span>Pilih Foto</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            disabled={!canAddMore}
-                            onChange={(e) => {
-                              const files = Array.from(e.target.files || []);
-                              if (files.length > 0) {
-                                addFilesToUnit(uIdx, files);
-                              }
-                              e.target.value = "";
-                            }}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                    </div>
+                    <p className="mb-2.5 truncate text-xs font-semibold text-ink">
+                      {unit.sku}
+                    </p>
 
                     {/* Slots Gambar 1-5 dengan Drag & Snap Reorder */}
                     <div className="grid grid-cols-5 gap-2">
@@ -605,7 +539,7 @@ export default function ToccoExcelModal({
                                   <X className="size-3" />
                                 </button>
                                 <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded text-[9px] bg-black/60 text-white font-medium pointer-events-none">
-                                  Foto {slotIdx + 1}{slotIdx === 0 ? " (Utama)" : ""}
+                                  {slotIdx + 1}
                                 </span>
                               </>
                             ) : (
@@ -614,10 +548,7 @@ export default function ToccoExcelModal({
                                   !canAddMore ? "opacity-30 cursor-not-allowed" : ""
                                 }`}
                               >
-                                <ImageIcon className="size-4 text-faint mb-1" />
-                                <span className="text-[10px] text-faint">
-                                  Foto {slotIdx + 1}
-                                </span>
+                                <ImageIcon className="size-4 text-faint" />
                                 <input
                                   type="file"
                                   accept="image/*"
@@ -638,22 +569,6 @@ export default function ToccoExcelModal({
                       })}
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-between gap-1 mt-2 text-[11px] text-muted">
-                      <span>
-                        Tips: Geser (drag &amp; drop) foto untuk mengubah urutan (Foto 1 = foto utama), atau tekan{" "}
-                        <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-mono">
-                          Ctrl+V
-                        </kbd>{" "}
-                        /{" "}
-                        <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-mono">
-                          ⌘+V
-                        </kbd>{" "}
-                        untuk paste.
-                      </span>
-                      <span className="font-medium shrink-0 ml-auto">
-                        {unit.images.length}/5 foto
-                      </span>
-                    </div>
                   </div>
                 );
               })}
@@ -691,7 +606,7 @@ export default function ToccoExcelModal({
           disabled={isProcessing}
           className="btn btn-secondary"
         >
-          Tutup
+          Batal
         </button>
 
         <button
@@ -706,7 +621,7 @@ export default function ToccoExcelModal({
             <FileSpreadsheet className="size-4" />
           )}
           <span>
-            {isProcessing ? "Memproses..." : "Upload & Unduh Excel (.xlsx)"}
+            {isProcessing ? "Memproses..." : "Unduh Excel"}
           </span>
         </button>
       </Modal.Footer>
