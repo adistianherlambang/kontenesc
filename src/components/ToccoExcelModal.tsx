@@ -4,15 +4,15 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   FileSpreadsheet,
   Upload,
+  Trash2,
   Check,
   AlertCircle,
   Loader2,
+  Download,
+  ClipboardPaste,
+  Image as ImageIcon,
   X,
   GripVertical,
-  Globe,
-  ExternalLink,
-  Cloud,
-  ImageIcon,
 } from "lucide-react";
 import Modal from "./Modal";
 import { generateTocoExcel, TocoProductRow } from "@/lib/tocoExcelHelper";
@@ -26,9 +26,8 @@ interface UnitImageItem {
   id: string;
   file?: File;
   previewUrl: string;
-  uploadedUrl?: string; // e.g. "https://domainsaya.com/r2/ANDROID-SAMSUNG-A07_5G-4-128_1.jpg"
-  uploadedKey?: string; // e.g. "tocco_esc/ANDROID-SAMSUNG-A07_5G-4-128_1.jpg"
-  isUploaded?: boolean;
+  uploadedUrl?: string;
+  isUploading?: boolean;
 }
 
 interface UnitState {
@@ -37,14 +36,6 @@ interface UnitState {
   sku: string;
   judul: string;
   images: UnitImageItem[];
-}
-
-function getCleanSku(sku: string): string {
-  return sku
-    .trim()
-    .replace(/\s+/g, "_")
-    .replace(/[/\\?%*:|"<>]/g, "-")
-    .replace(/_+/g, "_");
 }
 
 const SAMPLE_JSON = `[
@@ -75,31 +66,10 @@ export default function ToccoExcelModal({
   const [jsonInput, setJsonInput] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [units, setUnits] = useState<UnitState[]>([]);
-  const [customDomain, setCustomDomain] = useState<string>("");
   const [activeUnitPasteIdx, setActiveUnitPasteIdx] = useState<number | null>(null);
   const [draggedItem, setDraggedItem] = useState<{ unitIdx: number; imgIdx: number } | null>(null);
   const [dragOverItem, setDragOverItem] = useState<{ unitIdx: number; imgIdx: number } | null>(null);
-  const [sampleLinks, setSampleLinks] = useState<string[]>([]);
   const lastPasteTimestampRef = useRef<number>(0);
-
-  // Restore saved domain or default to current browser origin
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("tocco_custom_domain");
-      if (saved) {
-        setCustomDomain(saved);
-      } else if (!customDomain) {
-        setCustomDomain(window.location.origin);
-      }
-    }
-  }, []);
-
-  const handleDomainChange = (val: string) => {
-    setCustomDomain(val);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("tocco_custom_domain", val);
-    }
-  };
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [processStatus, setProcessStatus] = useState<string>("");
@@ -181,7 +151,7 @@ export default function ToccoExcelModal({
       }
 
       // Extract image files from clipboard
-      const imageFiles: File[] = [];
+      let imageFiles: File[] = [];
 
       // 1. Check e.clipboardData.files first
       const rawFiles = e.clipboardData?.files;
@@ -194,6 +164,8 @@ export default function ToccoExcelModal({
       }
 
       // 2. Fallback to clipboardData.items if no files found
+      // Note: A single clipboard copy often exposes multiple MIME types (e.g. image/png and image/jpeg).
+      // We must only take 1 image file to prevent duplicate entries!
       if (imageFiles.length === 0 && e.clipboardData?.items) {
         const items = e.clipboardData.items;
         for (let i = 0; i < items.length; i++) {
@@ -228,11 +200,11 @@ export default function ToccoExcelModal({
   const addFilesToUnit = (unitIdx: number, newFiles: File[]) => {
     if (!newFiles || newFiles.length === 0) return;
 
+    // Create unique item representations outside setUnits (avoid duplicate createObjectURL calls)
     const newItems: UnitImageItem[] = newFiles.map((file) => ({
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       file,
       previewUrl: URL.createObjectURL(file),
-      isUploaded: false,
     }));
 
     setUnits((prev) => {
@@ -244,6 +216,7 @@ export default function ToccoExcelModal({
 
       const itemsToAdd = newItems.slice(0, remainingSlots);
 
+      // Pure immutable update: never mutate target or prev
       return prev.map((u, i) => {
         if (i !== unitIdx) return u;
         return {
@@ -264,6 +237,7 @@ export default function ToccoExcelModal({
         URL.revokeObjectURL(removed.previewUrl);
       }
 
+      // Pure immutable update
       return prev.map((u, i) => {
         if (i !== unitIdx) return u;
         return {
@@ -296,18 +270,6 @@ export default function ToccoExcelModal({
     setJsonInput(SAMPLE_JSON);
     setErrorMessage(null);
     setSuccessMessage(null);
-    setSampleLinks([]);
-  };
-
-  const getEffectiveDomain = () => {
-    let domain = customDomain.trim();
-    if (!domain) {
-      domain = typeof window !== "undefined" ? window.location.origin : "";
-    }
-    if (!domain.startsWith("http://") && !domain.startsWith("https://")) {
-      domain = `https://${domain}`;
-    }
-    return domain.replace(/\/+$/, "");
   };
 
   const handleProcessAndDownload = async () => {
@@ -316,27 +278,32 @@ export default function ToccoExcelModal({
     setIsProcessing(true);
     setErrorMessage(null);
     setSuccessMessage(null);
-    setSampleLinks([]);
 
     try {
-      const baseDomain = getEffectiveDomain();
-      const updatedUnits = [...units];
-      const updatedRows: TocoProductRow[] = [];
-      const collectedLinks: string[] = [];
+      const origin =
+        typeof window !== "undefined" && window.location.origin
+          ? window.location.origin
+          : "";
 
-      // Step 1: Upload all unit images to Cloudflare R2
-      for (let uIdx = 0; uIdx < updatedUnits.length; uIdx++) {
-        const unit = updatedUnits[uIdx];
+      // Step 1: Upload all pending images to R2
+      const updatedRows: TocoProductRow[] = [];
+
+      for (let uIdx = 0; uIdx < units.length; uIdx++) {
+        const unit = units[uIdx];
         const rowData = { ...unit.data };
-        const newImages = [...unit.images];
 
         setProcessStatus(
-          `1/3: Mengunggah gambar unit ${uIdx + 1}/${updatedUnits.length} (${unit.sku}) ke Cloudflare R2...`
+          `Mengunggah gambar unit ${uIdx + 1}/${units.length} (${unit.sku})...`
         );
 
-        for (let imgIdx = 0; imgIdx < newImages.length; imgIdx++) {
-          const imgItem = { ...newImages[imgIdx] };
+        for (let imgIdx = 0; imgIdx < unit.images.length; imgIdx++) {
+          const imgItem = unit.images[imgIdx];
           const slotKey = `Foto ${imgIdx + 1}` as keyof TocoProductRow;
+
+          if (imgItem.uploadedUrl) {
+            rowData[slotKey] = imgItem.uploadedUrl;
+            continue;
+          }
 
           if (imgItem.file) {
             const formData = new FormData();
@@ -353,42 +320,22 @@ export default function ToccoExcelModal({
               const errJson = await res.json().catch(() => ({}));
               throw new Error(
                 errJson.error ||
-                  `Gagal mengunggah foto ${imgIdx + 1} untuk SKU ${unit.sku} ke R2`
+                  `Gagal mengunggah foto ${imgIdx + 1} untuk SKU ${unit.sku}`
               );
             }
 
             const data = await res.json();
-            const forwardedUrl = `${baseDomain}${data.path}`;
+            const forwardedUrl = `${origin}${data.path}`;
             imgItem.uploadedUrl = forwardedUrl;
-            imgItem.uploadedKey = data.key;
-            imgItem.isUploaded = true;
             rowData[slotKey] = forwardedUrl;
-
-            if (collectedLinks.length < 5) {
-              collectedLinks.push(forwardedUrl);
-            }
-          } else if (imgItem.uploadedUrl) {
-            rowData[slotKey] = imgItem.uploadedUrl;
-            if (collectedLinks.length < 5) {
-              collectedLinks.push(imgItem.uploadedUrl);
-            }
           }
-
-          newImages[imgIdx] = imgItem;
         }
 
-        updatedUnits[uIdx] = {
-          ...unit,
-          images: newImages,
-        };
         updatedRows.push(rowData);
       }
 
-      setUnits(updatedUnits);
-      setSampleLinks(collectedLinks);
-
       // Step 2: Fetch template Excel file
-      setProcessStatus("2/3: Menyiapkan berkas toco_bulk_upload_template.xlsx...");
+      setProcessStatus("Menyiapkan berkas toco_bulk_upload_template.xlsx...");
       const tplRes = await fetch("/toco_bulk_upload_template.xlsx");
       if (!tplRes.ok) {
         throw new Error(
@@ -398,7 +345,7 @@ export default function ToccoExcelModal({
       const tplBuffer = await tplRes.arrayBuffer();
 
       // Step 3: Inject rows into template
-      setProcessStatus("3/3: Menulis link forwarding Next.js ke kolom Foto 1-5 Excel...");
+      setProcessStatus("Menyusun data ke dalam Excel...");
       const excelBytes = await generateTocoExcel(tplBuffer, updatedRows);
 
       // Step 4: Trigger instant download
@@ -415,7 +362,7 @@ export default function ToccoExcelModal({
       URL.revokeObjectURL(url);
 
       setSuccessMessage(
-        `Sukses! File Excel untuk ${units.length} unit berhasil dibuat dan diunduh. Semua gambar telah terunggah ke Cloudflare R2 (folder: tocco_esc/) dan link forwarding Next.js (${baseDomain}/r2/...) telah tersimpan di kolom Foto 1 s/d Foto 5.`
+        `Berhasil! File Excel dengan ${units.length} unit berhasil diunduh.`
       );
     } catch (err: any) {
       console.error("Excel generation error:", err);
@@ -432,14 +379,12 @@ export default function ToccoExcelModal({
     return units.reduce((acc, u) => acc + u.images.length, 0);
   }, [units]);
 
-  const activeDomain = getEffectiveDomain();
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       maxWidth="3xl"
-      title="JSON ke Excel Toco (Cloudflare R2)"
+      title="JSON ke Excel Toco"
       closeButtonAriaLabel="Tutup modal"
     >
       <Modal.Body className="space-y-4">
@@ -477,45 +422,12 @@ export default function ToccoExcelModal({
           <div className="notice notice-success">
             <Check className="size-4 shrink-0" />
             <span className="font-medium">
-              Terdeteksi {units.length} unit produk siap diproses.
+              Terdeteksi {units.length} unit produk siap diisi gambar.
             </span>
           </div>
         )}
 
-        {/* Step 2: Konfigurasi Domain Forwarding Next.js */}
-        {units.length > 0 && (
-          <div className="rounded-xl border border-line bg-surface p-3.5 space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-1">
-              <label className="field-label mb-0 flex items-center gap-1.5 text-ink font-semibold">
-                <Globe className="size-4 text-brand" />
-                <span>Domain Forwarding Next.js untuk Link Foto</span>
-              </label>
-              <span className="text-[11px] text-muted">
-                Ditulis ke kolom Foto 1 - 5 Excel
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={customDomain}
-                onChange={(e) => handleDomainChange(e.target.value)}
-                placeholder="https://domainsaya.com atau http://localhost:3000"
-                className="input text-xs"
-              />
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-muted">
-              <Cloud className="size-3.5 text-brand shrink-0" />
-              <span>
-                Gambar diunggah ke Cloudflare R2 (<span className="text-ink font-medium">folder: tocco_esc/</span>), lalu di-forward via route Next.js:{" "}
-                <span className="text-ink font-medium">
-                  {activeDomain}/r2/[nama-sku]_[1-5].jpg
-                </span>
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Input Gambar per Unit */}
+        {/* Step 2: Input Gambar per Unit */}
         {units.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -531,7 +443,6 @@ export default function ToccoExcelModal({
               {units.map((unit, uIdx) => {
                 const isSelected = activeUnitPasteIdx === uIdx;
                 const canAddMore = unit.images.length < 5;
-                const cleanSku = getCleanSku(unit.sku);
 
                 return (
                   <div
@@ -556,8 +467,6 @@ export default function ToccoExcelModal({
                         </div>
                         <p className="text-[11px] text-muted mt-0.5 truncate">
                           SKU: <span className="font-medium text-ink">{unit.sku}</span>
-                          {" • "}
-                          Target R2: <span className="text-ink font-medium">tocco_esc/{cleanSku}_*.jpg</span>
                           {unit.data.Harga ? ` • Rp ${Number(unit.data.Harga).toLocaleString("id-ID")}` : ""}
                         </p>
                       </div>
@@ -637,6 +546,7 @@ export default function ToccoExcelModal({
                               e.preventDefault();
                               e.stopPropagation();
 
+                              // Check if dropping an internal dragged image for reordering
                               if (draggedItem && draggedItem.unitIdx === uIdx) {
                                 const fromIdx = draggedItem.imgIdx;
                                 const toIdx = Math.min(slotIdx, unit.images.length - 1);
@@ -646,6 +556,7 @@ export default function ToccoExcelModal({
                                 return;
                               }
 
+                              // Check if dropping external files from desktop/folder
                               const droppedFiles = Array.from(e.dataTransfer.files || []).filter((f) =>
                                 f.type.startsWith("image/")
                               );
@@ -696,12 +607,6 @@ export default function ToccoExcelModal({
                                 <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded text-[9px] bg-black/60 text-white font-medium pointer-events-none">
                                   Foto {slotIdx + 1}{slotIdx === 0 ? " (Utama)" : ""}
                                 </span>
-                                {img.isUploaded && (
-                                  <span className="absolute bottom-1 right-1 px-1 py-0.5 rounded text-[9px] bg-emerald-600 text-white font-medium flex items-center gap-0.5">
-                                    <Check className="size-2.5" />
-                                    <span>R2</span>
-                                  </span>
-                                )}
                               </>
                             ) : (
                               <label
@@ -735,12 +640,12 @@ export default function ToccoExcelModal({
 
                     <div className="flex flex-wrap items-center justify-between gap-1 mt-2 text-[11px] text-muted">
                       <span>
-                        Tips: Geser foto untuk susun urutan, atau tekan{" "}
-                        <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-medium">
+                        Tips: Geser (drag &amp; drop) foto untuk mengubah urutan (Foto 1 = foto utama), atau tekan{" "}
+                        <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-mono">
                           Ctrl+V
                         </kbd>{" "}
                         /{" "}
-                        <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-medium">
+                        <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-mono">
                           ⌘+V
                         </kbd>{" "}
                         untuk paste.
@@ -765,35 +670,9 @@ export default function ToccoExcelModal({
         )}
 
         {successMessage && (
-          <div className="space-y-2">
-            <div className="notice notice-success">
-              <Check className="size-4 shrink-0" />
-              <span>{successMessage}</span>
-            </div>
-
-            {sampleLinks.length > 0 && (
-              <div className="rounded-xl border border-line bg-surface p-3 space-y-1.5 text-xs">
-                <span className="font-semibold text-ink flex items-center gap-1.5">
-                  <ExternalLink className="size-3.5 text-brand" />
-                  <span>Uji Link Forwarding Next.js yang Masuk ke Excel:</span>
-                </span>
-                <div className="space-y-1">
-                  {sampleLinks.map((link, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <span className="text-[11px] text-muted shrink-0">Foto {idx + 1}:</span>
-                      <a
-                        href={link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand hover:underline truncate text-[11px]"
-                      >
-                        {link}
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div className="notice notice-success">
+            <Check className="size-4 shrink-0" />
+            <span>{successMessage}</span>
           </div>
         )}
 
@@ -834,3 +713,4 @@ export default function ToccoExcelModal({
     </Modal>
   );
 }
+
