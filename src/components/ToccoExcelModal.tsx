@@ -66,6 +66,7 @@ export default function ToccoExcelModal({
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [units, setUnits] = useState<UnitState[]>([]);
   const [activeUnitPasteIdx, setActiveUnitPasteIdx] = useState<number | null>(null);
+  const lastPasteTimestampRef = useRef<number>(0);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [processStatus, setProcessStatus] = useState<string>("");
@@ -127,14 +128,51 @@ export default function ToccoExcelModal({
     if (!isOpen) return;
 
     const handlePaste = (e: ClipboardEvent) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
+      // Debounce rapid duplicate paste events (within 300ms)
+      const now = Date.now();
+      if (now - lastPasteTimestampRef.current < 300) {
+        return;
+      }
 
-      const imageFiles: File[] = [];
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith("image/")) {
-          const file = items[i].getAsFile();
-          if (file) imageFiles.push(file);
+      // If user is typing/pasting into an input or textarea, check if text is being pasted
+      const activeEl = document.activeElement;
+      if (
+        activeEl instanceof HTMLTextAreaElement ||
+        activeEl instanceof HTMLInputElement
+      ) {
+        const text = e.clipboardData?.getData("text/plain");
+        if (text && text.trim().length > 0) {
+          // Allow normal text pasting into textarea/input
+          return;
+        }
+      }
+
+      // Extract image files from clipboard
+      let imageFiles: File[] = [];
+
+      // 1. Check e.clipboardData.files first
+      const rawFiles = e.clipboardData?.files;
+      if (rawFiles && rawFiles.length > 0) {
+        for (let i = 0; i < rawFiles.length; i++) {
+          if (rawFiles[i].type.startsWith("image/")) {
+            imageFiles.push(rawFiles[i]);
+          }
+        }
+      }
+
+      // 2. Fallback to clipboardData.items if no files found
+      // Note: A single clipboard copy often exposes multiple MIME types (e.g. image/png and image/jpeg).
+      // We must only take 1 image file to prevent duplicate entries!
+      if (imageFiles.length === 0 && e.clipboardData?.items) {
+        const items = e.clipboardData.items;
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.startsWith("image/")) {
+            const file = items[i].getAsFile();
+            if (file) {
+              imageFiles.push(file);
+              break; // Prevent adding secondary format representation of the same image
+            }
+          }
         }
       }
 
@@ -146,6 +184,7 @@ export default function ToccoExcelModal({
           : 0;
 
       if (units.length > 0 && targetUnitIdx >= 0) {
+        lastPasteTimestampRef.current = now;
         e.preventDefault();
         addFilesToUnit(targetUnitIdx, imageFiles);
       }
@@ -156,30 +195,38 @@ export default function ToccoExcelModal({
   }, [isOpen, activeUnitPasteIdx, units.length]);
 
   const addFilesToUnit = (unitIdx: number, newFiles: File[]) => {
+    if (!newFiles || newFiles.length === 0) return;
+
+    // Create unique item representations outside setUnits (avoid duplicate createObjectURL calls)
+    const newItems: UnitImageItem[] = newFiles.map((file) => ({
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
     setUnits((prev) => {
-      const next = [...prev];
-      const target = next[unitIdx];
+      const target = prev[unitIdx];
       if (!target) return prev;
 
       const remainingSlots = 5 - target.images.length;
       if (remainingSlots <= 0) return prev;
 
-      const filesToAdd = newFiles.slice(0, remainingSlots);
-      const newItems: UnitImageItem[] = filesToAdd.map((file) => ({
-        id: `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        file,
-        previewUrl: URL.createObjectURL(file),
-      }));
+      const itemsToAdd = newItems.slice(0, remainingSlots);
 
-      target.images = [...target.images, ...newItems];
-      return next;
+      // Pure immutable update: never mutate target or prev
+      return prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        return {
+          ...u,
+          images: [...u.images, ...itemsToAdd],
+        };
+      });
     });
   };
 
   const removeImageFromUnit = (unitIdx: number, imgIdx: number) => {
     setUnits((prev) => {
-      const next = [...prev];
-      const target = next[unitIdx];
+      const target = prev[unitIdx];
       if (!target) return prev;
 
       const removed = target.images[imgIdx];
@@ -187,8 +234,14 @@ export default function ToccoExcelModal({
         URL.revokeObjectURL(removed.previewUrl);
       }
 
-      target.images = target.images.filter((_, i) => i !== imgIdx);
-      return next;
+      // Pure immutable update
+      return prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        return {
+          ...u,
+          images: u.images.filter((_, idx) => idx !== imgIdx),
+        };
+      });
     });
   };
 
@@ -561,3 +614,4 @@ export default function ToccoExcelModal({
     </Modal>
   );
 }
+
