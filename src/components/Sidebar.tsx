@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag } from "lucide-react";
+import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag, FileSpreadsheet } from "lucide-react";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 export type StatusView = "all" | "pending" | "executed" | "priority";
@@ -19,6 +19,7 @@ interface SidebarProps {
   onOpenHargaExtractor?: () => void;
   onOpenPromptModal?: () => void;
   onOpenToccoModal?: () => void;
+  onOpenToccoExcelModal?: () => void;
   onOpenColorPicker?: (category: string) => void;
   firebaseStatus: "connected" | "offline" | "syncing";
   isOpenMobile: boolean;
@@ -38,6 +39,7 @@ export default function Sidebar({
   onOpenHargaExtractor,
   onOpenPromptModal,
   onOpenToccoModal,
+  onOpenToccoExcelModal,
   onOpenColorPicker,
   firebaseStatus,
   isOpenMobile,
@@ -175,6 +177,14 @@ export default function Sidebar({
               >
                 <ShoppingBag className="size-4 shrink-0" />
                 <span className="truncate">Prompt Tocco</span>
+              </button>
+              <button
+                type="button"
+                onClick={pick(() => onOpenToccoExcelModal?.())}
+                className="nav-item"
+              >
+                <FileSpreadsheet className="size-4 shrink-0" />
+                <span className="truncate">JSON ke Excel Toco</span>
               </button>
               <button
                 type="button"
