@@ -12,6 +12,7 @@ import {
   ClipboardPaste,
   Image as ImageIcon,
   X,
+  GripVertical,
 } from "lucide-react";
 import Modal from "./Modal";
 import { generateTocoExcel, TocoProductRow } from "@/lib/tocoExcelHelper";
@@ -66,6 +67,8 @@ export default function ToccoExcelModal({
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [units, setUnits] = useState<UnitState[]>([]);
   const [activeUnitPasteIdx, setActiveUnitPasteIdx] = useState<number | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{ unitIdx: number; imgIdx: number } | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<{ unitIdx: number; imgIdx: number } | null>(null);
   const lastPasteTimestampRef = useRef<number>(0);
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -240,6 +243,24 @@ export default function ToccoExcelModal({
         return {
           ...u,
           images: u.images.filter((_, idx) => idx !== imgIdx),
+        };
+      });
+    });
+  };
+
+  const reorderImages = (unitIdx: number, fromIdx: number, toIdx: number) => {
+    if (fromIdx === toIdx) return;
+    setUnits((prev) => {
+      return prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const newImages = [...u.images];
+        if (fromIdx >= newImages.length) return u;
+        const safeToIdx = Math.min(toIdx, newImages.length - 1);
+        const [moved] = newImages.splice(fromIdx, 1);
+        newImages.splice(safeToIdx, 0, moved);
+        return {
+          ...u,
+          images: newImages,
         };
       });
     });
@@ -477,36 +498,114 @@ export default function ToccoExcelModal({
                       </div>
                     </div>
 
-                    {/* Slots Gambar 1-5 */}
+                    {/* Slots Gambar 1-5 dengan Drag & Snap Reorder */}
                     <div className="grid grid-cols-5 gap-2">
                       {[0, 1, 2, 3, 4].map((slotIdx) => {
                         const img = unit.images[slotIdx];
+                        const isSlotOccupied = Boolean(img);
+                        const isBeingDragged =
+                          draggedItem?.unitIdx === uIdx && draggedItem?.imgIdx === slotIdx;
+                        const isSnapTarget =
+                          dragOverItem?.unitIdx === uIdx &&
+                          dragOverItem?.imgIdx === slotIdx &&
+                          draggedItem?.imgIdx !== slotIdx;
 
                         return (
                           <div
                             key={slotIdx}
-                            className="relative aspect-square rounded-lg border border-dashed border-line bg-canvas flex flex-col items-center justify-center p-1 overflow-hidden group/slot"
+                            draggable={isSlotOccupied}
+                            onDragStart={(e) => {
+                              if (!isSlotOccupied) return;
+                              setDraggedItem({ unitIdx: uIdx, imgIdx: slotIdx });
+                              e.dataTransfer.effectAllowed = "move";
+                              e.dataTransfer.setData("text/plain", `${uIdx}:${slotIdx}`);
+                            }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (draggedItem && draggedItem.unitIdx === uIdx) {
+                                e.dataTransfer.dropEffect = "move";
+                                if (
+                                  dragOverItem?.unitIdx !== uIdx ||
+                                  dragOverItem?.imgIdx !== slotIdx
+                                ) {
+                                  setDragOverItem({ unitIdx: uIdx, imgIdx: slotIdx });
+                                }
+                              }
+                            }}
+                            onDragLeave={(e) => {
+                              e.preventDefault();
+                              if (
+                                dragOverItem?.unitIdx === uIdx &&
+                                dragOverItem?.imgIdx === slotIdx
+                              ) {
+                                setDragOverItem(null);
+                              }
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              // Check if dropping an internal dragged image for reordering
+                              if (draggedItem && draggedItem.unitIdx === uIdx) {
+                                const fromIdx = draggedItem.imgIdx;
+                                const toIdx = Math.min(slotIdx, unit.images.length - 1);
+                                reorderImages(uIdx, fromIdx, toIdx);
+                                setDraggedItem(null);
+                                setDragOverItem(null);
+                                return;
+                              }
+
+                              // Check if dropping external files from desktop/folder
+                              const droppedFiles = Array.from(e.dataTransfer.files || []).filter((f) =>
+                                f.type.startsWith("image/")
+                              );
+                              if (droppedFiles.length > 0) {
+                                addFilesToUnit(uIdx, droppedFiles);
+                              }
+                              setDraggedItem(null);
+                              setDragOverItem(null);
+                            }}
+                            onDragEnd={() => {
+                              setDraggedItem(null);
+                              setDragOverItem(null);
+                            }}
+                            className={`relative aspect-square rounded-lg border transition-all duration-200 flex flex-col items-center justify-center p-1 overflow-hidden select-none group/slot ${
+                              isBeingDragged
+                                ? "opacity-30 scale-95 border-dashed border-brand bg-brand-soft/30 ring-2 ring-brand/40"
+                                : isSnapTarget
+                                ? "scale-105 border-brand ring-2 ring-brand shadow-md bg-brand-soft/50 z-10"
+                                : isSlotOccupied
+                                ? "border-line bg-canvas cursor-grab active:cursor-grabbing hover:border-brand/60 hover:shadow-xs"
+                                : "border-dashed border-line bg-canvas hover:border-brand/40"
+                            }`}
                           >
                             {img ? (
                               <>
                                 <img
                                   src={img.previewUrl}
                                   alt={`Foto ${slotIdx + 1}`}
-                                  className="size-full object-cover rounded-md"
+                                  className="size-full object-cover rounded-md pointer-events-none"
                                 />
+                                <div
+                                  className="absolute top-1 left-1 p-0.5 rounded bg-black/60 text-white opacity-0 group-hover/slot:opacity-100 transition-opacity pointer-events-none"
+                                  title="Geser untuk ubah urutan"
+                                >
+                                  <GripVertical className="size-3" />
+                                </div>
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     removeImageFromUnit(uIdx, slotIdx);
                                   }}
-                                  className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-danger transition-colors cursor-pointer"
+                                  className="absolute top-1 right-1 p-1 rounded-full bg-black/60 text-white hover:bg-danger transition-colors cursor-pointer z-10"
                                   title="Hapus foto"
                                 >
                                   <X className="size-3" />
                                 </button>
-                                <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded text-[9px] bg-black/60 text-white font-medium">
-                                  Foto {slotIdx + 1}
+                                <span className="absolute bottom-1 left-1 px-1 py-0.5 rounded text-[9px] bg-black/60 text-white font-medium pointer-events-none">
+                                  Foto {slotIdx + 1}{slotIdx === 0 ? " (Utama)" : ""}
                                 </span>
                               </>
                             ) : (
@@ -539,9 +638,9 @@ export default function ToccoExcelModal({
                       })}
                     </div>
 
-                    <div className="flex items-center justify-between mt-2 text-[11px] text-muted">
+                    <div className="flex flex-wrap items-center justify-between gap-1 mt-2 text-[11px] text-muted">
                       <span>
-                        Tips: Klik kartu ini lalu tekan{" "}
+                        Tips: Geser (drag &amp; drop) foto untuk mengubah urutan (Foto 1 = foto utama), atau tekan{" "}
                         <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-mono">
                           Ctrl+V
                         </kbd>{" "}
@@ -549,9 +648,9 @@ export default function ToccoExcelModal({
                         <kbd className="px-1 py-0.5 rounded bg-subtle border border-line text-[10px] font-mono">
                           ⌘+V
                         </kbd>{" "}
-                        untuk paste gambar langsung dari clipboard.
+                        untuk paste.
                       </span>
-                      <span className="font-medium shrink-0">
+                      <span className="font-medium shrink-0 ml-auto">
                         {unit.images.length}/5 foto
                       </span>
                     </div>
