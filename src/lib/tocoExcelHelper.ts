@@ -100,20 +100,20 @@ function buildRowXml(item: TocoProductRow, rowIdx: number): string {
     const rawVal = item[key];
 
     if (rawVal === undefined || rawVal === null || rawVal === "") {
-      cells.push(`<c r="${cellRef}" t="inlineStr"><is><t></t></is></c>`);
+      cells.push(`<c r="${cellRef}" s="1" t="inlineStr"><is><t></t></is></c>`);
       continue;
     }
 
     if (NUMERIC_KEYS.has(key)) {
       const num = Number(rawVal);
       if (!isNaN(num) && rawVal !== "") {
-        cells.push(`<c r="${cellRef}"><v>${num}</v></c>`);
+        cells.push(`<c r="${cellRef}" s="1"><v>${num}</v></c>`);
       } else {
-        cells.push(`<c r="${cellRef}" t="inlineStr"><is><t></t></is></c>`);
+        cells.push(`<c r="${cellRef}" s="1" t="inlineStr"><is><t></t></is></c>`);
       }
     } else {
       const escaped = escapeXml(String(rawVal));
-      cells.push(`<c r="${cellRef}" t="inlineStr"><is><t>${escaped}</t></is></c>`);
+      cells.push(`<c r="${cellRef}" s="1" t="inlineStr"><is><t>${escaped}</t></is></c>`);
     }
   }
 
@@ -157,6 +157,9 @@ export async function generateTocoExcel(
     `$1${rowXmls.join("")}$3`
   );
 
+  // Hapus proteksi sheet agar sel bebas diseleksi dan diedit tanpa password
+  sheetXml = sheetXml.replace(/<sheetProtection[^>]*\/>/g, "");
+
   // Update dimension in sheet3.xml
   sheetXml = sheetXml.replace(
     /<dimension ref="A1:AA\d+"\/>/,
@@ -168,7 +171,7 @@ export async function generateTocoExcel(
   if (tableXml) {
     tableXml = tableXml.replace(
       /ref="A1:AA\d+"/g,
-      `ref="A1:AA${Math.max(20, endRow)}"`
+      `ref="A1:AA${endRow}"`
     );
     zip.file("xl/tables/table28.xml", tableXml);
   }
