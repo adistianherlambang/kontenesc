@@ -35,8 +35,9 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     sku: string;
     merk: string;
     tipe: string;
-    nama_lengkap: string;
-    ram_rom: string;
+    varian_ini: string;
+    semua_varian_model_ini: string;
+    format_awalan_judul: string;
     harga_rupiah: number;
     cashback_rupiah: number;
     harga_diskon_rupiah: number | "";
@@ -44,6 +45,26 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
 
   let counter = 1;
   units.forEach((u) => {
+    // Kumpulkan seluruh varian RAM yang ada pada model ini
+    const allRamList =
+      u.seriList && u.seriList.length > 0
+        ? u.seriList.map((s) => s.ram).filter(Boolean)
+        : u.ram
+        ? [u.ram]
+        : [];
+
+    // Format varian lengkap, contoh: "8/128GB 8/256 12/256"
+    const semuaVarianStr =
+      allRamList.length > 0
+        ? allRamList
+            .map((r, i) => (i === 0 ? `${r}GB` : r))
+            .join(" ")
+        : "-";
+
+    const formatAwalanJudul = `${u.merk.toUpperCase()} ${u.tipe.toUpperCase()}${
+      semuaVarianStr !== "-" ? ` ${semuaVarianStr}` : ""
+    }`;
+
     if (u.seriList && u.seriList.length > 1) {
       u.seriList.forEach((seri) => {
         const hn = toRupiahNumber(seri.harga);
@@ -51,14 +72,14 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
         const hd = cb > 0 ? Math.max(0, hn - cb) : "";
         const ramStr = seri.ram ? `${seri.ram}` : "";
         const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
-        const namaLengkap = `${u.merk} ${u.tipe}${ramStr ? ` ${ramStr}GB` : ""}${u.nama ? ` (${u.nama})` : ""}`;
         expandedUnits.push({
           no_urut: counter++,
           sku,
           merk: u.merk,
           tipe: u.tipe,
-          nama_lengkap: namaLengkap,
-          ram_rom: ramStr ? `${ramStr}GB` : "-",
+          varian_ini: ramStr ? `${ramStr}GB` : "-",
+          semua_varian_model_ini: semuaVarianStr,
+          format_awalan_judul: formatAwalanJudul,
           harga_rupiah: hn,
           cashback_rupiah: cb,
           harga_diskon_rupiah: hd,
@@ -70,14 +91,14 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
       const hd = cb > 0 ? Math.max(0, hn - cb) : "";
       const ramStr = u.ram ? `${u.ram}` : "";
       const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
-      const namaLengkap = `${u.merk} ${u.tipe}${ramStr ? ` ${ramStr}GB` : ""}${u.nama ? ` (${u.nama})` : ""}`;
       expandedUnits.push({
         no_urut: counter++,
         sku,
         merk: u.merk,
         tipe: u.tipe,
-        nama_lengkap: namaLengkap,
-        ram_rom: ramStr ? `${ramStr}GB` : "-",
+        varian_ini: ramStr ? `${ramStr}GB` : "-",
+        semua_varian_model_ini: semuaVarianStr,
+        format_awalan_judul: formatAwalanJudul,
         harga_rupiah: hn,
         cashback_rupiah: cb,
         harga_diskon_rupiah: hd,
@@ -90,11 +111,11 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     "Main Category": "handphone-tablet",
     "Sub Category 1": "handphone",
     "Sub Category 2": "android-os",
-    "Judul": "realme 16 5G 12/256GB Prosesor Dimensity 6400 Turbo Layar 6.57” AMOLED 120Hz Kamera 50MP Sony AI Baterai 7000mAh 60W Ultra Charge Garansi Resmi 1 Tahun",
-    "Deskripsi": "Produk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi.",
-    "Harga": 4599000,
-    "Harga Diskon": "",
-    "SKU": "ANDROID-REALME-16 5G-12/256",
+    "Judul": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun",
+    "Deskripsi": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi SAMSUNG, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center SAMSUNG di Indonesia.\\n\\nPilihan RAM / Storage : 8/128GB, 8/256GB, 12/256GB\\nProsesor : Samsung Exynos 1680 (4nm)\\nUkuran : 6.7”\\nTeknologi : Super AMOLED+ 120Hz dengan tingkat kecerahan hingga ±1800 nits\\nResolusi : Full HD+ (2340 x 1080)\\nKamera Belakang : 50 MP OIS + 12 MP ultrawide + 5 MP macro\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : Yes\\nKamera Belakang - Zoom : Digital Zoom hingga 10x\\nKamera Depan : 32 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 4K @30fps\\nRAM : 8GB, 12GB (+8GB RAM Plus)\\nROM : 128GB, 256GB UFS 3.1\\nSIM Tray : Dual-SIM (Hybrid)\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Stereo speaker Dolby Atmos\\nBaterai : 5000 mAh\\nFast Charging : 45W Super Fast Charging\\nKeamanan : In-display Fingerprint, Samsung Knox Vault\\nSistem Operasi : Android\\nLainnya : IP67 tahan air dan debu, Circle to Search, Samsung AI\\nWarna : Awesome Navy, Awesome Iceblue, Awesome Lilac\\n\\nIsi dalam box : Ponsel, kabel data USB-C ke USB-C, alat SIM ejector, buku panduan, kartu garansi (tanpa adaptor charger).",
+    "Harga": 4499000,
+    "Harga Diskon": 4199000,
+    "SKU": "ANDROID-SAMSUNG-A57 5G-8/128",
     "Jenis Produk": "Buy Now",
     "Total Stok": 10,
     "Kondisi Barang": "Baru",
@@ -115,17 +136,18 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     "Foto 9": "",
     "Foto 10": "",
     "poster": [
-      { "icon": "processor", "isi": "MediaTek Helio G99 (6nm)" },
-      { "icon": "layar", "isi": "6.7” PLS LCD 90Hz" },
-      { "icon": "kamera", "isi": "50MP Auto Fokus" },
-      { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
+      { "icon": "processor", "isi": "Exynos 1680 (4nm)" },
+      { "icon": "layar", "isi": "6.7” Super AMOLED+ 120Hz" },
+      { "icon": "kamera", "isi": "50MP OIS Utama" },
+      { "icon": "baterai", "isi": "5000mAh 45W Fast Charging" }
     ],
     "warna": [
-      "Black Cloud",
-      "White Swan"
+      "Awesome Navy",
+      "Awesome Iceblue",
+      "Awesome Lilac"
     ],
     "caption": [
-      "realme 16 5G 12/256GB Prosesor Dimensity 6400 Turbo Layar 6.57” AMOLED 120Hz Kamera 50MP Sony AI Baterai 7000mAh 60W Ultra Charge Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi."
+      "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi SAMSUNG, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center SAMSUNG di Indonesia.\\n\\nPilihan RAM / Storage : 8/128GB, 8/256GB, 12/256GB\\nProsesor : Samsung Exynos 1680 (4nm)\\nUkuran : 6.7”\\nTeknologi : Super AMOLED+ 120Hz dengan tingkat kecerahan hingga ±1800 nits\\nResolusi : Full HD+ (2340 x 1080)\\nKamera Belakang : 50 MP OIS + 12 MP ultrawide + 5 MP macro\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : Yes\\nKamera Belakang - Zoom : Digital Zoom hingga 10x\\nKamera Depan : 32 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 4K @30fps\\nRAM : 8GB, 12GB (+8GB RAM Plus)\\nROM : 128GB, 256GB UFS 3.1\\nSIM Tray : Dual-SIM (Hybrid)\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Stereo speaker Dolby Atmos\\nBaterai : 7000 mAh\\nFast Charging : 45W Super Fast Charging\\nKeamanan : In-display Fingerprint, Samsung Knox Vault\\nSistem Operasi : Android\\nLainnya : IP67 tahan air dan debu, Circle to Search, Samsung AI\\nWarna : Awesome Navy, Awesome Iceblue, Awesome Lilac\\n\\nIsi dalam box : Ponsel, kabel data USB-C ke USB-C, alat SIM ejector, buku panduan, kartu garansi (tanpa adaptor charger)."
     ]
   }
 ]`;
@@ -167,12 +189,14 @@ ${JSON.stringify(expandedUnits, null, 2)}
    - Jika \`aksesoris-tablet\`: \`"keyboard-bluetooth"\`, \`"casing-cover-tablet"\`, \`"charger-tablet"\`.
    - Jika \`wearable-devices\`: \`"smart-watch-1"\`, \`"smart-band"\`, \`"aksesoris-wearable-devices"\`.
    - Jika \`power-bank\`: \`"portable-power-bank"\`.
-4. **SATU VARIAN (RAM/ROM) = SATU PRODUK TERPISAH**:
+4. **SATU VARIAN (RAM/ROM) = SATU PRODUK TERPISAH (JUDUL & DESKRIPSI WAJIB MEMUAT SEMUA VARIAN)**:
    - Setiap varian RAM/ROM pada daftar di atas memiliki harga dan SKU tersendiri dan merupakan produk terpisah di Toco (contoh: seri RAM 8/128 dan 8/256 adalah 2 objek produk terpisah dengan harga dan SKU masing-masing).
    - Buatkan tepat 1 objek produk dalam array JSON untuk setiap varian pada daftar di atas (${expandedUnits.length} varian = tepat ${expandedUnits.length} objek JSON).
-   - Pastikan Judul, SKU, Harga, dan spesifikasi RAM/ROM pada Deskripsi disesuaikan dengan varian RAM/ROM masing-masing item.
+   - **ATURAN WAJIB JUDUL (TITLE)**: DILARANG hanya menulis 1 varian RAM/ROM pada Judul! Judul pada SEMUA varian WAJIB mencantumkan seluruh varian RAM yang tersedia untuk model tersebut (gunakan nilai \`format_awalan_judul\` dari daftar di atas).
+     * Contoh format Judul yang BENAR: \`"SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun"\`
+     * Tujuan: Agar semua varian produk tetap muncul pada pencarian pembeli untuk semua kata kunci varian RAM.
 5. **SKU (WAJIB FORMAT BAKU)**:
-   - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A07 5G-4/128"\` atau \`"ANDROID-REALME-16 5G-12/256"\`).
+   - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A57 5G-8/128"\` atau \`"ANDROID-SAMSUNG-A57 5G-8/256"\`).
    - Gunakan langsung nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar varian di atas.
 6. **Harga & Harga Diskon**:
    - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`3499000\`).
@@ -220,13 +244,14 @@ Setiap objek produk di dalam JSON WAJIB memiliki properti \`"warna"\` berupa arr
 Gunakan persis struktur dan urutan baris template baku kita di bawah ini untuk mengisi kolom \`"Deskripsi"\` dan array \`"caption"\` (sesuaikan nama MERK huruf kapital pada bagian Keterangan aktivasi garansi serta seluruh nilai spesifikasi sesuai riset resmi unit terkait):
 
 -----------------------------
-[Nama Unit] [RAM/ROM] Prosesor [Nama Chipset] Layar [Ukuran]” [Panel & Refresh Rate] Kamera [Kamera Utama] Baterai [Kapasitas mAh] [Fast Charging] Garansi Resmi 1 Tahun
+[Awalan Judul dengan SEMUA VARIAN, contoh: SAMSUNG A57 5G 8/128GB 8/256 12/256] Prosesor [Nama Chipset] Layar [Ukuran]” [Panel & Refresh Rate] Kamera [Kamera Utama] Baterai [Kapasitas mAh] [Fast Charging] Garansi Resmi 1 Tahun
 
 Deskripsi:
 Produk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.
 
 Keterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi [NAMA MERK KAPITAL], sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center [NAMA MERK KAPITAL] di Indonesia.
 
+Pilihan RAM/Storage : [Sebutkan seluruh varian yang tersedia, contoh: 8/128GB, 8/256GB, 12/256GB]
 Prosesor : [Nama Prosesor Lengkap]
 Ukuran : [Ukuran Layar]”
 Teknologi : [Tipe Panel, Refresh Rate, dan Tingkat Kecerahan nits]
@@ -238,8 +263,8 @@ Kamera Belakang - Zoom : [Detail Zoom]
 Kamera Depan : [Resolusi Kamera Depan]
 Kamera Depan Auto Fokus : [Yes / No]
 Video Resolusi : [Resolusi Rekaman Video Maksimal & FPS]
-RAM : [Kapasitas RAM + Extended/Dynamic RAM]
-ROM : [Kapasitas ROM & Tipe Storage UFS/eMMC]
+RAM : [Kapasitas seluruh varian RAM + Extended/Dynamic RAM jika ada, contoh: 8GB, 12GB (+8GB RAM Plus)]
+ROM : [Kapasitas seluruh varian ROM & Tipe Storage, contoh: 128GB, 256GB UFS 3.1]
 SIM Tray : [Single-SIM / Dual-SIM / Hybrid]
 Jaringan : [2G / 4G / 5G]
 USB : [Tipe Port USB, misal USB Type-C]

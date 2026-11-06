@@ -65,11 +65,11 @@ const SAMPLE_JSON = `[
     "Main Category": "handphone-tablet",
     "Sub Category 1": "handphone",
     "Sub Category 2": "android-os",
-    "Judul": "Samsung Galaxy A07 5G 4/128GB Layar 6.7” 90Hz Kamera 50MP Baterai 5000mAh Garansi Resmi 1 Tahun",
-    "Deskripsi": "Produk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun.",
-    "Harga": 2399000,
-    "Harga Diskon": 2199000,
-    "SKU": "ANDROID-SAMSUNG-A07 5G-4/128",
+    "Judul": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun",
+    "Deskripsi": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun.\\n\\nPilihan RAM / Storage : 8/128GB, 8/256GB, 12/256GB\\nProsesor : Samsung Exynos 1680 (4nm)\\nUkuran : 6.7”\\nTeknologi : Super AMOLED+ 120Hz\\nResolusi : Full HD+ (2340 x 1080)\\nKamera Belakang : 50 MP OIS + 12 MP ultrawide + 5 MP macro\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : Yes\\nKamera Depan : 32 MP\\nRAM : 8GB, 12GB\\nROM : 128GB, 256GB\\nBaterai : 5000 mAh\\nFast Charging : 45W Super Fast Charging\\nWarna : Awesome Navy, Awesome Iceblue, Awesome Lilac\\n\\nIsi dalam box : Ponsel, kabel USB-C ke USB-C, alat SIM ejector, buku panduan, kartu garansi resmi.",
+    "Harga": 4499000,
+    "Harga Diskon": 4199000,
+    "SKU": "ANDROID-SAMSUNG-A57 5G-8/128",
     "Jenis Produk": "Buy Now",
     "Total Stok": 10,
     "Kondisi Barang": "Baru",
@@ -79,15 +79,15 @@ const SAMPLE_JSON = `[
     "Height": 6,
     "Width": 10,
     "poster": [
-      { "icon": "processor", "isi": "MediaTek Helio G99 (6nm)" },
-      { "icon": "layar", "isi": "6.7” PLS LCD 90Hz" },
-      { "icon": "kamera", "isi": "50MP Auto Fokus" },
-      { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
+      { "icon": "processor", "isi": "Exynos 1680 (4nm)" },
+      { "icon": "layar", "isi": "6.7” Super AMOLED+ 120Hz" },
+      { "icon": "kamera", "isi": "50MP OIS Utama" },
+      { "icon": "baterai", "isi": "5000mAh 45W Fast Charging" }
     ],
     "warna": [
-      "Awesome Black",
-      "Awesome Light Blue",
-      "Awesome Light Green"
+      "Awesome Navy",
+      "Awesome Iceblue",
+      "Awesome Lilac"
     ]
   }
 ]`;
