@@ -114,6 +114,13 @@ export default function ToccoPromptModal({
     return allUnits.filter((u) => selectedIds.has(u.id));
   }, [allUnits, selectedIds]);
 
+  const totalVariantsCount = useMemo(() => {
+    return selectedUnits.reduce((acc, u) => {
+      const seriCount = u.seriList && u.seriList.length > 0 ? u.seriList.length : 1;
+      return acc + seriCount;
+    }, 0);
+  }, [selectedUnits]);
+
   const handlePriceFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -300,7 +307,7 @@ export default function ToccoPromptModal({
           <div className="space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <label className="field-label mb-0">
-                Pilih Unit ({selectedUnits.length} dipilih) <span className="text-danger">*</span>
+                Pilih Unit ({selectedUnits.length} tipe{totalVariantsCount > selectedUnits.length ? ` / ${totalVariantsCount} varian` : ""} dipilih) <span className="text-danger">*</span>
               </label>
 
               <div className="flex items-center gap-2">
@@ -446,7 +453,13 @@ export default function ToccoPromptModal({
           className="btn btn-primary"
         >
           {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-          <span>{copied ? "Tersalin" : "Salin Prompt"}</span>
+          <span>
+            {copied
+              ? "Tersalin"
+              : totalVariantsCount > selectedUnits.length
+              ? `Salin Prompt (${selectedUnits.length} Tipe / ${totalVariantsCount} Varian)`
+              : `Salin Prompt (${selectedUnits.length} Unit)`}
+          </span>
         </button>
       </Modal.Footer>
     </Modal>

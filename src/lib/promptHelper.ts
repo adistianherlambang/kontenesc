@@ -30,45 +30,59 @@ function toRupiahNumber(val: number): number {
 export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
   if (!units || units.length === 0) return "";
 
-  const formattedUnits = units.map((u, idx) => {
-    const hargaNormal = toRupiahNumber(u.harga);
-    const nominalCashback = toRupiahNumber(u.cashback);
-    const hargaDiskon = nominalCashback > 0 ? Math.max(0, hargaNormal - nominalCashback) : "";
-    const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${u.ram ? `-${u.ram}` : ""}`;
+  const expandedUnits: Array<{
+    no_urut: number;
+    sku: string;
+    merk: string;
+    tipe: string;
+    nama_lengkap: string;
+    ram_rom: string;
+    harga_rupiah: number;
+    cashback_rupiah: number;
+    harga_diskon_rupiah: number | "";
+  }> = [];
 
-    const hasMultiRam = (u.seriList?.length || 0) > 1;
-    const ramOptions = hasMultiRam
-      ? u.seriList!.map((s) => (s.ram ? `${s.ram}GB` : "")).filter(Boolean)
-      : u.ram
-      ? [`${u.ram}GB`]
-      : [];
-
-    const seriDetail = hasMultiRam
-      ? u.seriList!.map((s) => {
-          const hn = toRupiahNumber(s.harga);
-          const cb = toRupiahNumber(s.cashback);
-          const hd = cb > 0 ? Math.max(0, hn - cb) : "";
-          return {
-            ram_rom: s.ram ? `${s.ram}GB` : "-",
-            harga_rupiah: hn,
-            harga_diskon_rupiah: hd,
-          };
-        })
-      : undefined;
-
-    return {
-      no_urut: idx + 1,
-      sku,
-      merk: u.merk,
-      tipe: u.tipe,
-      nama_lengkap: u.nama ? `${u.merk} ${u.tipe} (${u.nama})` : `${u.merk} ${u.tipe}`,
-      ram_rom_dasar: u.ram ? `${u.ram}GB` : "-",
-      ...(ramOptions.length > 1 ? { opsi_pilihan_ram_rom: ramOptions } : {}),
-      ...(seriDetail ? { daftar_harga_per_seri: seriDetail } : {}),
-      harga_rupiah: hargaNormal,
-      cashback_rupiah: nominalCashback,
-      harga_diskon_rupiah: hargaDiskon,
-    };
+  let counter = 1;
+  units.forEach((u) => {
+    if (u.seriList && u.seriList.length > 1) {
+      u.seriList.forEach((seri) => {
+        const hn = toRupiahNumber(seri.harga);
+        const cb = toRupiahNumber(seri.cashback);
+        const hd = cb > 0 ? Math.max(0, hn - cb) : "";
+        const ramStr = seri.ram ? `${seri.ram}` : "";
+        const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
+        const namaLengkap = `${u.merk} ${u.tipe}${ramStr ? ` ${ramStr}GB` : ""}${u.nama ? ` (${u.nama})` : ""}`;
+        expandedUnits.push({
+          no_urut: counter++,
+          sku,
+          merk: u.merk,
+          tipe: u.tipe,
+          nama_lengkap: namaLengkap,
+          ram_rom: ramStr ? `${ramStr}GB` : "-",
+          harga_rupiah: hn,
+          cashback_rupiah: cb,
+          harga_diskon_rupiah: hd,
+        });
+      });
+    } else {
+      const hn = toRupiahNumber(u.harga);
+      const cb = toRupiahNumber(u.cashback);
+      const hd = cb > 0 ? Math.max(0, hn - cb) : "";
+      const ramStr = u.ram ? `${u.ram}` : "";
+      const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
+      const namaLengkap = `${u.merk} ${u.tipe}${ramStr ? ` ${ramStr}GB` : ""}${u.nama ? ` (${u.nama})` : ""}`;
+      expandedUnits.push({
+        no_urut: counter++,
+        sku,
+        merk: u.merk,
+        tipe: u.tipe,
+        nama_lengkap: namaLengkap,
+        ram_rom: ramStr ? `${ramStr}GB` : "-",
+        harga_rupiah: hn,
+        cashback_rupiah: cb,
+        harga_diskon_rupiah: hd,
+      });
+    }
   });
 
   const exampleOutput = `[
@@ -119,11 +133,11 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
   return `Bertindaklah sebagai E-Commerce Product Specialist & Technical Researcher profesional untuk "Eldorado Semarang Cell".
 
 TUGAS UTAMA:
-Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi), array \`warna\` (daftar variasi warna resmi di Indonesia), dan array \`caption\` (sesuai template baku toko) untuk ${units.length} unit pilihan berikut ini:
+Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi), array \`warna\` (daftar variasi warna resmi di Indonesia), dan array \`caption\` (sesuai template baku toko) untuk ${expandedUnits.length} varian produk berikut ini:
 
-### DAFTAR UNIT PILIHAN DARI DAFTAR HARGA TOKO:
+### DAFTAR VARIAN PRODUK DARI DAFTAR HARGA TOKO:
 \`\`\`json
-${JSON.stringify(formattedUnits, null, 2)}
+${JSON.stringify(expandedUnits, null, 2)}
 \`\`\`
 
 ---
@@ -153,18 +167,16 @@ ${JSON.stringify(formattedUnits, null, 2)}
    - Jika \`aksesoris-tablet\`: \`"keyboard-bluetooth"\`, \`"casing-cover-tablet"\`, \`"charger-tablet"\`.
    - Jika \`wearable-devices\`: \`"smart-watch-1"\`, \`"smart-band"\`, \`"aksesoris-wearable-devices"\`.
    - Jika \`power-bank\`: \`"portable-power-bank"\`.
-4. **SATU TIPE = SATU PRODUK (PENGGABUNGAN SERI RAM/STORAGE)**:
-   - Buatkan tepat 1 objek produk dalam array JSON untuk setiap unit di daftar pilihan di atas (${units.length} unit = tepat ${units.length} objek JSON).
-   - Jika suatu unit memiliki opsi beberapa seri RAM/ROM (tercantum di "opsi_pilihan_ram_rom" atau "daftar_harga_per_seri", misal RAM 8/128, 8/256, 12/256):
-     * DILARANG membuat produk terpisah untuk tiap RAM. Cukup 1 produk saja untuk tipe tersebut!
-     * Gunakan RAM/ROM dasar/terendah sebagai acuan untuk Judul, SKU, dan Harga awal.
-     * Pada kolom "Deskripsi", tuliskan seluruh pilihan RAM/ROM yang tersedia (contoh: "Pilihan RAM/Storage : 8/128GB, 8/256GB, 12/256GB").
+4. **SATU VARIAN (RAM/ROM) = SATU PRODUK TERPISAH**:
+   - Setiap varian RAM/ROM pada daftar di atas memiliki harga dan SKU tersendiri dan merupakan produk terpisah di Toco (contoh: seri RAM 8/128 dan 8/256 adalah 2 objek produk terpisah dengan harga dan SKU masing-masing).
+   - Buatkan tepat 1 objek produk dalam array JSON untuk setiap varian pada daftar di atas (${expandedUnits.length} varian = tepat ${expandedUnits.length} objek JSON).
+   - Pastikan Judul, SKU, Harga, dan spesifikasi RAM/ROM pada Deskripsi disesuaikan dengan varian RAM/ROM masing-masing item.
 5. **SKU (WAJIB FORMAT BAKU)**:
-   - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A07 5G-4/128"\`).
-   - Gunakan langsung nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar unit pilihan di atas.
+   - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A07 5G-4/128"\` atau \`"ANDROID-REALME-16 5G-12/256"\`).
+   - Gunakan langsung nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar varian di atas.
 6. **Harga & Harga Diskon**:
    - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`3499000\`).
-   - Gunakan \`harga_rupiah\` dari daftar unit di atas untuk kolom \`"Harga"\`, dan \`harga_diskon_rupiah\` untuk kolom \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
+   - Gunakan \`harga_rupiah\` dari daftar varian di atas untuk kolom \`"Harga"\`, dan \`harga_diskon_rupiah\` untuk kolom \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
 7. **Berat & Ukuran**:
    - \`"Berat Produk"\`: angka dalam gram tanpa satuan (contoh: \`500\` untuk HP, \`800\` untuk Tablet).
    - \`"Length"\`, \`"Height"\`, \`"Width"\`: angka dalam cm tanpa satuan (contoh: Length \`18\`, Height \`6\`, Width \`10\`).
@@ -249,7 +261,7 @@ Isi dalam box : [Daftar isi kelengkapan resmi di dalam kotak penjualan Indonesia
 ---
 
 ### FORMAT OUTPUT WAJIB (JSON):
-Berikan output berupa SATU array JSON valid berisi seluruh ${units.length} unit yang dipilih tanpa terpotong, dengan skema persis seperti contoh berikut:
+Berikan output berupa SATU array JSON valid berisi seluruh ${expandedUnits.length} varian produk yang dipilih tanpa terpotong, dengan skema persis seperti contoh berikut:
 ${exampleOutput}`;
 }
 

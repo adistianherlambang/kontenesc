@@ -55,6 +55,11 @@ const NUMERIC_KEYS = new Set([
   "Width",
 ]);
 
+function formatRupiah(val: number): string {
+  if (!val || isNaN(val)) return "-";
+  return "Rp " + Math.round(val).toLocaleString("id-ID");
+}
+
 const SAMPLE_JSON = `[
   {
     "Main Category": "handphone-tablet",
@@ -63,7 +68,7 @@ const SAMPLE_JSON = `[
     "Judul": "Samsung Galaxy A07 5G 4/128GB Layar 6.7” 90Hz Kamera 50MP Baterai 5000mAh Garansi Resmi 1 Tahun",
     "Deskripsi": "Produk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun.",
     "Harga": 2399000,
-    "Harga Diskon": "",
+    "Harga Diskon": 2199000,
     "SKU": "ANDROID-SAMSUNG-A07 5G-4/128",
     "Jenis Produk": "Buy Now",
     "Total Stok": 10,
@@ -107,6 +112,7 @@ export default function ToccoExcelModal({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [colorInputs, setColorInputs] = useState<Record<number, string>>({});
+  const [diskonInputs, setDiskonInputs] = useState<Record<number, string>>({});
 
   // Parse JSON input whenever it changes via user typing or sample button
   useEffect(() => {
@@ -116,6 +122,7 @@ export default function ToccoExcelModal({
     if (!jsonInput.trim()) {
       setUnits([]);
       setColorInputs({});
+      setDiskonInputs({});
       setJsonError(null);
       isTypingJsonRef.current = false;
       return;
@@ -129,11 +136,28 @@ export default function ToccoExcelModal({
         setJsonError("Array JSON kosong.");
         setUnits([]);
         setColorInputs({});
+        setDiskonInputs({});
         isTypingJsonRef.current = false;
         return;
       }
 
       setColorInputs({});
+      const initialDiskon: Record<number, string> = {};
+      arr.forEach((item: any, idx: number) => {
+        const h = Number(item.Harga) || 0;
+        const hd =
+          item["Harga Diskon"] !== "" &&
+          item["Harga Diskon"] !== undefined &&
+          item["Harga Diskon"] !== null
+            ? Number(item["Harga Diskon"])
+            : 0;
+        if (h > 0 && hd > 0 && h > hd) {
+          initialDiskon[idx] = String(h - hd);
+        } else {
+          initialDiskon[idx] = "";
+        }
+      });
+      setDiskonInputs(initialDiskon);
       setUnits((prevUnits) => {
         return arr.map((item: any, idx: number) => {
           const sku =
@@ -199,6 +223,7 @@ export default function ToccoExcelModal({
     } catch (err: any) {
       setJsonError("Format JSON belum valid: " + err.message);
       setUnits([]);
+      setDiskonInputs({});
     } finally {
       isTypingJsonRef.current = false;
     }
@@ -374,6 +399,91 @@ export default function ToccoExcelModal({
     });
   };
 
+  const handleUpdateHargaJual = (unitIdx: number, val: string) => {
+    let formattedValue: any = val;
+    if (val === "" || val === null || val === undefined) {
+      formattedValue = "";
+    } else {
+      const num = Number(val);
+      formattedValue = isNaN(num) ? val : num;
+    }
+
+    const currentDiskonStr =
+      diskonInputs[unitIdx] !== undefined
+        ? diskonInputs[unitIdx]
+        : (() => {
+            const u = units[unitIdx];
+            if (!u) return "";
+            const h = Number(u.data.Harga) || 0;
+            const hd =
+              u.data["Harga Diskon"] !== "" &&
+              u.data["Harga Diskon"] !== undefined &&
+              u.data["Harga Diskon"] !== null
+                ? Number(u.data["Harga Diskon"])
+                : 0;
+            return h > 0 && hd > 0 && h > hd ? String(h - hd) : "";
+          })();
+
+    const numDiskon = Number(currentDiskonStr) || 0;
+    const numHarga = Number(formattedValue) || 0;
+
+    let newHargaDiskon = 0;
+    if (numDiskon > 0 && numHarga > 0) {
+      newHargaDiskon = Math.max(0, numHarga - numDiskon);
+    }
+
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const updatedData = {
+          ...u.data,
+          Harga: formattedValue,
+          "Harga Diskon": newHargaDiskon > 0 ? newHargaDiskon : "",
+        };
+        return {
+          ...u,
+          data: updatedData,
+        };
+      });
+
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
+    });
+  };
+
+  const handleUpdateDiskon = (unitIdx: number, val: string) => {
+    setDiskonInputs((prev) => ({ ...prev, [unitIdx]: val }));
+
+    const numDiskon = Number(val) || 0;
+    const currentHarga = Number(units[unitIdx]?.data.Harga) || 0;
+
+    let newHargaDiskon = 0;
+    if (numDiskon > 0 && currentHarga > 0) {
+      newHargaDiskon = Math.max(0, currentHarga - numDiskon);
+    }
+
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const updatedData = {
+          ...u.data,
+          "Harga Diskon": newHargaDiskon > 0 ? newHargaDiskon : "",
+        };
+        return {
+          ...u,
+          data: updatedData,
+        };
+      });
+
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
+    });
+  };
+
   const handleRemoveUnit = (unitIdx: number) => {
     setUnits((prev) => {
       const target = prev[unitIdx];
@@ -397,6 +507,16 @@ export default function ToccoExcelModal({
       }
 
       setColorInputs((prev) => {
+        const next: Record<number, string> = {};
+        Object.entries(prev).forEach(([key, val]) => {
+          const k = Number(key);
+          if (k < unitIdx) next[k] = val;
+          else if (k > unitIdx) next[k - 1] = val;
+        });
+        return next;
+      });
+
+      setDiskonInputs((prev) => {
         const next: Record<number, string> = {};
         Object.entries(prev).forEach(([key, val]) => {
           const k = Number(key);
@@ -700,6 +820,29 @@ export default function ToccoExcelModal({
                     : typeof unit.data.warna === "string"
                     ? unit.data.warna
                     : "";
+
+                const deriveInitialDiskon = (u: UnitState) => {
+                  const h = Number(u.data.Harga) || 0;
+                  const hd =
+                    u.data["Harga Diskon"] !== "" &&
+                    u.data["Harga Diskon"] !== undefined &&
+                    u.data["Harga Diskon"] !== null
+                      ? Number(u.data["Harga Diskon"])
+                      : 0;
+                  if (h > 0 && hd > 0 && h > hd) {
+                    return String(h - hd);
+                  }
+                  return "";
+                };
+
+                const diskonVal =
+                  diskonInputs[uIdx] !== undefined ? diskonInputs[uIdx] : deriveInitialDiskon(unit);
+                const numHarga = Number(unit.data.Harga) || 0;
+                const numDiskon = Number(diskonVal) || 0;
+                const hasDiskon = numHarga > 0 && numDiskon > 0;
+                const setelahDiskon = hasDiskon ? Math.max(0, numHarga - numDiskon) : 0;
+                const persenDiskon =
+                  hasDiskon ? Math.min(100, Math.round((numDiskon / numHarga) * 100)) : 0;
 
                 return (
                   <div
@@ -1022,32 +1165,56 @@ export default function ToccoExcelModal({
                         />
                       </div>
 
-                      {/* Harga, Diskon, Stok, Berat */}
+                      {/* Harga Jual, Diskon, Setelah Diskon, Persentase Diskon */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
-                            Harga (Rp)
+                            Harga Jual (Rp)
                           </label>
                           <input
                             type="number"
                             value={unit.data.Harga ?? ""}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Harga", e.target.value)}
-                            placeholder="2399000"
+                            onChange={(e) => handleUpdateHargaJual(uIdx, e.target.value)}
+                            placeholder="Contoh: 2399000"
                             className="input text-xs"
                           />
                         </div>
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
-                            Harga Diskon (Rp)
+                            Diskon (Rp)
                           </label>
                           <input
                             type="number"
-                            value={unit.data["Harga Diskon"] ?? ""}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Harga Diskon", e.target.value)}
-                            placeholder="Opsional"
+                            value={diskonVal}
+                            onChange={(e) => handleUpdateDiskon(uIdx, e.target.value)}
+                            placeholder="Potongan diskon"
                             className="input text-xs"
                           />
                         </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Setelah Diskon
+                          </label>
+                          <div className="flex items-center min-h-[34px] px-3 rounded-lg border border-line bg-canvas/60 text-xs font-semibold text-ink select-all">
+                            {hasDiskon ? formatRupiah(setelahDiskon) : "-"}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Persentase Diskon
+                          </label>
+                          <div className="flex items-center min-h-[34px] px-3 rounded-lg border border-line bg-canvas/60 text-xs font-semibold">
+                            {hasDiskon ? (
+                              <span className="text-danger font-bold">-{persenDiskon}%</span>
+                            ) : (
+                              <span className="text-muted font-normal">-</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Stok & Berat */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
                             Total Stok
