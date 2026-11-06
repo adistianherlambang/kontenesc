@@ -78,6 +78,11 @@ const SAMPLE_JSON = `[
       { "icon": "layar", "isi": "6.7” PLS LCD 90Hz" },
       { "icon": "kamera", "isi": "50MP Auto Fokus" },
       { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
+    ],
+    "warna": [
+      "Awesome Black",
+      "Awesome Light Blue",
+      "Awesome Light Green"
     ]
   }
 ]`;
@@ -101,6 +106,7 @@ export default function ToccoExcelModal({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [newColorInputs, setNewColorInputs] = useState<Record<number, string>>({});
 
   // Parse JSON input whenever it changes via user typing or sample button
   useEffect(() => {
@@ -153,6 +159,12 @@ export default function ToccoExcelModal({
                 { icon: "baterai", isi: "" },
               ];
 
+          const rawWarna: string[] = Array.isArray(item.warna)
+            ? item.warna.map((w: any) => String(w).trim()).filter(Boolean)
+            : typeof item.warna === "string" && item.warna.trim()
+            ? item.warna.split(",").map((w: string) => w.trim()).filter(Boolean)
+            : [];
+
           return {
             index: idx,
             data: {
@@ -172,6 +184,7 @@ export default function ToccoExcelModal({
               SKU: sku,
               Judul: judul,
               poster: rawPoster,
+              warna: rawWarna,
             },
             sku,
             judul,
@@ -410,6 +423,7 @@ export default function ToccoExcelModal({
         { icon: "kamera", isi: "" },
         { icon: "baterai", isi: "" },
       ],
+      warna: [],
     };
 
     setUnits((prev) => {
@@ -438,6 +452,54 @@ export default function ToccoExcelModal({
         setCopiedKey((cur) => (cur === key ? null : cur));
       }, 2000);
     }
+  };
+
+  const handleCopyText = async (key: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => {
+        setCopiedKey((cur) => (cur === key ? null : cur));
+      }, 2000);
+    } catch (err) {
+      console.error("Gagal menyalin teks:", err);
+    }
+  };
+
+  const handleAddWarna = (unitIdx: number, newColor: string) => {
+    const trimmed = newColor.trim();
+    if (!trimmed) return;
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const currentWarna = Array.isArray(u.data.warna) ? [...u.data.warna] : [];
+        if (!currentWarna.includes(trimmed)) {
+          currentWarna.push(trimmed);
+        }
+        const updatedData = { ...u.data, warna: currentWarna };
+        return { ...u, data: updatedData };
+      });
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
+    });
+  };
+
+  const handleRemoveWarna = (unitIdx: number, colorIdx: number) => {
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const currentWarna = Array.isArray(u.data.warna) ? [...u.data.warna] : [];
+        currentWarna.splice(colorIdx, 1);
+        const updatedData = { ...u.data, warna: currentWarna };
+        return { ...u, data: updatedData };
+      });
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
+    });
   };
 
   const handleUpdatePosterItem = (
@@ -653,6 +715,9 @@ export default function ToccoExcelModal({
                 const canAddMore = unit.images.length < 5;
                 const unitPoster: Array<{ icon: string; isi?: string }> =
                   Array.isArray(unit.data.poster) ? unit.data.poster : [];
+                const unitWarna: string[] = Array.isArray(unit.data.warna)
+                  ? unit.data.warna
+                  : [];
 
                 return (
                   <div
@@ -900,6 +965,89 @@ export default function ToccoExcelModal({
                         </div>
                       </div>
                     )}
+
+                    {/* Section: Variasi Warna */}
+                    <div className="space-y-2 pt-2 border-t border-line/70">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-medium text-muted">
+                          Variasi Warna {unitWarna.length > 0 && `(${unitWarna.length})`}
+                        </label>
+                        {unitWarna.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyText(`warna-${uIdx}`, unitWarna.join(", "))}
+                            className="inline-flex items-center gap-1 text-[11px] text-muted hover:text-brand transition-colors cursor-pointer select-none"
+                            title="Salin semua varian warna"
+                          >
+                            {copiedKey === `warna-${uIdx}` ? (
+                              <>
+                                <Check className="size-3 text-success stroke-[2.5]" />
+                                <span className="text-success font-medium">Tersalin</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="size-3" />
+                                <span>Salin Warna</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {unitWarna.map((colorName, cIdx) => (
+                          <div
+                            key={cIdx}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-canvas px-2.5 py-1 text-xs text-ink select-none"
+                          >
+                            <span className="size-2 rounded-full bg-[#1E75BB] shrink-0" />
+                            <span>{colorName}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveWarna(uIdx, cIdx)}
+                              className="text-muted hover:text-danger ml-0.5 cursor-pointer"
+                              title={`Hapus ${colorName}`}
+                            >
+                              <X className="size-3" />
+                            </button>
+                          </div>
+                        ))}
+
+                        <div className="inline-flex items-center gap-1">
+                          <input
+                            type="text"
+                            value={newColorInputs[uIdx] || ""}
+                            onChange={(e) =>
+                              setNewColorInputs((prev) => ({ ...prev, [uIdx]: e.target.value }))
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                if (newColorInputs[uIdx]?.trim()) {
+                                  handleAddWarna(uIdx, newColorInputs[uIdx]);
+                                  setNewColorInputs((prev) => ({ ...prev, [uIdx]: "" }));
+                                }
+                              }
+                            }}
+                            placeholder="+ Tambah warna (Enter)"
+                            className="input text-xs py-1 px-2.5 min-h-[30px] sm:min-h-[28px] w-44"
+                          />
+                          {newColorInputs[uIdx]?.trim() && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleAddWarna(uIdx, newColorInputs[uIdx]);
+                                setNewColorInputs((prev) => ({ ...prev, [uIdx]: "" }));
+                              }}
+                              className="btn btn-secondary px-2 min-h-[30px] sm:min-h-[28px] text-xs"
+                              title="Tambah warna"
+                            >
+                              <Plus className="size-3" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
                     {/* Section 2: Full Editable Inputs */}
                     <div className="space-y-3 pt-1 border-t border-line/70">

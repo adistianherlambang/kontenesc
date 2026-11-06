@@ -73,6 +73,10 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
       { "icon": "kamera", "isi": "50MP Auto Fokus" },
       { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
     ],
+    "warna": [
+      "Black Cloud",
+      "White Swan"
+    ],
     "caption": [
       "realme 16 5G 12/256GB Prosesor Dimensity 6400 Turbo Layar 6.57” AMOLED 120Hz Kamera 50MP Sony AI Baterai 7000mAh 60W Ultra Charge Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi."
     ]
@@ -82,7 +86,7 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
   return `Bertindaklah sebagai E-Commerce Product Specialist & Technical Researcher profesional untuk "Eldorado Semarang Cell".
 
 TUGAS UTAMA:
-Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi) dan array \`caption\` (sesuai template baku toko) untuk ${units.length} unit pilihan berikut ini:
+Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi), array \`warna\` (daftar variasi warna resmi di Indonesia), dan array \`caption\` (sesuai template baku toko) untuk ${units.length} unit pilihan berikut ini:
 
 ### DAFTAR UNIT PILIHAN DARI DAFTAR HARGA TOKO:
 \`\`\`json
@@ -153,6 +157,11 @@ Setiap objek produk di dalam JSON WAJIB memiliki properti \`"poster"\` berupa ar
   { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
 ]
 \`\`\`
+
+---
+
+### ATURAN ARRAY \`warna\`:
+Setiap objek produk di dalam JSON WAJIB memiliki properti \`"warna"\` berupa array string yang memuat seluruh variasi warna resmi yang dirilis di Indonesia untuk unit tersebut (contoh: \`["Awesome Iceblue", "Awesome Navy", "Awesome Lemon"]\` atau \`["Black Cloud", "White Swan"]\`). Dilarang mengosongkan varian warna jika produk memiliki variasi warna resmi.
 
 ---
 
