@@ -30,21 +30,7 @@ function toRupiahNumber(val: number): number {
 export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
   if (!units || units.length === 0) return "";
 
-  const expandedUnits: Array<{
-    no_urut: number;
-    sku: string;
-    merk: string;
-    tipe: string;
-    varian_ini: string;
-    semua_varian_model_ini: string;
-    format_awalan_judul: string;
-    harga_rupiah: number;
-    cashback_rupiah: number;
-    harga_diskon_rupiah: number | "";
-  }> = [];
-
-  let counter = 1;
-  units.forEach((u) => {
+  const formattedUnits = units.map((u, idx) => {
     // Kumpulkan seluruh varian RAM yang ada pada model ini
     const allRamList =
       u.seriList && u.seriList.length > 0
@@ -53,7 +39,6 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
         ? [u.ram]
         : [];
 
-    // Format varian lengkap, contoh: "8/128GB 8/256 12/256"
     const semuaVarianStr =
       allRamList.length > 0
         ? allRamList
@@ -65,45 +50,48 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
       semuaVarianStr !== "-" ? ` ${semuaVarianStr}` : ""
     }`;
 
-    if (u.seriList && u.seriList.length > 1) {
-      u.seriList.forEach((seri) => {
-        const hn = toRupiahNumber(seri.harga);
-        const cb = toRupiahNumber(seri.cashback);
-        const hd = cb > 0 ? Math.max(0, hn - cb) : "";
-        const ramStr = seri.ram ? `${seri.ram}` : "";
-        const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
-        expandedUnits.push({
-          no_urut: counter++,
-          sku,
-          merk: u.merk,
-          tipe: u.tipe,
-          varian_ini: ramStr ? `${ramStr}GB` : "-",
-          semua_varian_model_ini: semuaVarianStr,
-          format_awalan_judul: formatAwalanJudul,
-          harga_rupiah: hn,
-          cashback_rupiah: cb,
-          harga_diskon_rupiah: hd,
-        });
-      });
-    } else {
-      const hn = toRupiahNumber(u.harga);
-      const cb = toRupiahNumber(u.cashback);
-      const hd = cb > 0 ? Math.max(0, hn - cb) : "";
-      const ramStr = u.ram ? `${u.ram}` : "";
-      const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
-      expandedUnits.push({
-        no_urut: counter++,
-        sku,
-        merk: u.merk,
-        tipe: u.tipe,
-        varian_ini: ramStr ? `${ramStr}GB` : "-",
-        semua_varian_model_ini: semuaVarianStr,
-        format_awalan_judul: formatAwalanJudul,
-        harga_rupiah: hn,
-        cashback_rupiah: cb,
-        harga_diskon_rupiah: hd,
-      });
-    }
+    const varianList =
+      u.seriList && u.seriList.length > 1
+        ? u.seriList.map((s) => {
+            const hn = toRupiahNumber(s.harga);
+            const cb = toRupiahNumber(s.cashback);
+            const hd = cb > 0 ? Math.max(0, hn - cb) : "";
+            const ramStr = s.ram ? `${s.ram}` : "";
+            const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${ramStr ? `-${ramStr}` : ""}`;
+            return {
+              ram: ramStr ? `${ramStr}GB` : "-",
+              sku,
+              harga: hn,
+              diskon: cb > 0 ? cb : 0,
+              harga_diskon: hd,
+              stok: 10,
+            };
+          })
+        : [
+            {
+              ram: u.ram ? `${u.ram}GB` : "-",
+              sku: `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${u.ram ? `-${u.ram}` : ""}`,
+              harga: toRupiahNumber(u.harga),
+              diskon: toRupiahNumber(u.cashback) > 0 ? toRupiahNumber(u.cashback) : 0,
+              harga_diskon:
+                toRupiahNumber(u.cashback) > 0
+                  ? Math.max(0, toRupiahNumber(u.harga) - toRupiahNumber(u.cashback))
+                  : "",
+              stok: 10,
+            },
+          ];
+
+    const lowestVarian = varianList[0];
+
+    return {
+      no_urut: idx + 1,
+      sku: lowestVarian.sku,
+      merk: u.merk,
+      tipe: u.tipe,
+      format_awalan_judul: formatAwalanJudul,
+      semua_varian_ram_rom: semuaVarianStr,
+      daftar_varian_dan_harga: varianList,
+    };
   });
 
   const exampleOutput = `[
@@ -113,9 +101,35 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     "Sub Category 2": "android-os",
     "Judul": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun",
     "Deskripsi": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi SAMSUNG, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center SAMSUNG di Indonesia.\\n\\nPilihan RAM / Storage : 8/128GB, 8/256GB, 12/256GB\\nProsesor : Samsung Exynos 1680 (4nm)\\nUkuran : 6.7”\\nTeknologi : Super AMOLED+ 120Hz dengan tingkat kecerahan hingga ±1800 nits\\nResolusi : Full HD+ (2340 x 1080)\\nKamera Belakang : 50 MP OIS + 12 MP ultrawide + 5 MP macro\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : Yes\\nKamera Belakang - Zoom : Digital Zoom hingga 10x\\nKamera Depan : 32 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 4K @30fps\\nRAM : 8GB, 12GB (+8GB RAM Plus)\\nROM : 128GB, 256GB UFS 3.1\\nSIM Tray : Dual-SIM (Hybrid)\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Stereo speaker Dolby Atmos\\nBaterai : 5000 mAh\\nFast Charging : 45W Super Fast Charging\\nKeamanan : In-display Fingerprint, Samsung Knox Vault\\nSistem Operasi : Android\\nLainnya : IP67 tahan air dan debu, Circle to Search, Samsung AI\\nWarna : Awesome Navy, Awesome Iceblue, Awesome Lilac\\n\\nIsi dalam box : Ponsel, kabel data USB-C ke USB-C, alat SIM ejector, buku panduan, kartu garansi (tanpa adaptor charger).",
+    "SKU": "ANDROID-SAMSUNG-A57 5G-8/128",
     "Harga": 4499000,
     "Harga Diskon": 4199000,
-    "SKU": "ANDROID-SAMSUNG-A57 5G-8/128",
+    "varian": [
+      {
+        "ram": "8/128GB",
+        "sku": "ANDROID-SAMSUNG-A57 5G-8/128",
+        "harga": 4499000,
+        "diskon": 300000,
+        "harga_diskon": 4199000,
+        "stok": 10
+      },
+      {
+        "ram": "8/256GB",
+        "sku": "ANDROID-SAMSUNG-A57 5G-8/256",
+        "harga": 4899000,
+        "diskon": 300000,
+        "harga_diskon": 4599000,
+        "stok": 10
+      },
+      {
+        "ram": "12/256GB",
+        "sku": "ANDROID-SAMSUNG-A57 5G-12/256",
+        "harga": 5399000,
+        "diskon": 400000,
+        "harga_diskon": 4999000,
+        "stok": 10
+      }
+    ],
     "Jenis Produk": "Buy Now",
     "Total Stok": 10,
     "Kondisi Barang": "Baru",
@@ -155,11 +169,11 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
   return `Bertindaklah sebagai E-Commerce Product Specialist & Technical Researcher profesional untuk "Eldorado Semarang Cell".
 
 TUGAS UTAMA:
-Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi), array \`warna\` (daftar variasi warna resmi di Indonesia), dan array \`caption\` (sesuai template baku toko) untuk ${expandedUnits.length} varian produk berikut ini:
+Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi), array \`warna\` (daftar variasi warna resmi di Indonesia), array \`varian\` (seluruh varian RAM, SKU, harga, dan diskon untuk produk tersebut), dan array \`caption\` (sesuai template baku toko) untuk ${formattedUnits.length} tipe produk berikut ini:
 
-### DAFTAR VARIAN PRODUK DARI DAFTAR HARGA TOKO:
+### DAFTAR TIPE PRODUK DARI DAFTAR HARGA TOKO:
 \`\`\`json
-${JSON.stringify(expandedUnits, null, 2)}
+${JSON.stringify(formattedUnits, null, 2)}
 \`\`\`
 
 ---
@@ -189,18 +203,20 @@ ${JSON.stringify(expandedUnits, null, 2)}
    - Jika \`aksesoris-tablet\`: \`"keyboard-bluetooth"\`, \`"casing-cover-tablet"\`, \`"charger-tablet"\`.
    - Jika \`wearable-devices\`: \`"smart-watch-1"\`, \`"smart-band"\`, \`"aksesoris-wearable-devices"\`.
    - Jika \`power-bank\`: \`"portable-power-bank"\`.
-4. **SATU VARIAN (RAM/ROM) = SATU PRODUK TERPISAH (JUDUL & DESKRIPSI WAJIB MEMUAT SEMUA VARIAN)**:
-   - Setiap varian RAM/ROM pada daftar di atas memiliki harga dan SKU tersendiri dan merupakan produk terpisah di Toco (contoh: seri RAM 8/128 dan 8/256 adalah 2 objek produk terpisah dengan harga dan SKU masing-masing).
-   - Buatkan tepat 1 objek produk dalam array JSON untuk setiap varian pada daftar di atas (${expandedUnits.length} varian = tepat ${expandedUnits.length} objek JSON).
-   - **ATURAN WAJIB JUDUL (TITLE)**: DILARANG hanya menulis 1 varian RAM/ROM pada Judul! Judul pada SEMUA varian WAJIB mencantumkan seluruh varian RAM yang tersedia untuk model tersebut (gunakan nilai \`format_awalan_judul\` dari daftar di atas).
+4. **SATU TIPE = SATU OBJEK PRODUK (SELURUH VARIAN DIGABUNG PADA PROPERTI 'varian')**:
+   - Buatkan tepat 1 objek produk dalam array JSON untuk setiap tipe di atas (${formattedUnits.length} tipe = tepat ${formattedUnits.length} objek JSON).
+   - DILARANG memecah 1 tipe menjadi beberapa objek card JSON terpisah di luar array!
+   - Setiap objek produk WAJIB memiliki properti \`"varian"\` berupa array objek yang memuat seluruh variasi RAM/ROM dari \`daftar_varian_dan_harga\` lengkap dengan properti: \`ram\`, \`sku\`, \`harga\`, \`diskon\`, \`harga_diskon\`, dan \`stok\` (contoh: seri RAM 8/128, 8/256, dan 12/256 berada di dalam array \`"varian"\` pada produk yang sama).
+   - Gunakan varian pertama/terendah untuk mengisi kolom SKU, Harga, dan Harga Diskon default di level produk.
+   - **ATURAN WAJIB JUDUL (TITLE)**: Judul dan baris awal Deskripsi WAJIB mencantumkan SEMUA varian RAM yang tersedia untuk model tersebut (gunakan nilai \`format_awalan_judul\` dari daftar di atas).
      * Contoh format Judul yang BENAR: \`"SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun"\`
      * Tujuan: Agar semua varian produk tetap muncul pada pencarian pembeli untuk semua kata kunci varian RAM.
 5. **SKU (WAJIB FORMAT BAKU)**:
    - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A57 5G-8/128"\` atau \`"ANDROID-SAMSUNG-A57 5G-8/256"\`).
-   - Gunakan langsung nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar varian di atas.
+   - Gunakan nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar varian di atas.
 6. **Harga & Harga Diskon**:
-   - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`3499000\`).
-   - Gunakan \`harga_rupiah\` dari daftar varian di atas untuk kolom \`"Harga"\`, dan \`harga_diskon_rupiah\` untuk kolom \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
+   - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`4499000\`).
+   - Gunakan nilai dari daftar varian di atas untuk kolom \`"Harga"\` dan \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
 7. **Berat & Ukuran**:
    - \`"Berat Produk"\`: angka dalam gram tanpa satuan (contoh: \`500\` untuk HP, \`800\` untuk Tablet).
    - \`"Length"\`, \`"Height"\`, \`"Width"\`: angka dalam cm tanpa satuan (contoh: Length \`18\`, Height \`6\`, Width \`10\`).
@@ -286,7 +302,7 @@ Isi dalam box : [Daftar isi kelengkapan resmi di dalam kotak penjualan Indonesia
 ---
 
 ### FORMAT OUTPUT WAJIB (JSON):
-Berikan output berupa SATU array JSON valid berisi seluruh ${expandedUnits.length} varian produk yang dipilih tanpa terpotong, dengan skema persis seperti contoh berikut:
+Berikan output berupa SATU array JSON valid berisi seluruh ${formattedUnits.length} produk yang dipilih tanpa terpotong, dengan skema persis seperti contoh berikut:
 ${exampleOutput}`;
 }
 

@@ -37,12 +37,23 @@ interface UnitImageItem {
   isUploading?: boolean;
 }
 
+export interface ProductVariant {
+  id: string;
+  ram: string;
+  sku: string;
+  harga: number | string;
+  diskon: number | string;
+  hargaDiskon: number | string;
+  stok: number | string;
+}
+
 interface UnitState {
   index: number;
   data: TocoProductRow;
   sku: string;
   judul: string;
   images: UnitImageItem[];
+  variants: ProductVariant[];
 }
 
 const NUMERIC_KEYS = new Set([
@@ -67,9 +78,35 @@ const SAMPLE_JSON = `[
     "Sub Category 2": "android-os",
     "Judul": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun",
     "Deskripsi": "SAMSUNG A57 5G 8/128GB 8/256 12/256 Prosesor Exynos 1680 Layar 6.7” Super AMOLED+ 120Hz Kamera 50MP OIS Baterai 5000mAh 45W Super Fast Charging Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru bergaransi resmi SAMSUNG Indonesia 1 tahun.\\n\\nPilihan RAM / Storage : 8/128GB, 8/256GB, 12/256GB\\nProsesor : Samsung Exynos 1680 (4nm)\\nUkuran : 6.7”\\nTeknologi : Super AMOLED+ 120Hz\\nResolusi : Full HD+ (2340 x 1080)\\nKamera Belakang : 50 MP OIS + 12 MP ultrawide + 5 MP macro\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : Yes\\nKamera Depan : 32 MP\\nRAM : 8GB, 12GB\\nROM : 128GB, 256GB\\nBaterai : 5000 mAh\\nFast Charging : 45W Super Fast Charging\\nWarna : Awesome Navy, Awesome Iceblue, Awesome Lilac\\n\\nIsi dalam box : Ponsel, kabel USB-C ke USB-C, alat SIM ejector, buku panduan, kartu garansi resmi.",
+    "SKU": "ANDROID-SAMSUNG-A57 5G-8/128",
     "Harga": 4499000,
     "Harga Diskon": 4199000,
-    "SKU": "ANDROID-SAMSUNG-A57 5G-8/128",
+    "varian": [
+      {
+        "ram": "8/128GB",
+        "sku": "ANDROID-SAMSUNG-A57 5G-8/128",
+        "harga": 4499000,
+        "diskon": 300000,
+        "harga_diskon": 4199000,
+        "stok": 10
+      },
+      {
+        "ram": "8/256GB",
+        "sku": "ANDROID-SAMSUNG-A57 5G-8/256",
+        "harga": 4899000,
+        "diskon": 300000,
+        "harga_diskon": 4599000,
+        "stok": 10
+      },
+      {
+        "ram": "12/256GB",
+        "sku": "ANDROID-SAMSUNG-A57 5G-12/256",
+        "harga": 5399000,
+        "diskon": 400000,
+        "harga_diskon": 4999000,
+        "stok": 10
+      }
+    ],
     "Jenis Produk": "Buy Now",
     "Total Stok": 10,
     "Kondisi Barang": "Baru",
@@ -112,7 +149,6 @@ export default function ToccoExcelModal({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [colorInputs, setColorInputs] = useState<Record<number, string>>({});
-  const [diskonInputs, setDiskonInputs] = useState<Record<number, string>>({});
 
   // Parse JSON input whenever it changes via user typing or sample button
   useEffect(() => {
@@ -122,7 +158,6 @@ export default function ToccoExcelModal({
     if (!jsonInput.trim()) {
       setUnits([]);
       setColorInputs({});
-      setDiskonInputs({});
       setJsonError(null);
       isTypingJsonRef.current = false;
       return;
@@ -136,33 +171,117 @@ export default function ToccoExcelModal({
         setJsonError("Array JSON kosong.");
         setUnits([]);
         setColorInputs({});
-        setDiskonInputs({});
         isTypingJsonRef.current = false;
         return;
       }
 
       setColorInputs({});
-      const initialDiskon: Record<number, string> = {};
-      arr.forEach((item: any, idx: number) => {
-        const h = Number(item.Harga) || 0;
-        const hd =
-          item["Harga Diskon"] !== "" &&
-          item["Harga Diskon"] !== undefined &&
-          item["Harga Diskon"] !== null
-            ? Number(item["Harga Diskon"])
-            : 0;
-        if (h > 0 && hd > 0 && h > hd) {
-          initialDiskon[idx] = String(h - hd);
+
+      // Kelompokkan item berdasarkan SKU base atau Judul jika terpecah, atau pertahankan .varian
+      const groupedList: any[] = [];
+      const groupIndexMap = new Map<string, number>();
+
+      const getGroupKey = (item: any) => {
+        const sku = String(item.SKU || item.sku || "").trim().toUpperCase();
+        if (sku) {
+          const baseSku = sku.replace(/-[0-9/]+(?:GB|gb)?$/, "");
+          if (baseSku && baseSku !== sku) {
+            return `sku:${baseSku}`;
+          }
+        }
+        const rawJudul = String(item.Judul || item.judul || item.nama || item.title || "")
+          .trim()
+          .toLowerCase();
+        if (rawJudul) {
+          const normJudul = rawJudul
+            .replace(/\b\d{1,2}\s*\/\s*\d{2,4}(?:gb)?\b/gi, "")
+            .replace(/\s+/g, " ")
+            .trim();
+          if (normJudul.length > 5) {
+            return `judul:${normJudul}`;
+          }
+          return `judul:${rawJudul}`;
+        }
+        return `item:${Math.random()}`;
+      };
+
+      arr.forEach((item: any) => {
+        const grpKey = getGroupKey(item);
+
+        if (Array.isArray(item.varian) && item.varian.length > 0) {
+          groupedList.push({
+            ...item,
+            variantsRaw: [...item.varian],
+          });
+          return;
+        }
+
+        if (groupIndexMap.has(grpKey)) {
+          const targetGrp = groupedList[groupIndexMap.get(grpKey)!];
+          const h = Number(item.Harga) || 0;
+          const hd =
+            item["Harga Diskon"] !== "" &&
+            item["Harga Diskon"] !== undefined &&
+            item["Harga Diskon"] !== null
+              ? Number(item["Harga Diskon"])
+              : 0;
+          const diskon = h > 0 && hd > 0 && h > hd ? h - hd : "";
+          const ramFound =
+            item.ram ||
+            item.RAM ||
+            item.seri ||
+            (item.SKU ? item.SKU.split("-").pop() : "") ||
+            `Varian ${targetGrp.variantsRaw.length + 1}`;
+
+          targetGrp.variantsRaw.push({
+            ram: ramFound,
+            sku: item.SKU || item.sku || "",
+            harga: item.Harga ?? 0,
+            diskon: diskon,
+            harga_diskon: item["Harga Diskon"] ?? "",
+            stok: item["Total Stok"] ?? 10,
+          });
         } else {
-          initialDiskon[idx] = "";
+          const h = Number(item.Harga) || 0;
+          const hd =
+            item["Harga Diskon"] !== "" &&
+            item["Harga Diskon"] !== undefined &&
+            item["Harga Diskon"] !== null
+              ? Number(item["Harga Diskon"])
+              : 0;
+          const diskon = h > 0 && hd > 0 && h > hd ? h - hd : "";
+          const ramFound =
+            item.ram ||
+            item.RAM ||
+            item.seri ||
+            (item.SKU ? item.SKU.split("-").pop() : "") ||
+            "Standar";
+
+          const variantsRaw = [
+            {
+              ram: ramFound,
+              sku: item.SKU || item.sku || "",
+              harga: item.Harga ?? 0,
+              diskon: diskon,
+              harga_diskon: item["Harga Diskon"] ?? "",
+              stok: item["Total Stok"] ?? 10,
+            },
+          ];
+
+          groupIndexMap.set(grpKey, groupedList.length);
+          groupedList.push({
+            ...item,
+            variantsRaw,
+          });
         }
       });
-      setDiskonInputs(initialDiskon);
+
       setUnits((prevUnits) => {
-        return arr.map((item: any, idx: number) => {
+        return groupedList.map((item: any, idx: number) => {
           const sku =
             item.SKU ||
             item.sku ||
+            item.variantsRaw?.[0]?.sku ||
             `UNIT-${idx + 1}`;
           const judul =
             item.Judul ||
@@ -192,6 +311,28 @@ export default function ToccoExcelModal({
             ? item.warna.split(",").map((w: string) => w.trim()).filter(Boolean)
             : [];
 
+          const variants: ProductVariant[] = (item.variantsRaw || []).map((v: any, vIdx: number) => {
+            const h = Number(v.harga) || 0;
+            const hd =
+              v.harga_diskon !== "" && v.harga_diskon !== undefined && v.harga_diskon !== null
+                ? Number(v.harga_diskon)
+                : (v["Harga Diskon"] !== "" && v["Harga Diskon"] !== undefined && v["Harga Diskon"] !== null ? Number(v["Harga Diskon"]) : 0);
+            let diskon = v.diskon !== "" && v.diskon !== undefined && v.diskon !== null ? Number(v.diskon) : "";
+            if (diskon === "" && h > 0 && hd > 0 && h > hd) {
+              diskon = h - hd;
+            }
+
+            return {
+              id: `v-${idx}-${vIdx}-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+              ram: v.ram || v.seri || v.varian || `Varian ${vIdx + 1}`,
+              sku: v.sku || v.SKU || `${sku}-${v.ram || vIdx + 1}`,
+              harga: v.harga ?? item.Harga ?? 0,
+              diskon: diskon !== "" ? diskon : "",
+              hargaDiskon: hd > 0 ? hd : (v.harga_diskon ?? v["Harga Diskon"] ?? ""),
+              stok: v.stok ?? v["Total Stok"] ?? item["Total Stok"] ?? 10,
+            };
+          });
+
           return {
             index: idx,
             data: {
@@ -210,12 +351,16 @@ export default function ToccoExcelModal({
               ...item,
               SKU: sku,
               Judul: judul,
+              Harga: variants[0]?.harga ?? item.Harga ?? 0,
+              "Harga Diskon": variants[0]?.hargaDiskon ?? item["Harga Diskon"] ?? "",
               poster: rawPoster,
               warna: rawWarna,
+              varian: variants,
             },
             sku,
             judul,
             images,
+            variants,
           };
         });
       });
@@ -223,7 +368,6 @@ export default function ToccoExcelModal({
     } catch (err: any) {
       setJsonError("Format JSON belum valid: " + err.message);
       setUnits([]);
-      setDiskonInputs({});
     } finally {
       isTypingJsonRef.current = false;
     }
@@ -399,49 +543,122 @@ export default function ToccoExcelModal({
     });
   };
 
-  const handleUpdateHargaJual = (unitIdx: number, val: string) => {
-    let formattedValue: any = val;
-    if (val === "" || val === null || val === undefined) {
-      formattedValue = "";
-    } else {
-      const num = Number(val);
-      formattedValue = isNaN(num) ? val : num;
-    }
-
-    const currentDiskonStr =
-      diskonInputs[unitIdx] !== undefined
-        ? diskonInputs[unitIdx]
-        : (() => {
-            const u = units[unitIdx];
-            if (!u) return "";
-            const h = Number(u.data.Harga) || 0;
-            const hd =
-              u.data["Harga Diskon"] !== "" &&
-              u.data["Harga Diskon"] !== undefined &&
-              u.data["Harga Diskon"] !== null
-                ? Number(u.data["Harga Diskon"])
-                : 0;
-            return h > 0 && hd > 0 && h > hd ? String(h - hd) : "";
-          })();
-
-    const numDiskon = Number(currentDiskonStr) || 0;
-    const numHarga = Number(formattedValue) || 0;
-
-    let newHargaDiskon = 0;
-    if (numDiskon > 0 && numHarga > 0) {
-      newHargaDiskon = Math.max(0, numHarga - numDiskon);
-    }
-
+  const handleUpdateVariant = (
+    unitIdx: number,
+    variantIdx: number,
+    field: keyof ProductVariant,
+    val: any
+  ) => {
     setUnits((prev) => {
       const updated = prev.map((u, i) => {
         if (i !== unitIdx) return u;
+
+        const currentVariants = [...u.variants];
+        const targetV = { ...currentVariants[variantIdx] };
+
+        if (field === "harga") {
+          const numHarga = Number(val);
+          const formattedHarga = val === "" || isNaN(numHarga) ? "" : numHarga;
+          targetV.harga = formattedHarga;
+
+          const numDiskon = Number(targetV.diskon) || 0;
+          if (numDiskon > 0 && typeof formattedHarga === "number" && formattedHarga > 0) {
+            targetV.hargaDiskon = Math.max(0, formattedHarga - numDiskon);
+          } else if (!numDiskon) {
+            targetV.hargaDiskon = "";
+          }
+        } else if (field === "diskon") {
+          const numDiskon = Number(val);
+          const formattedDiskon = val === "" || isNaN(numDiskon) ? "" : numDiskon;
+          targetV.diskon = formattedDiskon;
+
+          const numHarga = Number(targetV.harga) || 0;
+          if (typeof formattedDiskon === "number" && formattedDiskon > 0 && numHarga > 0) {
+            targetV.hargaDiskon = Math.max(0, numHarga - formattedDiskon);
+          } else {
+            targetV.hargaDiskon = "";
+          }
+        } else if (field === "stok") {
+          const numStok = Number(val);
+          targetV.stok = val === "" || isNaN(numStok) ? "" : numStok;
+        } else {
+          (targetV as any)[field] = val;
+        }
+
+        currentVariants[variantIdx] = targetV;
+
         const updatedData = {
           ...u.data,
-          Harga: formattedValue,
-          "Harga Diskon": newHargaDiskon > 0 ? newHargaDiskon : "",
+          varian: currentVariants.map((v) => ({
+            ram: v.ram,
+            sku: v.sku,
+            harga: v.harga,
+            diskon: v.diskon,
+            harga_diskon: v.hargaDiskon,
+            stok: v.stok,
+          })),
         };
+
+        if (variantIdx === 0) {
+          updatedData.SKU = targetV.sku;
+          updatedData.Harga = targetV.harga;
+          updatedData["Harga Diskon"] = targetV.hargaDiskon;
+          updatedData["Total Stok"] = targetV.stok;
+        }
+
         return {
           ...u,
+          sku: variantIdx === 0 ? targetV.sku : u.sku,
+          variants: currentVariants,
+          data: updatedData,
+        };
+      });
+
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+
+      return updated;
+    });
+  };
+
+  const handleAddVariant = (unitIdx: number) => {
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+
+        const currentVariants = [...u.variants];
+        const vCount = currentVariants.length + 1;
+        const baseSku = u.sku ? u.sku.replace(/-[0-9/]+(?:GB|gb)?$/, "") : "SKU";
+        const firstV = currentVariants[0];
+
+        const newVariant: ProductVariant = {
+          id: `v-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+          ram: "",
+          sku: `${baseSku}-VAR${vCount}`,
+          harga: firstV?.harga ?? 0,
+          diskon: firstV?.diskon ?? "",
+          hargaDiskon: firstV?.hargaDiskon ?? "",
+          stok: 10,
+        };
+
+        currentVariants.push(newVariant);
+
+        const updatedData = {
+          ...u.data,
+          varian: currentVariants.map((v) => ({
+            ram: v.ram,
+            sku: v.sku,
+            harga: v.harga,
+            diskon: v.diskon,
+            harga_diskon: v.hargaDiskon,
+            stok: v.stok,
+          })),
+        };
+
+        return {
+          ...u,
+          variants: currentVariants,
           data: updatedData,
         };
       });
@@ -453,26 +670,35 @@ export default function ToccoExcelModal({
     });
   };
 
-  const handleUpdateDiskon = (unitIdx: number, val: string) => {
-    setDiskonInputs((prev) => ({ ...prev, [unitIdx]: val }));
-
-    const numDiskon = Number(val) || 0;
-    const currentHarga = Number(units[unitIdx]?.data.Harga) || 0;
-
-    let newHargaDiskon = 0;
-    if (numDiskon > 0 && currentHarga > 0) {
-      newHargaDiskon = Math.max(0, currentHarga - numDiskon);
-    }
-
+  const handleRemoveVariant = (unitIdx: number, variantIdx: number) => {
     setUnits((prev) => {
       const updated = prev.map((u, i) => {
         if (i !== unitIdx) return u;
+        if (u.variants.length <= 1) return u;
+
+        const currentVariants = u.variants.filter((_, idx) => idx !== variantIdx);
+        const firstV = currentVariants[0];
+
         const updatedData = {
           ...u.data,
-          "Harga Diskon": newHargaDiskon > 0 ? newHargaDiskon : "",
+          SKU: firstV.sku,
+          Harga: firstV.harga,
+          "Harga Diskon": firstV.hargaDiskon,
+          "Total Stok": firstV.stok,
+          varian: currentVariants.map((v) => ({
+            ram: v.ram,
+            sku: v.sku,
+            harga: v.harga,
+            diskon: v.diskon,
+            harga_diskon: v.hargaDiskon,
+            stok: v.stok,
+          })),
         };
+
         return {
           ...u,
+          sku: firstV.sku,
+          variants: currentVariants,
           data: updatedData,
         };
       });
@@ -516,28 +742,29 @@ export default function ToccoExcelModal({
         return next;
       });
 
-      setDiskonInputs((prev) => {
-        const next: Record<number, string> = {};
-        Object.entries(prev).forEach(([key, val]) => {
-          const k = Number(key);
-          if (k < unitIdx) next[k] = val;
-          else if (k > unitIdx) next[k - 1] = val;
-        });
-        return next;
-      });
-
       return updated;
     });
   };
 
   const handleAddUnit = () => {
     const newIdx = units.length;
+    const defaultSku = `ANDROID-BRAND-TIPE-${newIdx + 1}-8/128`;
+    const defaultVariant: ProductVariant = {
+      id: `v-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      ram: "8/128GB",
+      sku: defaultSku,
+      harga: 0,
+      diskon: "",
+      hargaDiskon: "",
+      stok: 10,
+    };
+
     const newRow: TocoProductRow = {
       "Main Category": "handphone-tablet",
       "Sub Category 1": "handphone",
       "Sub Category 2": "android-os",
       Judul: `Unit ${newIdx + 1}`,
-      SKU: `ANDROID-BRAND-TIPE-${newIdx + 1}`,
+      SKU: defaultSku,
       Deskripsi: "",
       Harga: 0,
       "Harga Diskon": "",
@@ -557,6 +784,16 @@ export default function ToccoExcelModal({
         { icon: "baterai", isi: "" },
       ],
       warna: [],
+      varian: [
+        {
+          ram: defaultVariant.ram,
+          sku: defaultVariant.sku,
+          harga: defaultVariant.harga,
+          diskon: defaultVariant.diskon,
+          harga_diskon: defaultVariant.hargaDiskon,
+          stok: defaultVariant.stok,
+        },
+      ],
     };
 
     setUnits((prev) => {
@@ -565,9 +802,10 @@ export default function ToccoExcelModal({
         {
           index: newIdx,
           data: newRow,
-          sku: newRow.SKU!,
+          sku: defaultSku,
           judul: newRow.Judul!,
           images: [],
+          variants: [defaultVariant],
         },
       ];
       isTypingJsonRef.current = false;
@@ -652,23 +890,23 @@ export default function ToccoExcelModal({
           ? window.location.origin
           : "";
 
-      // Step 1: Upload all pending images to R2
+      // Step 1: Upload all pending images to R2 & generate row per variant
       const updatedRows: TocoProductRow[] = [];
 
       for (let uIdx = 0; uIdx < units.length; uIdx++) {
         const unit = units[uIdx];
-        const rowData = { ...unit.data };
+        const photoUrls: Record<string, string> = {};
 
         setProcessStatus(
-          `Mengunggah gambar unit ${uIdx + 1}/${units.length} (${unit.sku})...`
+          `Mengunggah gambar unit ${uIdx + 1}/${units.length} (${unit.judul || unit.sku})...`
         );
 
         for (let imgIdx = 0; imgIdx < unit.images.length; imgIdx++) {
           const imgItem = unit.images[imgIdx];
-          const slotKey = `Foto ${imgIdx + 1}` as keyof TocoProductRow;
+          const slotKey = `Foto ${imgIdx + 1}`;
 
           if (imgItem.uploadedUrl) {
-            rowData[slotKey] = imgItem.uploadedUrl;
+            photoUrls[slotKey] = imgItem.uploadedUrl;
             continue;
           }
 
@@ -687,23 +925,63 @@ export default function ToccoExcelModal({
               const errJson = await res.json().catch(() => ({}));
               throw new Error(
                 errJson.error ||
-                `Gagal mengunggah foto ${imgIdx + 1} untuk SKU ${unit.sku}`
+                `Gagal mengunggah foto ${imgIdx + 1} untuk ${unit.sku}`
               );
             }
 
             const data = await res.json();
             const forwardedUrl = `${origin}${data.path}`;
             imgItem.uploadedUrl = forwardedUrl;
-            rowData[slotKey] = forwardedUrl;
+            photoUrls[slotKey] = forwardedUrl;
           }
         }
 
-        // Clean up remaining unused photo slots in rowData
-        for (let emptySlot = unit.images.length + 1; emptySlot <= 10; emptySlot++) {
-          delete rowData[`Foto ${emptySlot}`];
-        }
+        // Generate one Excel row per variant of this unit
+        const variantsToExport =
+          unit.variants && unit.variants.length > 0
+            ? unit.variants
+            : [
+                {
+                  id: "v-default",
+                  ram: "Standar",
+                  sku: unit.sku,
+                  harga: unit.data.Harga ?? 0,
+                  diskon: "",
+                  hargaDiskon: unit.data["Harga Diskon"] ?? "",
+                  stok: unit.data["Total Stok"] ?? 10,
+                },
+              ];
 
-        updatedRows.push(rowData);
+        for (const v of variantsToExport) {
+          const h = Number(v.harga) || 0;
+          const hd =
+            v.hargaDiskon !== "" && v.hargaDiskon !== undefined && v.hargaDiskon !== null
+              ? Number(v.hargaDiskon)
+              : "";
+          const stokNum = Number(v.stok) || 10;
+
+          const rowData: any = {
+            ...unit.data,
+            SKU: v.sku || unit.sku,
+            Harga: h,
+            "Harga Diskon": hd,
+            "Total Stok": stokNum,
+            Judul: unit.data.Judul || unit.judul,
+            Deskripsi: unit.data.Deskripsi || "",
+            ...photoUrls,
+          };
+
+          for (let emptySlot = unit.images.length + 1; emptySlot <= 10; emptySlot++) {
+            delete rowData[`Foto ${emptySlot}`];
+          }
+
+          delete rowData.poster;
+          delete rowData.warna;
+          delete rowData.varian;
+          delete rowData.caption;
+
+          updatedRows.push(rowData as TocoProductRow);
+        }
       }
 
       // Step 2: Fetch template Excel file
@@ -821,29 +1099,6 @@ export default function ToccoExcelModal({
                     ? unit.data.warna
                     : "";
 
-                const deriveInitialDiskon = (u: UnitState) => {
-                  const h = Number(u.data.Harga) || 0;
-                  const hd =
-                    u.data["Harga Diskon"] !== "" &&
-                    u.data["Harga Diskon"] !== undefined &&
-                    u.data["Harga Diskon"] !== null
-                      ? Number(u.data["Harga Diskon"])
-                      : 0;
-                  if (h > 0 && hd > 0 && h > hd) {
-                    return String(h - hd);
-                  }
-                  return "";
-                };
-
-                const diskonVal =
-                  diskonInputs[uIdx] !== undefined ? diskonInputs[uIdx] : deriveInitialDiskon(unit);
-                const numHarga = Number(unit.data.Harga) || 0;
-                const numDiskon = Number(diskonVal) || 0;
-                const hasDiskon = numHarga > 0 && numDiskon > 0;
-                const setelahDiskon = hasDiskon ? Math.max(0, numHarga - numDiskon) : 0;
-                const persenDiskon =
-                  hasDiskon ? Math.min(100, Math.round((numDiskon / numHarga) * 100)) : 0;
-
                 return (
                   <div
                     key={uIdx}
@@ -861,13 +1116,11 @@ export default function ToccoExcelModal({
                           {uIdx + 1}
                         </span>
                         <span className="text-xs font-semibold text-ink truncate">
-                          {unit.sku || `Unit ${uIdx + 1}`}
+                          {unit.data.Judul || unit.sku || `Unit ${uIdx + 1}`}
                         </span>
-                        {/* {isSelected && (
-                          <span className="text-[11px] text-brand font-medium shrink-0">
-                            (Aktif untuk paste foto)
-                          </span>
-                        )} */}
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#1E75BB]/10 text-[#1E75BB] shrink-0">
+                          {unit.variants.length} Varian
+                        </span>
                       </div>
 
                       {units.length > 1 && (
@@ -1140,7 +1393,7 @@ export default function ToccoExcelModal({
                       {/* Judul Produk */}
                       <div>
                         <label className="block text-[11px] font-medium text-muted mb-1">
-                          Nama Produk / Judul
+                          Nama Produk / Judul (Wajib mencakup seluruh varian)
                         </label>
                         <textarea
                           rows={2}
@@ -1151,91 +1404,218 @@ export default function ToccoExcelModal({
                         />
                       </div>
 
-                      {/* SKU */}
-                      <div>
-                        <label className="block text-[11px] font-medium text-muted mb-1">
-                          SKU (Format: ANDROID-BRAND-TIPE-RAM/STORAGE)
-                        </label>
-                        <input
-                          type="text"
-                          value={unit.data.SKU || ""}
-                          onChange={(e) => handleUpdateUnitField(uIdx, "SKU", e.target.value)}
-                          placeholder="ANDROID-SAMSUNG-A07 5G-4/128"
-                          className="input text-xs"
-                        />
+                      {/* Section: Varian & Harga Produk */}
+                      <div className="space-y-2.5 pt-2 border-t border-line/70">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <label className="text-xs font-semibold text-ink">
+                                Varian & Harga Produk
+                              </label>
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#1E75BB]/10 text-[#1E75BB]">
+                                {unit.variants.length} Varian
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-muted">
+                              Setiap varian diekspor sebagai baris tersendiri di Excel dengan foto dan spesifikasi yang sama.
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleAddVariant(uIdx)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-line bg-surface hover:bg-subtle text-xs font-medium text-ink transition-colors cursor-pointer self-start sm:self-auto shrink-0"
+                          >
+                            <Plus className="size-3.5 text-brand" />
+                            <span>Tambah Varian</span>
+                          </button>
+                        </div>
+
+                        {/* List of Variant Rows */}
+                        <div className="space-y-2.5">
+                          {unit.variants.map((vItem, vIdx) => {
+                            const numH = Number(vItem.harga) || 0;
+                            const numD = Number(vItem.diskon) || 0;
+                            const hasD = numH > 0 && numD > 0;
+                            const setD = hasD ? Math.max(0, numH - numD) : 0;
+                            const perD = hasD ? Math.min(100, Math.round((numD / numH) * 100)) : 0;
+
+                            return (
+                              <div
+                                key={vItem.id || vIdx}
+                                className="rounded-lg border border-line bg-canvas/70 p-3 space-y-2.5"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs font-semibold text-ink flex items-center gap-1.5">
+                                    <span className="size-2 rounded-full bg-[#1E75BB]" />
+                                    <span>
+                                      Varian #{vIdx + 1}
+                                      {vItem.ram ? `: ${vItem.ram}` : ""}
+                                    </span>
+                                  </span>
+
+                                  {unit.variants.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveVariant(uIdx, vIdx)}
+                                      className="inline-flex items-center gap-1 text-[11px] text-muted hover:text-danger p-1 rounded transition-colors cursor-pointer"
+                                      title="Hapus varian ini"
+                                    >
+                                      <Trash2 className="size-3.5" />
+                                      <span>Hapus Varian</span>
+                                    </button>
+                                  )}
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                                  {/* Varian / RAM */}
+                                  <div className="col-span-1">
+                                    <label className="block text-[10px] font-medium text-muted mb-1">
+                                      Varian / RAM
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={vItem.ram}
+                                      onChange={(e) =>
+                                        handleUpdateVariant(uIdx, vIdx, "ram", e.target.value)
+                                      }
+                                      placeholder="8/128GB"
+                                      className="input text-xs"
+                                    />
+                                  </div>
+
+                                  {/* SKU */}
+                                  <div className="col-span-2 lg:col-span-2">
+                                    <label className="block text-[10px] font-medium text-muted mb-1">
+                                      SKU
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={vItem.sku}
+                                      onChange={(e) =>
+                                        handleUpdateVariant(uIdx, vIdx, "sku", e.target.value)
+                                      }
+                                      placeholder="ANDROID-BRAND-TIPE-RAM"
+                                      className="input text-xs"
+                                    />
+                                  </div>
+
+                                  {/* Harga Jual */}
+                                  <div className="col-span-1">
+                                    <label className="block text-[10px] font-medium text-muted mb-1">
+                                      Harga Jual (Rp)
+                                    </label>
+                                    <input
+                                      type="number"
+                                      value={vItem.harga ?? ""}
+                                      onChange={(e) =>
+                                        handleUpdateVariant(uIdx, vIdx, "harga", e.target.value)
+                                      }
+                                      placeholder="4499000"
+                                      className="input text-xs"
+                                    />
+                                  </div>
+
+                                  {/* Diskon */}
+                                  <div className="col-span-1">
+                                    <label className="block text-[10px] font-medium text-muted mb-1">
+                                      Diskon (Rp)
+                                    </label>
+                                    <input
+                                      type="number"
+                                      value={vItem.diskon ?? ""}
+                                      onChange={(e) =>
+                                        handleUpdateVariant(uIdx, vIdx, "diskon", e.target.value)
+                                      }
+                                      placeholder="300000"
+                                      className="input text-xs"
+                                    />
+                                  </div>
+
+                                  {/* Setelah Diskon & % */}
+                                  <div className="col-span-1">
+                                    <label className="block text-[10px] font-medium text-muted mb-1">
+                                      Setelah Diskon
+                                    </label>
+                                    <div className="flex items-center justify-between min-h-[34px] px-2.5 rounded-lg border border-line bg-surface text-xs font-semibold text-ink select-all">
+                                      <span className="truncate">{hasD ? formatRupiah(setD) : "-"}</span>
+                                      {hasD && (
+                                        <span className="text-danger text-[10px] font-bold shrink-0 ml-1">
+                                          -{perD}%
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Stok */}
+                                  <div className="col-span-1">
+                                    <label className="block text-[10px] font-medium text-muted mb-1">
+                                      Stok
+                                    </label>
+                                    <input
+                                      type="number"
+                                      value={vItem.stok ?? ""}
+                                      onChange={(e) =>
+                                        handleUpdateVariant(uIdx, vIdx, "stok", e.target.value)
+                                      }
+                                      placeholder="10"
+                                      className="input text-xs"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
 
-                      {/* Harga Jual, Diskon, Setelah Diskon, Persentase Diskon */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {/* Dimensi & Berat Paket */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 border-t border-line/70">
                         <div>
                           <label className="block text-[11px] font-medium text-muted mb-1">
-                            Harga Jual (Rp)
-                          </label>
-                          <input
-                            type="number"
-                            value={unit.data.Harga ?? ""}
-                            onChange={(e) => handleUpdateHargaJual(uIdx, e.target.value)}
-                            placeholder="Contoh: 2399000"
-                            className="input text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Diskon (Rp)
-                          </label>
-                          <input
-                            type="number"
-                            value={diskonVal}
-                            onChange={(e) => handleUpdateDiskon(uIdx, e.target.value)}
-                            placeholder="Potongan diskon"
-                            className="input text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Setelah Diskon
-                          </label>
-                          <div className="flex items-center min-h-[34px] px-3 rounded-lg border border-line bg-canvas/60 text-xs font-semibold text-ink select-all">
-                            {hasDiskon ? formatRupiah(setelahDiskon) : "-"}
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Persentase Diskon
-                          </label>
-                          <div className="flex items-center min-h-[34px] px-3 rounded-lg border border-line bg-canvas/60 text-xs font-semibold">
-                            {hasDiskon ? (
-                              <span className="text-danger font-bold">-{persenDiskon}%</span>
-                            ) : (
-                              <span className="text-muted font-normal">-</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Stok & Berat */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Total Stok
-                          </label>
-                          <input
-                            type="number"
-                            value={unit.data["Total Stok"] ?? ""}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Total Stok", e.target.value)}
-                            placeholder="10"
-                            className="input text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Berat (gram)
+                            Berat Produk (gram)
                           </label>
                           <input
                             type="number"
                             value={unit.data["Berat Produk"] ?? ""}
                             onChange={(e) => handleUpdateUnitField(uIdx, "Berat Produk", e.target.value)}
                             placeholder="500"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Panjang / Length (cm)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Length ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Length", e.target.value)}
+                            placeholder="18"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Lebar / Width (cm)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Width ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Width", e.target.value)}
+                            placeholder="10"
+                            className="input text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-medium text-muted mb-1">
+                            Tinggi / Height (cm)
+                          </label>
+                          <input
+                            type="number"
+                            value={unit.data.Height ?? ""}
+                            onChange={(e) => handleUpdateUnitField(uIdx, "Height", e.target.value)}
+                            placeholder="6"
                             className="input text-xs"
                           />
                         </div>
@@ -1285,46 +1665,6 @@ export default function ToccoExcelModal({
                             value={unit.data["Jenis Produk"] || "Buy Now"}
                             onChange={(e) => handleUpdateUnitField(uIdx, "Jenis Produk", e.target.value)}
                             placeholder="Buy Now"
-                            className="input text-xs"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Dimensi Paket */}
-                      <div className="grid grid-cols-3 gap-2.5">
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Panjang / Length (cm)
-                          </label>
-                          <input
-                            type="number"
-                            value={unit.data.Length ?? ""}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Length", e.target.value)}
-                            placeholder="18"
-                            className="input text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Lebar / Width (cm)
-                          </label>
-                          <input
-                            type="number"
-                            value={unit.data.Width ?? ""}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Width", e.target.value)}
-                            placeholder="10"
-                            className="input text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-medium text-muted mb-1">
-                            Tinggi / Height (cm)
-                          </label>
-                          <input
-                            type="number"
-                            value={unit.data.Height ?? ""}
-                            onChange={(e) => handleUpdateUnitField(uIdx, "Height", e.target.value)}
-                            placeholder="6"
                             className="input text-xs"
                           />
                         </div>
