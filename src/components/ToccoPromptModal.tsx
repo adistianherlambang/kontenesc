@@ -35,37 +35,75 @@ export default function ToccoPromptModal({
   const allUnits = useMemo<SelectedToccoUnit[]>(() => {
     if (!priceResult) return [];
     const list: SelectedToccoUnit[] = [];
+
     priceResult.data.forEach((group) => {
-      group.detail.forEach((item, idx) => {
+      // Kelompokkan item berdasarkan tipe yang sama (walau RAM/storage berbeda)
+      const tipeMap = new Map<string, typeof group.detail>();
+      group.detail.forEach((item) => {
+        const key = item.tipe.trim().toUpperCase();
+        if (!tipeMap.has(key)) {
+          tipeMap.set(key, []);
+        }
+        tipeMap.get(key)!.push(item);
+      });
+
+      tipeMap.forEach((items, key) => {
+        const first = items[0];
+        const seriList = items.map((it) => {
+          const net = it.cashback > 0 ? Math.max(0, it.harga - it.cashback) : it.harga;
+          return {
+            ram: it.ram,
+            harga: it.harga,
+            cashback: it.cashback,
+            netHarga: net,
+          };
+        });
+
+        // Urutkan seri dari harga terendah ke tertinggi
+        seriList.sort((a, b) => a.netHarga - b.netHarga);
+        const lowest = seriList[0];
+
         list.push({
-          ...item,
+          id: `${group.merk}-${key}`,
           merk: group.merk,
-          id: `${group.merk}-${idx}-${item.tipe}-${item.ram}`,
+          tipe: first.tipe,
+          nama: first.nama,
+          ram: lowest.ram,
+          harga: lowest.harga,
+          cashback: lowest.cashback,
+          seriList,
+          minPrice: seriList[0].netHarga,
+          maxPrice: seriList[seriList.length - 1].netHarga,
         });
       });
     });
+
     return list;
   }, [priceResult]);
 
   const brandOptions = useMemo(() => {
     if (!priceResult) return [{ value: "ALL", label: "Semua Merk" }];
     return [
-      { value: "ALL", label: `Semua Merk (${priceResult.totalUnits})` },
+      { value: "ALL", label: `Semua Merk (${allUnits.length})` },
       ...priceResult.data
-        .filter((b) => b.detail.length > 0)
-        .map((b) => ({
-          value: b.merk,
-          label: `${b.merk} (${b.detail.length})`,
-        })),
+        .map((b) => {
+          const count = allUnits.filter((u) => u.merk === b.merk).length;
+          return {
+            value: b.merk,
+            label: `${b.merk} (${count})`,
+          };
+        })
+        .filter((b) => !b.label.includes("(0)")),
     ];
-  }, [priceResult]);
+  }, [priceResult, allUnits]);
 
   const filteredUnits = useMemo(() => {
     return allUnits.filter((u) => {
       if (brandFilter !== "ALL" && u.merk !== brandFilter) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const text = `${u.merk} ${u.tipe} ${u.nama || ""} ${u.ram || ""}`.toLowerCase();
+        const ramAll = u.seriList ? u.seriList.map((s) => s.ram).join(" ") : u.ram || "";
+        const text = `${u.merk} ${u.tipe} ${u.nama || ""} ${ramAll}`.toLowerCase();
         if (!text.includes(q)) return false;
       }
       return true;
@@ -319,8 +357,16 @@ export default function ToccoPromptModal({
               ) : (
                 filteredUnits.map((unit) => {
                   const checked = selectedIds.has(unit.id);
-                  const netHarga =
-                    unit.cashback > 0 ? Math.max(0, unit.harga - unit.cashback) : unit.harga;
+                  const hasMultipleSeri = (unit.seriList?.length || 0) > 1;
+                  const ramSummary =
+                    unit.seriList && unit.seriList.length > 0
+                      ? unit.seriList
+                          .map((s) => (s.ram ? `${s.ram}GB` : ""))
+                          .filter(Boolean)
+                          .join(", ")
+                      : unit.ram
+                      ? `${unit.ram}GB`
+                      : "Aksesoris / Non-RAM";
 
                   return (
                     <label
@@ -341,9 +387,10 @@ export default function ToccoPromptModal({
                             {unit.merk} {unit.tipe}
                             {unit.nama ? ` (${unit.nama})` : ""}
                           </p>
-                          <p className="text-[11px] text-muted">
-                            {unit.ram ? `RAM/ROM: ${unit.ram}GB` : "Aksesoris / Non-RAM"}
-                            {unit.cashback > 0
+                          <p className="text-[11px] text-muted truncate">
+                            RAM/ROM: {ramSummary}
+                            {hasMultipleSeri && ` (${unit.seriList!.length} seri)`}
+                            {unit.cashback > 0 && !hasMultipleSeri
                               ? ` • Cashback ${formatRupiah(unit.cashback)}`
                               : ""}
                           </p>
@@ -351,8 +398,12 @@ export default function ToccoPromptModal({
                       </div>
 
                       <div className="text-right shrink-0">
-                        <p className="font-semibold text-ink">{formatRupiah(netHarga)}</p>
-                        {unit.cashback > 0 && (
+                        <p className="font-semibold text-ink">
+                          {hasMultipleSeri && unit.minPrice !== unit.maxPrice
+                            ? `${formatRupiah(unit.minPrice!)} - ${formatRupiah(unit.maxPrice!)}`
+                            : formatRupiah(unit.minPrice || unit.harga)}
+                        </p>
+                        {unit.cashback > 0 && !hasMultipleSeri && (
                           <p className="text-[11px] text-faint line-through">
                             {formatRupiah(unit.harga)}
                           </p>

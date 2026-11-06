@@ -7,9 +7,19 @@ export interface PromptOptions {
   priceData?: ExtractResult | null;
 }
 
+export interface ToccoRamSeries {
+  ram: string;
+  harga: number;
+  cashback: number;
+  netHarga: number;
+}
+
 export interface SelectedToccoUnit extends HargaItem {
   id: string;
   merk: string;
+  seriList?: ToccoRamSeries[];
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 function toRupiahNumber(val: number): number {
@@ -25,13 +35,36 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     const nominalCashback = toRupiahNumber(u.cashback);
     const hargaDiskon = nominalCashback > 0 ? Math.max(0, hargaNormal - nominalCashback) : "";
     const sku = `ANDROID-${u.merk.toUpperCase()}-${u.tipe.toUpperCase()}${u.ram ? `-${u.ram}` : ""}`;
+
+    const hasMultiRam = (u.seriList?.length || 0) > 1;
+    const ramOptions = hasMultiRam
+      ? u.seriList!.map((s) => (s.ram ? `${s.ram}GB` : "")).filter(Boolean)
+      : u.ram
+      ? [`${u.ram}GB`]
+      : [];
+
+    const seriDetail = hasMultiRam
+      ? u.seriList!.map((s) => {
+          const hn = toRupiahNumber(s.harga);
+          const cb = toRupiahNumber(s.cashback);
+          const hd = cb > 0 ? Math.max(0, hn - cb) : "";
+          return {
+            ram_rom: s.ram ? `${s.ram}GB` : "-",
+            harga_rupiah: hn,
+            harga_diskon_rupiah: hd,
+          };
+        })
+      : undefined;
+
     return {
       no_urut: idx + 1,
       sku,
       merk: u.merk,
       tipe: u.tipe,
       nama_lengkap: u.nama ? `${u.merk} ${u.tipe} (${u.nama})` : `${u.merk} ${u.tipe}`,
-      ram_rom: u.ram ? `${u.ram}GB` : "-",
+      ram_rom_dasar: u.ram ? `${u.ram}GB` : "-",
+      ...(ramOptions.length > 1 ? { opsi_pilihan_ram_rom: ramOptions } : {}),
+      ...(seriDetail ? { daftar_harga_per_seri: seriDetail } : {}),
       harga_rupiah: hargaNormal,
       cashback_rupiah: nominalCashback,
       harga_diskon_rupiah: hargaDiskon,
@@ -120,13 +153,19 @@ ${JSON.stringify(formattedUnits, null, 2)}
    - Jika \`aksesoris-tablet\`: \`"keyboard-bluetooth"\`, \`"casing-cover-tablet"\`, \`"charger-tablet"\`.
    - Jika \`wearable-devices\`: \`"smart-watch-1"\`, \`"smart-band"\`, \`"aksesoris-wearable-devices"\`.
    - Jika \`power-bank\`: \`"portable-power-bank"\`.
-4. **SKU (WAJIB FORMAT BAKU)**:
+4. **SATU TIPE = SATU PRODUK (PENGGABUNGAN SERI RAM/STORAGE)**:
+   - Buatkan tepat 1 objek produk dalam array JSON untuk setiap unit di daftar pilihan di atas (${units.length} unit = tepat ${units.length} objek JSON).
+   - Jika suatu unit memiliki opsi beberapa seri RAM/ROM (tercantum di "opsi_pilihan_ram_rom" atau "daftar_harga_per_seri", misal RAM 8/128, 8/256, 12/256):
+     * DILARANG membuat produk terpisah untuk tiap RAM. Cukup 1 produk saja untuk tipe tersebut!
+     * Gunakan RAM/ROM dasar/terendah sebagai acuan untuk Judul, SKU, dan Harga awal.
+     * Pada kolom "Deskripsi", tuliskan seluruh pilihan RAM/ROM yang tersedia (contoh: "Pilihan RAM/Storage : 8/128GB, 8/256GB, 12/256GB").
+5. **SKU (WAJIB FORMAT BAKU)**:
    - Kolom \`"SKU"\` WAJIB berformat huruf kapital \`ANDROID-BRAND-TIPE-RAM/STORAGE\` (contoh: \`"ANDROID-SAMSUNG-A07 5G-4/128"\`).
    - Gunakan langsung nilai \`sku\` yang sudah disediakan pada masing-masing item di daftar unit pilihan di atas.
-5. **Harga & Harga Diskon**:
+6. **Harga & Harga Diskon**:
    - Wajib berupa angka murni dalam Rupiah TANPA simbol Rp, titik, maupun koma (contoh: \`3499000\`).
    - Gunakan \`harga_rupiah\` dari daftar unit di atas untuk kolom \`"Harga"\`, dan \`harga_diskon_rupiah\` untuk kolom \`"Harga Diskon"\` (kosongkan \`""\` jika tidak ada cashback/diskon).
-6. **Berat & Ukuran**:
+7. **Berat & Ukuran**:
    - \`"Berat Produk"\`: angka dalam gram tanpa satuan (contoh: \`500\` untuk HP, \`800\` untuk Tablet).
    - \`"Length"\`, \`"Height"\`, \`"Width"\`: angka dalam cm tanpa satuan (contoh: Length \`18\`, Height \`6\`, Width \`10\`).
    - \`"Jenis Produk"\`: \`"Buy Now"\`, \`"Kondisi Barang"\`: \`"Baru"\`, \`"Status Produk"\`: \`"Aktif"\`, \`"Total Stok"\`: \`10\`.

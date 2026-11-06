@@ -583,45 +583,7 @@ export default function ToccoExcelModal({
           delete rowData[`Foto ${emptySlot}`];
         }
 
-        const rawWarna = unit.data.warna;
-        const colorList: string[] = Array.isArray(rawWarna)
-          ? rawWarna.map((w) => String(w).trim()).filter(Boolean)
-          : typeof rawWarna === "string" && rawWarna.trim()
-          ? rawWarna.split(",").map((w) => w.trim()).filter(Boolean)
-          : [];
-
-        if (colorList.length > 1) {
-          // Buat 1 baris untuk setiap variasi warna agar terdaftar sebagai varian di Toco
-          for (const color of colorList) {
-            const cleanColor = color.trim();
-            const colorCode = cleanColor
-              .toUpperCase()
-              .replace(/[\/\\,]+/g, " ")
-              .replace(/\s+/g, " ")
-              .trim();
-            const baseSku = (rowData.SKU || unit.sku).trim();
-            const variantSku = baseSku.endsWith(`-${colorCode}`)
-              ? baseSku
-              : `${baseSku}-${colorCode}`;
-
-            let variantDesc = rowData.Deskripsi || "";
-            if (variantDesc.includes("Warna :")) {
-              variantDesc = variantDesc.replace(
-                /Warna\s*:[^\n\r]*/,
-                `Warna : ${cleanColor}`
-              );
-            }
-
-            const variantRow: TocoProductRow = {
-              ...rowData,
-              SKU: variantSku,
-              Deskripsi: variantDesc,
-            };
-            updatedRows.push(variantRow);
-          }
-        } else {
-          updatedRows.push(rowData);
-        }
+        updatedRows.push(rowData);
       }
 
       // Step 2: Fetch template Excel file
