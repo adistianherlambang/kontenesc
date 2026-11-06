@@ -12,10 +12,21 @@ import {
   X,
   GripVertical,
   Plus,
+  Copy,
 } from "lucide-react";
 import Modal from "./Modal";
 import CustomSelect from "./CustomSelect";
 import { generateTocoExcel, TocoProductRow } from "@/lib/tocoExcelHelper";
+import {
+  POSTER_ICONS,
+  POSTER_ICON_KEYS,
+  PosterIconType,
+  getPosterIconDef,
+  renderPosterIcon,
+  copySvgToClipboard,
+  buildCombinedSvgRow,
+  normalizePosterIconKey,
+} from "@/lib/posterIcons";
 
 interface ToccoExcelModalProps {
   isOpen: boolean;
@@ -65,7 +76,13 @@ const SAMPLE_JSON = `[
     "Status Produk": "Aktif",
     "Length": 18,
     "Height": 6,
-    "Width": 10
+    "Width": 10,
+    "poster": [
+      { "icon": "processor", "isi": "MediaTek Helio G99 (6nm)" },
+      { "icon": "layar", "isi": "6.7” PLS LCD 90Hz" },
+      { "icon": "kamera", "isi": "50MP Auto Fokus" },
+      { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
+    ]
   }
 ]`;
 
@@ -87,6 +104,7 @@ export default function ToccoExcelModal({
   const [processStatus, setProcessStatus] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // Parse JSON input whenever it changes via user typing or sample button
   useEffect(() => {
@@ -127,6 +145,18 @@ export default function ToccoExcelModal({
           const existing = prevUnits[idx];
           const images = existing && existing.sku === sku ? existing.images : [];
 
+          const rawPoster = Array.isArray(item.poster) && item.poster.length > 0
+            ? item.poster.slice(0, 4).map((p: any) => ({
+                icon: normalizePosterIconKey(p.icon || "processor"),
+                isi: typeof p.isi === "string" ? p.isi : String(p.isi || ""),
+              }))
+            : [
+                { icon: "processor", isi: "" },
+                { icon: "layar", isi: "" },
+                { icon: "kamera", isi: "" },
+                { icon: "baterai", isi: "" },
+              ];
+
           return {
             index: idx,
             data: {
@@ -145,6 +175,7 @@ export default function ToccoExcelModal({
               ...item,
               SKU: sku,
               Judul: judul,
+              poster: rawPoster,
             },
             sku,
             judul,
@@ -377,6 +408,12 @@ export default function ToccoExcelModal({
       Height: 6,
       Width: 10,
       Preorder: "Tidak",
+      poster: [
+        { icon: "processor", isi: "" },
+        { icon: "layar", isi: "" },
+        { icon: "kamera", isi: "" },
+        { icon: "baterai", isi: "" },
+      ],
     };
 
     setUnits((prev) => {
@@ -394,6 +431,122 @@ export default function ToccoExcelModal({
       setJsonInput(JSON.stringify(nextUnits.map((u) => u.data), null, 2));
       setActiveUnitPasteIdx(newIdx);
       return nextUnits;
+    });
+  };
+
+  const handleCopySvg = async (key: string, svgString: string) => {
+    const success = await copySvgToClipboard(svgString);
+    if (success) {
+      setCopiedKey(key);
+      setTimeout(() => {
+        setCopiedKey((cur) => (cur === key ? null : cur));
+      }, 2000);
+    }
+  };
+
+  const handleCopyText = async (key: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => {
+        setCopiedKey((cur) => (cur === key ? null : cur));
+      }, 2000);
+    } catch (err) {
+      console.error("Gagal menyalin teks:", err);
+    }
+  };
+
+  const handleCopyAllPosterSvg = async (
+    unitIdx: number,
+    posterItems: Array<{ icon: string; isi?: string }>
+  ) => {
+    const combined = buildCombinedSvgRow(posterItems);
+    await handleCopySvg(`all-svg-${unitIdx}`, combined);
+  };
+
+  const handleCopyAllPosterText = async (
+    unitIdx: number,
+    posterItems: Array<{ icon: string; isi?: string }>
+  ) => {
+    const text = posterItems
+      .map((p) => {
+        const def = getPosterIconDef(p.icon);
+        return `• ${def.label}: ${p.isi || "-"}`;
+      })
+      .join("\n");
+    await handleCopyText(`all-text-${unitIdx}`, text);
+  };
+
+  const handleUpdatePosterItem = (
+    unitIdx: number,
+    posterIdx: number,
+    field: "icon" | "isi",
+    value: string
+  ) => {
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const currentPoster = Array.isArray(u.data.poster)
+          ? [...u.data.poster]
+          : [];
+        while (currentPoster.length <= posterIdx) {
+          currentPoster.push({ icon: "processor", isi: "" });
+        }
+        currentPoster[posterIdx] = {
+          ...currentPoster[posterIdx],
+          [field]: value,
+        };
+        const updatedData = { ...u.data, poster: currentPoster };
+        return {
+          ...u,
+          data: updatedData,
+        };
+      });
+
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
+    });
+  };
+
+  const handleAddPosterItem = (unitIdx: number) => {
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const currentPoster = Array.isArray(u.data.poster)
+          ? [...u.data.poster]
+          : [];
+        if (currentPoster.length >= 4) return u;
+        const existingKeys = new Set(currentPoster.map((p) => p.icon));
+        const nextKey =
+          POSTER_ICON_KEYS.find((k) => !existingKeys.has(k)) || "processor";
+        currentPoster.push({ icon: nextKey, isi: "" });
+        const updatedData = { ...u.data, poster: currentPoster };
+        return { ...u, data: updatedData };
+      });
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
+    });
+  };
+
+  const handleRemovePosterItem = (unitIdx: number, posterIdx: number) => {
+    setUnits((prev) => {
+      const updated = prev.map((u, i) => {
+        if (i !== unitIdx) return u;
+        const currentPoster = Array.isArray(u.data.poster)
+          ? [...u.data.poster]
+          : [];
+        currentPoster.splice(posterIdx, 1);
+        const updatedData = { ...u.data, poster: currentPoster };
+        return { ...u, data: updatedData };
+      });
+      const updatedRaw = updated.map((u) => u.data);
+      isTypingJsonRef.current = false;
+      setJsonInput(JSON.stringify(updatedRaw, null, 2));
+      return updated;
     });
   };
 
@@ -452,7 +605,7 @@ export default function ToccoExcelModal({
               const errJson = await res.json().catch(() => ({}));
               throw new Error(
                 errJson.error ||
-                  `Gagal mengunggah foto ${imgIdx + 1} untuk SKU ${unit.sku}`
+                `Gagal mengunggah foto ${imgIdx + 1} untuk SKU ${unit.sku}`
               );
             }
 
@@ -559,7 +712,7 @@ export default function ToccoExcelModal({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-ink">
-                Daftar Produk ({units.length} unit)
+                Daftar Produk
               </label>
               <button
                 type="button"
@@ -575,17 +728,18 @@ export default function ToccoExcelModal({
               {units.map((unit, uIdx) => {
                 const isSelected = activeUnitPasteIdx === uIdx;
                 const canAddMore = unit.images.length < 5;
+                const unitPoster: Array<{ icon: string; isi?: string }> =
+                  Array.isArray(unit.data.poster) ? unit.data.poster : [];
 
                 return (
                   <div
                     key={uIdx}
                     onClick={() => setActiveUnitPasteIdx(uIdx)}
                     onFocus={() => setActiveUnitPasteIdx(uIdx)}
-                    className={`rounded-xl border p-4 transition-colors space-y-3.5 ${
-                      isSelected
-                        ? "border-brand bg-brand-soft/10 ring-1 ring-brand/30"
-                        : "border-line bg-surface"
-                    }`}
+                    className={`rounded-xl border p-4 transition-colors space-y-3.5 ${isSelected
+                      ? "border-brand bg-brand-soft/10 ring-1 ring-brand/30"
+                      : "border-line bg-surface"
+                      }`}
                   >
                     {/* Card Header */}
                     <div className="flex items-center justify-between pb-2.5 border-b border-line">
@@ -596,11 +750,11 @@ export default function ToccoExcelModal({
                         <span className="text-xs font-semibold text-ink truncate">
                           {unit.sku || `Unit ${uIdx + 1}`}
                         </span>
-                        {isSelected && (
+                        {/* {isSelected && (
                           <span className="text-[11px] text-brand font-medium shrink-0">
                             (Aktif untuk paste foto)
                           </span>
-                        )}
+                        )} */}
                       </div>
 
                       {units.length > 1 && (
@@ -695,15 +849,14 @@ export default function ToccoExcelModal({
                                 setDraggedItem(null);
                                 setDragOverItem(null);
                               }}
-                              className={`relative aspect-square rounded-lg border transition-all duration-200 flex flex-col items-center justify-center p-1 overflow-hidden select-none group/slot ${
-                                isBeingDragged
-                                  ? "opacity-30 scale-95 border-dashed border-brand bg-brand-soft/30 ring-2 ring-brand/40"
-                                  : isSnapTarget
+                              className={`relative aspect-square rounded-lg border transition-all duration-200 flex flex-col items-center justify-center p-1 overflow-hidden select-none group/slot ${isBeingDragged
+                                ? "opacity-30 scale-95 border-dashed border-brand bg-brand-soft/30 ring-2 ring-brand/40"
+                                : isSnapTarget
                                   ? "scale-105 border-brand ring-2 ring-brand shadow-md bg-brand-soft/50 z-10"
                                   : isSlotOccupied
-                                  ? "border-line bg-canvas cursor-grab active:cursor-grabbing hover:border-brand/60 hover:shadow-xs"
-                                  : "border-dashed border-line bg-canvas hover:border-brand/40"
-                              }`}
+                                    ? "border-line bg-canvas cursor-grab active:cursor-grabbing hover:border-brand/60 hover:shadow-xs"
+                                    : "border-dashed border-line bg-canvas hover:border-brand/40"
+                                }`}
                             >
                               {img ? (
                                 <>
@@ -735,9 +888,8 @@ export default function ToccoExcelModal({
                                 </>
                               ) : (
                                 <label
-                                  className={`size-full flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-subtle ${
-                                    !canAddMore ? "opacity-30 cursor-not-allowed" : ""
-                                  }`}
+                                  className={`size-full flex flex-col items-center justify-center cursor-pointer transition-colors hover:bg-subtle ${!canAddMore ? "opacity-30 cursor-not-allowed" : ""
+                                    }`}
                                 >
                                   <ImageIcon className="size-4 text-faint" />
                                   <input
@@ -754,6 +906,167 @@ export default function ToccoExcelModal({
                                     className="hidden"
                                   />
                                 </label>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Section: Spesifikasi Poster & Salin SVG untuk Figma / Illustrator */}
+                    <div className="space-y-2.5 pt-3 border-t border-line/70">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <label className="text-[11px] font-semibold text-ink">
+                              Spesifikasi Poster &middot; Salin SVG (Figma / Illustrator)
+                            </label>
+                            <span className="text-[10px] text-faint">
+                              ({unitPoster.length}/4 poin)
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-muted">
+                            Salin SVG untuk dipaste langsung (Ctrl+V) ke canvas Figma atau Illustrator sebagai vektor.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          {unitPoster.length < 4 && (
+                            <button
+                              type="button"
+                              onClick={() => handleAddPosterItem(uIdx)}
+                              className="inline-flex items-center gap-1 text-[11px] text-brand hover:underline font-medium cursor-pointer"
+                            >
+                              <Plus className="size-3" />
+                              Tambah Poin
+                            </button>
+                          )}
+
+                          {unitPoster.length > 0 && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyAllPosterSvg(uIdx, unitPoster)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-line bg-canvas hover:bg-subtle text-[11px] text-ink transition-colors cursor-pointer select-none"
+                                title="Salin semua icon SVG sekaligus ke clipboard"
+                              >
+                                {copiedKey === `all-svg-${uIdx}` ? (
+                                  <>
+                                    <Check className="size-3 text-success stroke-[2.5]" />
+                                    <span className="text-success font-medium">Semua SVG Tersalin!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="size-3 text-muted" />
+                                    <span>Salin Semua SVG</span>
+                                  </>
+                                )}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleCopyAllPosterText(uIdx, unitPoster)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg border border-line bg-canvas hover:bg-subtle text-[11px] text-ink transition-colors cursor-pointer select-none"
+                                title="Salin teks seluruh spesifikasi poster"
+                              >
+                                {copiedKey === `all-text-${uIdx}` ? (
+                                  <>
+                                    <Check className="size-3 text-success stroke-[2.5]" />
+                                    <span className="text-success font-medium">Teks Tersalin!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="size-3 text-muted" />
+                                    <span>Salin Teks</span>
+                                  </>
+                                )}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* List of poster items */}
+                      <div className="space-y-2">
+                        {unitPoster.map((pItem, pIdx) => {
+                          const def = getPosterIconDef(pItem.icon);
+                          const isSvgCopied = copiedKey === `svg-${uIdx}-${pIdx}`;
+
+                          return (
+                            <div
+                              key={pIdx}
+                              className="flex items-center gap-2 rounded-lg border border-line bg-canvas p-2 text-xs"
+                            >
+                              {/* Visual SVG Icon Preview */}
+                              <div
+                                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-soft/70 border border-brand/20 text-brand"
+                                title={`Ikon: ${def.label}`}
+                              >
+                                {renderPosterIcon(pItem.icon, "size-4")}
+                              </div>
+
+                              {/* Select Icon Dropdown */}
+                              <div className="w-40 shrink-0">
+                                <CustomSelect
+                                  value={pItem.icon}
+                                  onChange={(val) => handleUpdatePosterItem(uIdx, pIdx, "icon", val)}
+                                  options={POSTER_ICON_KEYS.map((k) => {
+                                    const d = getPosterIconDef(k);
+                                    return {
+                                      value: d.key,
+                                      label: d.label,
+                                      icon: renderPosterIcon(d.key, "size-3.5"),
+                                    };
+                                  })}
+                                  size="sm"
+                                />
+                              </div>
+
+                              {/* Input Isi Spesifikasi */}
+                              <div className="flex-1 min-w-0">
+                                <input
+                                  type="text"
+                                  value={pItem.isi || ""}
+                                  onChange={(e) => handleUpdatePosterItem(uIdx, pIdx, "isi", e.target.value)}
+                                  placeholder="Contoh: MediaTek Helio G99 (6nm)"
+                                  className="input text-xs py-1 px-2.5 min-h-[34px] sm:min-h-[32px]"
+                                />
+                              </div>
+
+                              {/* Action: Copy SVG Button */}
+                              <button
+                                type="button"
+                                onClick={() => handleCopySvg(`svg-${uIdx}-${pIdx}`, def.svgMarkup)}
+                                className={`inline-flex items-center gap-1.5 min-h-[34px] sm:min-h-[32px] px-2.5 rounded-lg border transition-all text-xs font-medium cursor-pointer shrink-0 select-none ${
+                                  isSvgCopied
+                                    ? "border-success bg-success-soft text-success shadow-2xs"
+                                    : "border-line bg-canvas hover:border-brand hover:text-brand hover:bg-brand-soft/30 text-ink"
+                                }`}
+                                title="Salin kode vektor SVG untuk paste langsung di Figma / Illustrator"
+                              >
+                                {isSvgCopied ? (
+                                  <>
+                                    <Check className="size-3.5 stroke-[2.5]" />
+                                    <span>Tersalin!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="size-3.5 text-muted" />
+                                    <span>Salin SVG</span>
+                                  </>
+                                )}
+                              </button>
+
+                              {/* Remove Item */}
+                              {unitPoster.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemovePosterItem(uIdx, pIdx)}
+                                  className="p-1.5 rounded-lg text-muted hover:text-danger hover:bg-danger-soft transition-colors cursor-pointer shrink-0"
+                                  title="Hapus poin poster ini"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </button>
                               )}
                             </div>
                           );

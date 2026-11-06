@@ -68,10 +68,10 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
     "Foto 9": "",
     "Foto 10": "",
     "poster": [
-      { "icon": "processor", "isi": "Dimensity 6400 Turbo" },
-      { "icon": "layar", "isi": "6.57\\" AMOLED 120Hz" },
-      { "icon": "kamera", "isi": "50MP Sony AI" },
-      { "icon": "baterai", "isi": "7000mAh 60W Ultra Charge" }
+      { "icon": "processor", "isi": "MediaTek Helio G99 (6nm)" },
+      { "icon": "layar", "isi": "6.7” PLS LCD 90Hz" },
+      { "icon": "kamera", "isi": "50MP Auto Fokus" },
+      { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
     ],
     "caption": [
       "realme 16 5G 12/256GB Prosesor Dimensity 6400 Turbo Layar 6.57” AMOLED 120Hz Kamera 50MP Sony AI Baterai 7000mAh 60W Ultra Charge Garansi Resmi 1 Tahun\\n\\nDeskripsi:\\nProduk dijamin 100% original dan baru. Kami menyediakan garansi uang kembali apabila terjadi kehilangan selama proses pengiriman, garansi penukaran unit jika produk diterima dalam kondisi rusak atau cacat, serta garansi resmi 1 tahun dengan dukungan penuh untuk proses klaim.\\n\\nKeterangan : Barang akan kami open box sebelum pengiriman untuk mengambil kartu garansi bagian penjual. Hal ini wajib dilakukan untuk aktivasi garansi resmi REALME, sehingga apabila terjadi kendala pada perangkat, klaim dapat dilakukan di seluruh service center REALME di Indonesia.\\n\\nProsesor : MediaTek Dimensity 6400 Turbo\\nUkuran : 6.57”\\nTeknologi : AMOLED 120Hz dengan tingkat kecerahan hingga ±4200 nits\\nResolusi : Full HD+ (2372 x 1080)\\nKamera Belakang : 50 MP Sony AI + 2 MP depth/monochrome\\nKamera Utama Auto Fokus : Yes\\nKamera Belakang - OIS : No\\nKamera Belakang - Zoom : Digital Zoom\\nKamera Depan : 50 MP\\nKamera Depan Auto Fokus : Yes\\nVideo Resolusi : 1080p @30fps\\nRAM : 12GB (+14GB Dynamic RAM)\\nROM : 256GB UFS 2.2\\nSIM Tray : Dual-SIM\\nJaringan : 5G\\nUSB : USB Type-C\\nUSB : USB 2.0\\nEarjack : No\\nBluetooth : Bluetooth v5.3\\nNFC : Yes\\nAUDIO : Dual stereo speaker\\nBaterai : 7000 mAh\\nFast Charging : 60W Ultra Charge\\nKeamanan : Fingerprint in-display, AI Face Unlock\\nSistem Operasi : Android\\nLainnya : Reverse charging, bypass charging, tahan air dan debu, AI Instant Clip, Selfie Mirror\\nWarna : Black Cloud, White Swan\\n\\nIsi dalam box : Ponsel, adaptor, kabel USB Type-C, alat SIM ejector, casing pelindung, panduan pengguna, dan kartu garansi resmi."
@@ -82,7 +82,7 @@ export function generateToccoPrompt(units: SelectedToccoUnit[]): string {
   return `Bertindaklah sebagai E-Commerce Product Specialist & Technical Researcher profesional untuk "Eldorado Semarang Cell".
 
 TUGAS UTAMA:
-Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan) dan array \`caption\` (sesuai template baku toko) untuk ${units.length} unit pilihan berikut ini:
+Buatkan data produk lengkap dalam format JSON untuk keperluan bulk upload Toco (sesuai struktur file \`toco_bulk_upload_template.xlsx\` sheet \`Product Listing\`), dilengkapi array \`poster\` (maksimal 4 spesifikasi unggulan dengan icon yang telah dibatasi) dan array \`caption\` (sesuai template baku toko) untuk ${units.length} unit pilihan berikut ini:
 
 ### DAFTAR UNIT PILIHAN DARI DAFTAR HARGA TOKO:
 \`\`\`json
@@ -91,12 +91,12 @@ ${JSON.stringify(formattedUnits, null, 2)}
 
 ---
 
-### ATURAN RISET SPESIFIKASI RESMI (WAJIB AKURAT & DILARANG ASAL):
-1. **Wajib Riset Situs Resmi Brand**:
-   - Spesifikasi TIDAK BOLEH ASAL atau dikarang (no hallucination).
-   - WAJIB mengacu pada spesifikasi teknis resmi yang tertera di situs resmi / toko online resmi masing-masing brand di Indonesia (seperti Samsung Official Indonesia, Xiaomi/Mi.co.id, OPPO Indonesia, Vivo Indonesia, Realme Indonesia, Infinix Official, Tecno Official, Apple Official, serta GSMArena untuk validasi detail teknis).
+### ATURAN RISET SPESIFIKASI RESMI (WAJIB AKURAT & DILARANG ASAL / NO HALLUCINATION):
+1. **PERINGATAN KERAS: JANGAN MENGARANG ATAU MENGASAL SPESIFIKASI SAMA SEKALI**:
+   - Seluruh spesifikasi teknis HARUS 100% RIIL, akurat, dan diverifikasi dari spesifikasi resmi yang dirilis oleh brand resmi di Indonesia (seperti situs resmi Samsung Indonesia, Xiaomi/Mi.co.id, OPPO Indonesia, Vivo Indonesia, Realme Indonesia, Infinix Official, Tecno Official, Apple Indonesia, serta GSMArena untuk validasi detail chipset/sensor).
+   - JANGAN PERNAH MENEBAK! Jika sebuah varian smartphone memakai prosesor Helio G99, jangan tulis Dimensity atau Snapdragon. Jika layarnya 90Hz, jangan tulis 120Hz. Jika kamera tidak punya OIS, tulis 'No'. Kesalahan spesifikasi berakibat fatal pada pembatalan pesanan dan komplain garansi pembeli!
 2. **Keakuratan Tiap Baris Spesifikasi**:
-   - Pastikan nama chipset/prosesor, ukuran layar, jenis panel & refresh rate & nits, resolusi layar, konfigurasi kamera belakang & depan (MP, Auto Fokus, OIS, Zoom, Video Resolusi), RAM (+ Extended/Dynamic RAM jika ada), jenis ROM (UFS/eMMC), SIM Tray, Jaringan (4G/5G), tipe port USB & versi USB, ketersediaan Earjack 3.5mm, versi Bluetooth, NFC (Yes/No), sistem Audio (Mono/Dual Stereo Speaker), kapasitas Baterai (mAh), kecepatan Fast Charging (Watt & nama teknologinya), sensor Keamanan, Sistem Operasi, Fitur Lainnya (IP rating, AI features, dll), varian Warna resmi di Indonesia, hingga **Isi dalam box** (apakah dapat adaptor charger atau hanya kabel di dalam box resmi Indonesia, misal Samsung seri tertentu tidak menyertakan kepala charger di dalam box) ditulis 100% sesuai fakta produk aslinya.
+   - Pastikan nama chipset/prosesor lengkap (termasuk fabrikasi nm jika ada), ukuran layar, jenis panel & refresh rate & kecerahan nits, resolusi layar, konfigurasi kamera belakang & depan (MP, Auto Fokus, OIS, Zoom, Video Resolusi), RAM (+ Extended/Dynamic RAM jika ada), jenis ROM (UFS/eMMC), SIM Tray, Jaringan (4G/5G), tipe port USB & versi USB, ketersediaan Earjack 3.5mm, versi Bluetooth, NFC (Yes/No), sistem Audio (Mono/Dual Stereo Speaker), kapasitas Baterai (mAh), kecepatan Fast Charging (Watt & nama teknologinya), sensor Keamanan, Sistem Operasi, Fitur Lainnya (IP rating, AI features, dll), varian Warna resmi di Indonesia, hingga **Isi dalam box** (apakah dapat adaptor charger atau hanya kabel di dalam box resmi Indonesia, misal Samsung seri tertentu tidak menyertakan kepala charger di dalam box) ditulis 100% sesuai fakta produk aslinya.
 
 ---
 
@@ -129,18 +129,30 @@ ${JSON.stringify(formattedUnits, null, 2)}
 
 ---
 
-### ATURAN ARRAY \`poster\` (MAKSIMAL 4 ITEM):
-Setiap objek produk di dalam JSON WAJIB memiliki properti \`"poster"\` berupa array berisi maksimal 4 spesifikasi yang paling diunggulkan dari unit tersebut:
+### ATURAN ARRAY \`poster\` (MAKSIMAL 4 ITEM & ICON DIBATASI KETAT):
+Setiap objek produk di dalam JSON WAJIB memiliki properti \`"poster"\` berupa array berisi tepat maksimal 4 spesifikasi yang paling diunggulkan dari unit tersebut untuk kebutuhan desain poster di Figma / Illustrator.
+
+**DIBATASI KETAT: Nilai properti "icon" HANYA BOLEH menggunakan salah satu nilai dari daftar baku berikut (DILARANG MENGGUNAKAN NAMA ICON DI LUAR DAFTAR INI):**
+1. \`"processor"\` -> untuk Chipset / CPU / Prosesor (contoh isi: \`"MediaTek Helio G99 (6nm)"\`, \`"Snapdragon 680 (6nm)"\`)
+2. \`"layar"\` -> untuk Layar, Panel, Ukuran, atau Refresh Rate (contoh isi: \`"6.7” PLS LCD 90Hz"\`, \`"6.67” AMOLED 120Hz"\`)
+3. \`"kamera"\` -> untuk Kamera Utama, Resolusi, atau OIS (contoh isi: \`"50MP Auto Fokus"\`, \`"108MP OIS Ultra Clear"\`)
+4. \`"baterai"\` -> untuk Kapasitas Baterai & Daya Charging (contoh isi: \`"5000mAh 25W Fast Charging"\`, \`"6000mAh 45W"\`)
+5. \`"ram"\` -> untuk RAM & Dynamic/Extended RAM (contoh isi: \`"8GB (+8GB Dynamic RAM)"\`)
+6. \`"penyimpanan"\` -> untuk Memori Internal ROM & Tipe Storage (contoh isi: \`"256GB UFS 2.2"\`)
+7. \`"jaringan"\` -> untuk Konektivitas 5G / Sinyal (contoh isi: \`"5G Dual SIM"\`)
+8. \`"nfc"\` -> untuk Fitur NFC (contoh isi: \`"Multifunction NFC"\`)
+9. \`"speaker"\` -> untuk Sistem Audio Speaker (contoh isi: \`"Dual Stereo Speaker"\`)
+10. \`"ketahanan"\` -> untuk Proteksi / IP Rating Tahan Air & Debu (contoh isi: \`"IP54 Tahan Cipratan Air"\`)
+
+**CONTOH FORMAT BAKU \`poster\` (WAJIB PERSIS SEPERTI INI):**
 \`\`\`json
 "poster": [
-  { "icon": "processor", "isi": "Snapdragon / Dimensity ..." },
-  { "icon": "baterai", "isi": "6000mAh 60W" },
-  { "icon": "layar", "isi": "6.57\\" AMOLED 120Hz" },
-  { "icon": "kamera", "isi": "50MP OIS" }
+  { "icon": "processor", "isi": "MediaTek Helio G99 (6nm)" },
+  { "icon": "layar", "isi": "6.7” PLS LCD 90Hz" },
+  { "icon": "kamera", "isi": "50MP Auto Fokus" },
+  { "icon": "baterai", "isi": "5000mAh 25W Fast Charging" }
 ]
 \`\`\`
-- \`icon\`: kategori ikon singkat (misal: \`processor\`, \`baterai\`, \`layar\`, \`kamera\`, \`ram\`, \`nfc\`, \`ketahanan\`, \`audio\`).
-- \`isi\`: teks spesifikasi unggulan yang ringkas, padat, dan siap dipasang pada poster produk.
 
 ---
 
