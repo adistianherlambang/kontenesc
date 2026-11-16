@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { ChevronDown, Smartphone } from "lucide-react";
+import React from "react";
+import { Smartphone } from "lucide-react";
 import { StokItem } from "@/lib/firebase";
 
 interface StokItemListProps {
@@ -21,20 +21,9 @@ export default function StokItemList({
   emptyMessage = "Tidak ada data stok ditemukan",
   onResetSearch,
 }: StokItemListProps) {
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-
-  const toggleItem = (id: string) => {
-    setExpandedItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
   if (isLoading) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-12 text-muted text-xs">
+      <div className="h-64 flex flex-col items-center justify-center text-center p-8 text-muted text-xs">
         Memuat data stok...
       </div>
     );
@@ -42,21 +31,21 @@ export default function StokItemList({
 
   if (items.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center p-8 sm:p-12 text-gray-400">
-        <div className="w-16 h-16 rounded-2xl bg-[#FAFAFA] border border-gray-200 flex items-center justify-center text-muted mb-4 shadow-xs">
+      <div className="flex flex-col items-center justify-center text-center py-12 px-4 text-gray-400">
+        <div className="size-14 rounded-2xl bg-surface border border-line flex items-center justify-center text-muted mb-3 shadow-2xs">
           <Smartphone className="size-6" />
         </div>
-        <h3 className="text-sm font-bold text-[#18181B] mb-1.5">
+        <h3 className="text-sm font-bold text-ink mb-1">
           {emptyMessage}
         </h3>
-        <p className="text-xs max-w-sm text-[#71717A] mb-5">
-          Ubah kata kunci pencarian atau pilih brand lain untuk menampilkan data.
+        <p className="text-xs max-w-sm text-muted mb-4">
+          Coba ubah kata kunci pencarian tipe atau warna untuk menemukan stok.
         </p>
         {onResetSearch && (
           <button
             type="button"
             onClick={onResetSearch}
-            className="px-5 py-2.5 min-h-[42px] rounded-xl bg-[#18181B] text-white text-xs font-semibold hover:bg-black cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-ink text-white text-xs font-semibold hover:bg-black active:scale-95 transition-all cursor-pointer"
           >
             Reset Pencarian
           </button>
@@ -67,76 +56,71 @@ export default function StokItemList({
 
   if (viewMode === "grid") {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 pb-24">
-        {items.map((item, idx) => {
-          const isExpanded = expandedItems.has(item.id);
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4 pb-20">
+        {items.map((item) => {
           const hasWarna =
             Array.isArray(item.rincian_warna) && item.rincian_warna.length > 0;
 
           return (
             <article
               key={item.id}
-              className="flex flex-col rounded-2xl border border-line bg-surface p-2 sm:p-1.5 transition-all duration-200 hover:shadow-sm"
+              className="group relative flex flex-col justify-between rounded-2xl border border-line bg-canvas p-4 sm:p-5 shadow-2xs hover:border-line-strong hover:shadow-sm transition-all duration-200"
             >
-              {/* Top frame header — matches ContentCard */}
-              <header className="flex min-h-10 items-center justify-between gap-2 pl-3 pr-1 pb-2">
-                <span className="truncate text-[13px] font-semibold text-muted">
-                  {showBrand ? item.brand : `#${idx + 1}`}
-                </span>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg border border-line-strong bg-white text-xs font-semibold text-ink shadow-2xs shrink-0">
-                  {item.total_stok} unit
-                </span>
-              </header>
-
-              {/* Inner white sheet */}
-              <div className="flex flex-1 flex-col rounded-xl border border-black/[0.04] bg-canvas p-4">
-                <h4 className="mb-3 text-[15px] font-semibold leading-snug text-ink">
-                  {item.tipe}
-                </h4>
-
-                <div className="mt-auto">
-                  <button
-                    type="button"
-                    onClick={() => hasWarna && toggleItem(item.id)}
-                    disabled={!hasWarna}
-                    className={`w-full flex items-center justify-between rounded-xl border border-line bg-surface px-3 py-2 text-xs font-medium transition-colors ${
-                      hasWarna
-                        ? "text-muted hover:bg-subtle hover:text-ink cursor-pointer"
-                        : "text-faint opacity-70 cursor-default"
-                    }`}
-                  >
-                    <span>
-                      {hasWarna
-                        ? `Detail Warna (${item.rincian_warna.length})`
-                        : "Tidak ada rincian warna"}
-                    </span>
-                    {hasWarna && (
-                      <ChevronDown
-                        className={`size-4 text-faint transition-transform duration-200 ${
-                          isExpanded ? "rotate-180 text-ink" : ""
-                        }`}
-                      />
+              {/* Header: Title & Total Stock Badge */}
+              <div>
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="min-w-0 flex-1">
+                    {showBrand && (
+                      <span className="text-[11px] font-bold text-muted uppercase tracking-wider block mb-1">
+                        {item.brand}
+                      </span>
                     )}
-                  </button>
+                    <h3 className="text-sm sm:text-[15px] font-bold text-ink leading-snug group-hover:text-brand transition-colors">
+                      {item.tipe}
+                    </h3>
+                  </div>
 
-                  {isExpanded && hasWarna && (
-                    <div className="mt-2 rounded-xl border border-line bg-surface/60 divide-y divide-line overflow-hidden">
-                      {item.rincian_warna.map((wItem, wIdx) => (
-                        <div
-                          key={wIdx}
-                          className="flex items-center justify-between px-3 py-2 text-xs"
-                        >
-                          <span className="text-muted capitalize">
-                            {wItem.warna}
-                          </span>
-                          <span className="font-semibold text-ink">
-                            {wItem.qty}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {/* Stock Badge */}
+                  <div className="shrink-0 inline-flex items-baseline gap-1 px-2.5 py-1 rounded-xl bg-subtle border border-line shadow-2xs">
+                    <span className="text-xs sm:text-[13px] font-bold text-ink">
+                      {item.total_stok}
+                    </span>
+                    <span className="text-[10px] text-muted font-medium">unit</span>
+                  </div>
                 </div>
+              </div>
+
+              {/* Color Variants: Direct visual chips */}
+              <div className="pt-3 mt-3 border-t border-line/60">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-faint">
+                    Rincian Warna
+                  </span>
+                  <span className="text-[11px] font-medium text-muted">
+                    {hasWarna ? `${item.rincian_warna.length} warna` : "-"}
+                  </span>
+                </div>
+
+                {hasWarna ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {item.rincian_warna.map((w, wIdx) => (
+                      <span
+                        key={wIdx}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface border border-line text-xs font-medium text-ink transition-colors hover:bg-subtle"
+                      >
+                        <span className="size-2 rounded-full bg-line-strong ring-1 ring-black/10 shrink-0" />
+                        <span className="capitalize">{w.warna}</span>
+                        <span className="font-bold text-ink bg-canvas px-1.5 py-0.5 rounded border border-line/70 text-[11px] ml-0.5">
+                          {w.qty}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-faint italic py-0.5">
+                    Tidak ada rincian warna
+                  </p>
+                )}
               </div>
             </article>
           );
@@ -145,94 +129,67 @@ export default function StokItemList({
     );
   }
 
-  // Table view — matches ContentTable
+  // Table view
   return (
-    <div className="pb-24">
-      <div className="rounded-xl border border-line bg-canvas overflow-hidden shadow-xs">
+    <div className="pb-20">
+      <div className="rounded-xl border border-line bg-canvas overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr>
-                <th className="th w-14 text-center">No</th>
+                <th className="th w-12 text-center">No</th>
                 {showBrand && <th className="th whitespace-nowrap">Brand</th>}
                 <th className="th min-w-[200px]">Tipe Handphone</th>
                 <th className="th w-24 text-right">Total Stok</th>
-                <th className="th w-40 text-right">Rincian Warna</th>
+                <th className="th min-w-[260px]">Rincian Warna</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
               {items.map((item, idx) => {
-                const isExpanded = expandedItems.has(item.id);
                 const hasWarna =
                   Array.isArray(item.rincian_warna) &&
                   item.rincian_warna.length > 0;
-                const colSpan = showBrand ? 5 : 4;
 
                 return (
-                  <React.Fragment key={item.id}>
-                    <tr
-                      onClick={() => hasWarna && toggleItem(item.id)}
-                      className={`hover:bg-subtle/50 transition-colors ${
-                        hasWarna ? "cursor-pointer" : ""
-                      }`}
-                    >
-                      <td className="td text-center text-muted">
-                        {idx + 1}
+                  <tr
+                    key={item.id}
+                    className="hover:bg-subtle/50 transition-colors"
+                  >
+                    <td className="td text-center text-muted font-medium">
+                      {idx + 1}
+                    </td>
+                    {showBrand && (
+                      <td className="td font-medium text-muted">
+                        {item.brand}
                       </td>
-                      {showBrand && (
-                        <td className="td whitespace-nowrap text-muted font-medium">
-                          {item.brand}
-                        </td>
-                      )}
-                      <td className="td font-medium text-ink">{item.tipe}</td>
-                      <td className="td text-right font-semibold text-ink">
-                        {item.total_stok}
-                      </td>
-                      <td className="td text-right">
-                        {hasWarna ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleItem(item.id);
-                            }}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface hover:bg-subtle px-2.5 py-1 text-[11px] font-medium text-muted hover:text-ink transition-colors cursor-pointer"
-                          >
-                            <span>{item.rincian_warna.length} warna</span>
-                            <ChevronDown
-                              className={`size-3.5 text-faint transition-transform ${
-                                isExpanded ? "rotate-180 text-ink" : ""
-                              }`}
-                            />
-                          </button>
-                        ) : (
-                          <span className="text-[11px] text-faint">-</span>
-                        )}
-                      </td>
-                    </tr>
-
-                    {isExpanded && hasWarna && (
-                      <tr className="bg-surface/70">
-                        <td colSpan={colSpan} className="px-4 py-3 border-b border-line">
-                          <div className="flex flex-wrap gap-2 pl-6 sm:pl-10">
-                            {item.rincian_warna.map((wItem, wIdx) => (
-                              <div
-                                key={wIdx}
-                                className="inline-flex items-center gap-2 rounded-lg border border-line bg-canvas px-3 py-1.5 text-xs"
-                              >
-                                <span className="text-muted capitalize">
-                                  {wItem.warna}
-                                </span>
-                                <span className="font-semibold text-ink">
-                                  {wItem.qty}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
                     )}
-                  </React.Fragment>
+                    <td className="td font-bold text-ink">{item.tipe}</td>
+                    <td className="td text-right">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-subtle border border-line font-bold text-ink">
+                        {item.total_stok}
+                      </span>
+                    </td>
+                    <td className="td py-2">
+                      {hasWarna ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          {item.rincian_warna.map((w, wIdx) => (
+                            <span
+                              key={wIdx}
+                              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface border border-line text-[11px] text-ink"
+                            >
+                              <span className="size-1.5 rounded-full bg-muted/60" />
+                              <span className="capitalize">{w.warna}</span>
+                              <span className="font-bold text-ink ml-0.5">
+                                ({w.qty})
+                              </span>
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-faint">-</span>
+                      )}
+                    </td>
+                  </tr>
                 );
               })}
             </tbody>

@@ -2,14 +2,21 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Menu, Search, X, LayoutGrid, AlignJustify } from "lucide-react";
+import {
+  ArrowLeft,
+  Search,
+  X,
+  LayoutGrid,
+  AlignJustify,
+  Menu,
+} from "lucide-react";
 import {
   StokItem,
   StokSummary,
   subscribeToStok,
   getStokFromDb,
 } from "@/lib/firebase";
-import { BrandLogo, BRAND_LIST, getBrandConfig } from "@/lib/brandLogos";
+import { BrandLogo, getBrandConfig } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
 
@@ -127,78 +134,92 @@ export default function BrandStokClient({ brand }: { brand: string }) {
       />
 
       <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
-        {/* Top Header — matches /konten */}
-        <header className="min-h-[60px] sm:min-h-[62px] px-4 sm:px-8 py-2.5 border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 bg-white">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <button
-              type="button"
-              onClick={() => setIsMobileSidebarOpen(true)}
-              aria-label="Buka menu navigasi"
-              className="md:hidden -ml-1 p-2.5 min-w-[42px] min-h-[42px] flex items-center justify-center text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-100 active:bg-gray-200 cursor-pointer transition-colors"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+        {/* Responsive Header */}
+        <header className="px-4 sm:px-8 py-3 border-b border-[#ECEBE8] flex flex-col gap-2.5 shrink-0 bg-white">
+          <div className="flex items-center justify-between gap-3">
+            {/* Left: Back Button + Brand Logo + Count */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Link
+                href="/stok"
+                className="btn btn-ghost btn-icon -ml-2"
+                title="Kembali ke Semua Brand"
+                aria-label="Kembali ke Semua Brand"
+              >
+                <ArrowLeft className="size-4.5" />
+              </Link>
 
-            <BrandLogo
-              brand={rawBrandSlug}
-              color={rawBrandSlug === "infinix" ? "#2E9E00" : undefined}
-              className="h-4 w-auto"
-            />
-            <span className="text-xs text-[#71717A] shrink-0">
-              &middot; {brandTotalUnits} unit
-            </span>
-          </div>
+              <div className="flex items-center gap-2">
+                <BrandLogo
+                  brand={rawBrandSlug}
+                  color={rawBrandSlug === "infinix" ? "#2E9E00" : undefined}
+                  className="h-4 sm:h-4.5 w-auto"
+                />
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-subtle border border-line text-[11px] font-semibold text-muted">
+                  {isLoading ? "…" : `${brandTotalUnits} unit`}
+                </span>
+              </div>
+            </div>
 
-          {/* Center Search Input (Desktop) */}
-          <div className="relative flex-1 max-w-sm hidden sm:block">
-            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Cari tipe atau warna di ${brandConfig.name}...`}
-              className="w-full pl-10 pr-9 py-2 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
-            />
-            {searchQuery && (
+            {/* Desktop Center Search */}
+            <div className="relative flex-1 max-w-sm hidden sm:block">
+              <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={`Cari tipe atau warna di ${brandConfig.name}...`}
+                className="w-full pl-10 pr-9 py-2 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Hapus pencarian"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#A1A1AA] hover:text-[#18181B] hover:bg-black/5 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Right: View Mode Toggle & Mobile Menu */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
+                    viewMode === "grid"
+                      ? "bg-white text-[#18181B] shadow-2xs font-semibold"
+                      : "text-[#71717A] hover:text-[#18181B]"
+                  }`}
+                  title="Tampilan Kartu"
+                  aria-label="Tampilan Kartu"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("table")}
+                  className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
+                    viewMode === "table"
+                      ? "bg-white text-[#18181B] shadow-2xs font-semibold"
+                      : "text-[#71717A] hover:text-[#18181B]"
+                  }`}
+                  title="Tampilan Tabel"
+                  aria-label="Tampilan Tabel"
+                >
+                  <AlignJustify className="w-4 h-4" />
+                </button>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setSearchQuery("")}
-                aria-label="Hapus pencarian"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#A1A1AA] hover:text-[#18181B] hover:bg-black/5 cursor-pointer"
+                onClick={() => setIsMobileSidebarOpen(true)}
+                aria-label="Buka menu navigasi"
+                className="btn btn-ghost btn-icon md:hidden"
               >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Right Actions: View switch */}
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
-              <button
-                type="button"
-                onClick={() => setViewMode("table")}
-                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
-                  viewMode === "table"
-                    ? "bg-white text-[#18181B] shadow-2xs font-semibold"
-                    : "text-[#71717A] hover:text-[#18181B]"
-                }`}
-                title="Tampilan Tabel"
-                aria-label="Tampilan Tabel"
-              >
-                <AlignJustify className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("grid")}
-                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
-                  viewMode === "grid"
-                    ? "bg-white text-[#18181B] shadow-2xs font-semibold"
-                    : "text-[#71717A] hover:text-[#18181B]"
-                }`}
-                title="Tampilan Kartu"
-                aria-label="Tampilan Kartu"
-              >
-                <LayoutGrid className="w-4 h-4" />
+                <Menu className="size-5" />
               </button>
             </div>
           </div>
@@ -210,46 +231,19 @@ export default function BrandStokClient({ brand }: { brand: string }) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Cari tipe di ${brandConfig.name}...`}
-              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-base bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              placeholder={`Cari tipe atau warna di ${brandConfig.name}...`}
+              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
             />
             {searchQuery && (
               <button
                 type="button"
-                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setSearchQuery("")}
                 aria-label="Hapus pencarian"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] active:bg-black/5 cursor-pointer"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
-          </div>
-
-          {/* Mobile Quick Brand Switcher Pills — matches /konten mobile filter bar */}
-          <div className="flex items-center gap-1.5 w-full md:hidden overflow-x-auto pb-0.5">
-            <Link
-              href="/stok"
-              className="min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap bg-[#F4F4F6] text-[#71717A] flex items-center"
-            >
-              Semua
-            </Link>
-            {BRAND_LIST.map(({ slug, name }) => {
-              const active = slug === rawBrandSlug;
-              return (
-                <Link
-                  key={slug}
-                  href={`/stok/${slug}`}
-                  className={`min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors flex items-center ${
-                    active
-                      ? "bg-[#18181B] text-white"
-                      : "bg-[#F4F4F6] text-[#71717A]"
-                  }`}
-                >
-                  {name}
-                </Link>
-              );
-            })}
           </div>
         </header>
 
