@@ -135,7 +135,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
 
       <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
         {/* Responsive Header */}
-        <header className="px-4 sm:px-8 py-3 border-b border-[#ECEBE8] flex flex-col gap-2.5 shrink-0 bg-white">
+        <header className="px-3 sm:px-6 py-3 border-b border-[#ECEBE8] flex flex-col gap-2.5 shrink-0 bg-white">
           <div className="flex items-center justify-between gap-3">
             {/* Left: Back Button + Brand Logo + Count */}
             <div className="flex items-center gap-2.5 min-w-0">
@@ -154,7 +154,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
                   color={rawBrandSlug === "infinix" ? "#2E9E00" : undefined}
                   className="h-4 sm:h-4.5 w-auto"
                 />
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-subtle border border-line text-[11px] font-semibold text-muted">
+                <span className="text-xs text-muted font-medium">
                   {isLoading ? "…" : `${brandTotalUnits} unit`}
                 </span>
               </div>
@@ -248,7 +248,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
         </header>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6">
           <StokItemList
             items={filteredBrandItems}
             viewMode={viewMode}

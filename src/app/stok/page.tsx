@@ -104,7 +104,7 @@ export default function StokOverviewPage() {
 
       <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
         {/* Top Header */}
-        <header className="h-14 sm:h-16 px-4 sm:px-8 border-b border-[#ECEBE8] flex items-center justify-between shrink-0 bg-white">
+        <header className="h-14 sm:h-16 px-3 sm:px-6 border-b border-[#ECEBE8] flex items-center justify-between shrink-0 bg-white">
           <div className="flex items-center gap-2.5 min-w-0">
             <Link
               href="/"
@@ -127,8 +127,8 @@ export default function StokOverviewPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-xl bg-subtle border border-line text-xs font-semibold text-ink">
+          <div className="flex items-center gap-3">
+            <span className="text-xs sm:text-[13px] text-muted">
               Total <strong className="font-bold text-ink">{totalUnits}</strong> unit
             </span>
             <button
@@ -142,11 +142,10 @@ export default function StokOverviewPage() {
           </div>
         </header>
 
-        {/* Stretched Brand Cards Grid */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-5 sm:py-7">
-          <div className="w-full max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-20">
-              {BRAND_LIST.map(({ slug, name, bgColor, logoColor }) => {
+        {/* Stretched Brand Cards Grid - Full Width Edge-to-Edge */}
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 pb-20 w-full">
+            {BRAND_LIST.map(({ slug, name, bgColor, logoColor }) => {
                 const count =
                   brandTotals[name] ??
                   brandTotals[slug] ??
@@ -201,8 +200,7 @@ export default function StokOverviewPage() {
               })}
             </div>
           </div>
-        </div>
-      </main>
-    </div>
-  );
-}
+        </main>
+      </div>
+    );
+  }

@@ -56,7 +56,7 @@ export default function StokItemList({
 
   if (viewMode === "grid") {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4 pb-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4 pb-20 w-full">
         {items.map((item) => {
           const hasWarna =
             Array.isArray(item.rincian_warna) && item.rincian_warna.length > 0;
@@ -66,7 +66,7 @@ export default function StokItemList({
               key={item.id}
               className="group relative flex flex-col justify-between rounded-2xl border border-line bg-canvas p-4 sm:p-5 shadow-2xs hover:border-line-strong hover:shadow-sm transition-all duration-200"
             >
-              {/* Header: Title & Total Stock Badge */}
+              {/* Header: Title & Total Stock */}
               <div>
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="min-w-0 flex-1">
@@ -80,38 +80,40 @@ export default function StokItemList({
                     </h3>
                   </div>
 
-                  {/* Stock Badge */}
-                  <div className="shrink-0 inline-flex items-baseline gap-1 px-2.5 py-1 rounded-xl bg-subtle border border-line shadow-2xs">
-                    <span className="text-xs sm:text-[13px] font-bold text-ink">
+                  {/* Stock Count — clean typography, zero badge */}
+                  <div className="shrink-0 text-right">
+                    <span className="text-base sm:text-lg font-bold text-ink tabular-nums block leading-tight">
                       {item.total_stok}
                     </span>
-                    <span className="text-[10px] text-muted font-medium">unit</span>
+                    <span className="text-[10px] text-muted font-medium uppercase tracking-wider block">
+                      unit
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Color Variants: Direct visual chips */}
-              <div className="pt-3 mt-3 border-t border-line/60">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-faint">
+              {/* Color Variants: Clean typography without boxy badges */}
+              <div className="pt-2.5 mt-2.5 border-t border-line/60">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-faint">
                     Rincian Warna
                   </span>
-                  <span className="text-[11px] font-medium text-muted">
+                  <span className="text-[11px] text-muted">
                     {hasWarna ? `${item.rincian_warna.length} warna` : "-"}
                   </span>
                 </div>
 
                 {hasWarna ? (
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                     {item.rincian_warna.map((w, wIdx) => (
                       <span
                         key={wIdx}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface border border-line text-xs font-medium text-ink transition-colors hover:bg-subtle"
+                        className="inline-flex items-center gap-1.5 text-ink py-0.5"
                       >
-                        <span className="size-2 rounded-full bg-line-strong ring-1 ring-black/10 shrink-0" />
+                        <span className="size-1.5 rounded-full bg-muted/60 shrink-0" />
                         <span className="capitalize">{w.warna}</span>
-                        <span className="font-bold text-ink bg-canvas px-1.5 py-0.5 rounded border border-line/70 text-[11px] ml-0.5">
-                          {w.qty}
+                        <span className="text-muted text-[11px] font-semibold">
+                          × {w.qty}
                         </span>
                       </span>
                     ))}
@@ -131,7 +133,7 @@ export default function StokItemList({
 
   // Table view
   return (
-    <div className="pb-20">
+    <div className="pb-20 w-full">
       <div className="rounded-xl border border-line bg-canvas overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
@@ -164,22 +166,20 @@ export default function StokItemList({
                       </td>
                     )}
                     <td className="td font-bold text-ink">{item.tipe}</td>
-                    <td className="td text-right">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-subtle border border-line font-bold text-ink">
-                        {item.total_stok}
-                      </span>
+                    <td className="td text-right font-bold text-ink tabular-nums text-xs sm:text-[13px]">
+                      {item.total_stok}
                     </td>
                     <td className="td py-2">
                       {hasWarna ? (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
                           {item.rincian_warna.map((w, wIdx) => (
                             <span
                               key={wIdx}
-                              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-surface border border-line text-[11px] text-ink"
+                              className="inline-flex items-center gap-1.5 text-ink"
                             >
-                              <span className="size-1.5 rounded-full bg-muted/60" />
+                              <span className="size-1.5 rounded-full bg-muted/60 shrink-0" />
                               <span className="capitalize">{w.warna}</span>
-                              <span className="font-bold text-ink ml-0.5">
+                              <span className="text-muted font-semibold text-[11px]">
                                 ({w.qty})
                               </span>
                             </span>
