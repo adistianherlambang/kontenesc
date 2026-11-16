@@ -3,97 +3,35 @@ import React from "react";
 export interface BrandInfo {
   slug: string;
   name: string;
-  color: string;
-  bgLight: string;
-  borderColor: string;
-  badgeTextColor: string;
 }
 
-export const BRAND_CONFIGS: Record<string, BrandInfo> = {
-  samsung: {
-    slug: "samsung",
-    name: "Samsung",
-    color: "#1428A0",
-    bgLight: "rgba(20, 40, 160, 0.08)",
-    borderColor: "rgba(20, 40, 160, 0.2)",
-    badgeTextColor: "#1428A0",
-  },
-  xiaomi: {
-    slug: "xiaomi",
-    name: "Xiaomi",
-    color: "#FF6900",
-    bgLight: "rgba(255, 105, 0, 0.08)",
-    borderColor: "rgba(255, 105, 0, 0.2)",
-    badgeTextColor: "#D85600",
-  },
-  vivo: {
-    slug: "vivo",
-    name: "Vivo",
-    color: "#008CD6",
-    bgLight: "rgba(0, 140, 214, 0.08)",
-    borderColor: "rgba(0, 140, 214, 0.2)",
-    badgeTextColor: "#0072B0",
-  },
-  oppo: {
-    slug: "oppo",
-    name: "Oppo",
-    color: "#0F7A4D",
-    bgLight: "rgba(15, 122, 77, 0.08)",
-    borderColor: "rgba(15, 122, 77, 0.2)",
-    badgeTextColor: "#0F7A4D",
-  },
-  infinix: {
-    slug: "infinix",
-    name: "Infinix",
-    color: "#00B67A",
-    bgLight: "rgba(0, 182, 122, 0.08)",
-    borderColor: "rgba(0, 182, 122, 0.2)",
-    badgeTextColor: "#00875A",
-  },
-  realme: {
-    slug: "realme",
-    name: "Realme",
-    color: "#E5A800",
-    bgLight: "rgba(229, 168, 0, 0.08)",
-    borderColor: "rgba(229, 168, 0, 0.25)",
-    badgeTextColor: "#B88600",
-  },
-  tecno: {
-    slug: "tecno",
-    name: "Tecno",
-    color: "#0072CE",
-    bgLight: "rgba(0, 114, 206, 0.08)",
-    borderColor: "rgba(0, 114, 206, 0.2)",
-    badgeTextColor: "#0072CE",
-  },
-  nokia: {
-    slug: "nokia",
-    name: "Nokia",
-    color: "#124191",
-    bgLight: "rgba(18, 65, 145, 0.08)",
-    borderColor: "rgba(18, 65, 145, 0.2)",
-    badgeTextColor: "#124191",
-  },
-};
+export const BRAND_LIST: BrandInfo[] = [
+  { slug: "samsung", name: "Samsung" },
+  { slug: "xiaomi", name: "Xiaomi" },
+  { slug: "vivo", name: "Vivo" },
+  { slug: "oppo", name: "Oppo" },
+  { slug: "infinix", name: "Infinix" },
+  { slug: "realme", name: "Realme" },
+  { slug: "tecno", name: "Tecno" },
+  { slug: "nokia", name: "Nokia" },
+];
+
+export const BRAND_CONFIGS: Record<string, BrandInfo> = Object.fromEntries(
+  BRAND_LIST.map((b) => [b.slug, b])
+);
 
 export function getBrandConfig(brandKeyOrName: string): BrandInfo {
   const normalized = (brandKeyOrName || "").trim().toLowerCase();
-  if (BRAND_CONFIGS[normalized]) {
-    return BRAND_CONFIGS[normalized];
-  }
-  // Fallback for custom or accessory brands
-  return {
-    slug: normalized || "other",
-    name: brandKeyOrName || "Lainnya",
-    color: "#78716C",
-    bgLight: "rgba(120, 113, 108, 0.08)",
-    borderColor: "rgba(120, 113, 108, 0.2)",
-    badgeTextColor: "#57534E",
-  };
+  return (
+    BRAND_CONFIGS[normalized] || {
+      slug: normalized || "other",
+      name: brandKeyOrName || "Lainnya",
+    }
+  );
 }
 
 /**
- * Clean SVG Brand Logo / Wordmark Component
+ * Clean, proportional SVG wordmarks/logos for each brand
  */
 export function BrandLogo({
   brand,
@@ -102,22 +40,19 @@ export function BrandLogo({
   brand: string;
   className?: string;
 }) {
-  const b = brand.toLowerCase();
+  const b = (brand || "").toLowerCase();
 
   switch (b) {
     case "samsung":
       return (
-        <svg viewBox="0 0 120 28" fill="currentColor" className={className} aria-label="Samsung">
+        <svg viewBox="0 0 140 24" className={className} fill="currentColor" aria-label="Samsung">
           <text
-            x="50%"
-            y="54%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="18"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="21"
-            letterSpacing="3.5"
+            fontSize="18"
+            letterSpacing="3"
           >
             SAMSUNG
           </text>
@@ -126,29 +61,36 @@ export function BrandLogo({
 
     case "xiaomi":
       return (
-        <svg viewBox="0 0 32 32" className={className} aria-label="Xiaomi" fill="none">
-          <rect width="32" height="32" rx="7" fill="#FF6900" />
+        <svg viewBox="0 0 110 24" className={className} fill="none" aria-label="Xiaomi">
+          <rect x="0" y="1" width="22" height="22" rx="5" fill="#FF6900" />
           <path
-            d="M9 10h5v6h4v-6h5v12h-5v-3.5h-4v3.5H9V10z"
+            d="M4.5 7.5h3.5v4.5h3V7.5h3.5v9H11v-3H8v3H4.5v-9zm11.5 0h2v9h-2v-9z"
             fill="#FFFFFF"
           />
-          <circle cx="20.5" cy="16" r="1.5" fill="#FFFFFF" />
+          <text
+            x="30"
+            y="17.5"
+            fill="currentColor"
+            fontFamily="var(--font-jakarta), sans-serif"
+            fontWeight="700"
+            fontSize="16"
+            letterSpacing="0.5"
+          >
+            Xiaomi
+          </text>
         </svg>
       );
 
     case "vivo":
       return (
-        <svg viewBox="0 0 80 28" fill="currentColor" className={className} aria-label="Vivo">
+        <svg viewBox="0 0 80 24" className={className} fill="currentColor" aria-label="Vivo">
           <text
-            x="50%"
-            y="52%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="19"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="24"
-            letterSpacing="2"
+            fontSize="21"
+            letterSpacing="1.5"
           >
             vivo
           </text>
@@ -157,17 +99,14 @@ export function BrandLogo({
 
     case "oppo":
       return (
-        <svg viewBox="0 0 90 28" fill="currentColor" className={className} aria-label="Oppo">
+        <svg viewBox="0 0 85 24" className={className} fill="currentColor" aria-label="Oppo">
           <text
-            x="50%"
-            y="54%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="18.5"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="24"
-            letterSpacing="2"
+            fontSize="20"
+            letterSpacing="1.5"
           >
             oppo
           </text>
@@ -176,17 +115,14 @@ export function BrandLogo({
 
     case "infinix":
       return (
-        <svg viewBox="0 0 100 28" fill="currentColor" className={className} aria-label="Infinix">
+        <svg viewBox="0 0 100 24" className={className} fill="currentColor" aria-label="Infinix">
           <text
-            x="50%"
-            y="54%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="18.5"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="21"
-            letterSpacing="2"
+            fontSize="18"
+            letterSpacing="1.2"
           >
             Infinix
           </text>
@@ -195,17 +131,14 @@ export function BrandLogo({
 
     case "realme":
       return (
-        <svg viewBox="0 0 96 28" fill="currentColor" className={className} aria-label="Realme">
+        <svg viewBox="0 0 95 24" className={className} fill="currentColor" aria-label="Realme">
           <text
-            x="50%"
-            y="54%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="18.5"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="23"
-            letterSpacing="1"
+            fontSize="19"
+            letterSpacing="0.8"
           >
             realme
           </text>
@@ -214,16 +147,13 @@ export function BrandLogo({
 
     case "tecno":
       return (
-        <svg viewBox="0 0 90 28" fill="currentColor" className={className} aria-label="Tecno">
+        <svg viewBox="0 0 95 24" className={className} fill="currentColor" aria-label="Tecno">
           <text
-            x="50%"
-            y="54%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="18.5"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="22"
+            fontSize="18"
             letterSpacing="2.5"
           >
             TECNO
@@ -233,17 +163,14 @@ export function BrandLogo({
 
     case "nokia":
       return (
-        <svg viewBox="0 0 96 28" fill="currentColor" className={className} aria-label="Nokia">
+        <svg viewBox="0 0 95 24" className={className} fill="currentColor" aria-label="Nokia">
           <text
-            x="50%"
-            y="54%"
-            dominantBaseline="middle"
-            textAnchor="middle"
-            fill="currentColor"
-            fontFamily="var(--font-jakarta), ui-sans-serif, system-ui, sans-serif"
+            x="0"
+            y="18.5"
+            fontFamily="var(--font-jakarta), sans-serif"
             fontWeight="800"
-            fontSize="22"
-            letterSpacing="3"
+            fontSize="18"
+            letterSpacing="2.8"
           >
             NOKIA
           </text>
@@ -252,7 +179,7 @@ export function BrandLogo({
 
     default:
       return (
-        <span className="font-bold text-sm tracking-wide uppercase truncate">
+        <span className="font-bold text-sm tracking-wide uppercase">
           {brand}
         </span>
       );

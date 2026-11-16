@@ -73,13 +73,12 @@ export default function Sidebar({
       >
         {/* Brand — same height as the main header so the borders line up */}
         <div className="flex min-h-14 shrink-0 items-center justify-between border-b border-line px-4 sm:px-5">
-          <Link href="/" className="min-w-0 group flex flex-col justify-center py-1 text-left" title="Kembali ke Beranda Utama">
-            <div className="flex items-center gap-1 text-[11px] font-medium text-muted group-hover:text-brand transition-colors">
-              <ArrowLeft className="size-3" />
-              <span>Portal Hub</span>
+          <Link href="/" className="flex min-w-0 items-center gap-2.5 group" title="Kembali ke Beranda">
+            <ArrowLeft className="size-4 shrink-0 text-muted group-hover:text-ink transition-colors" />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-ink">Semarang Cell</p>
+              <p className="truncate text-xs text-muted">Konten Instagram</p>
             </div>
-            <p className="truncate text-sm font-semibold text-ink group-hover:text-brand transition-colors leading-tight">Semarang Cell</p>
-            <p className="truncate text-[11px] text-muted">Konten Instagram</p>
           </Link>
           <button
             type="button"
