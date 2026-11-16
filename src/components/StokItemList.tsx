@@ -93,9 +93,9 @@ export default function StokItemList({
               </div>
 
               {/* Color Variants: Clean typography without boxy badges */}
-              <div className="pt-2.5 mt-2.5 border-t border-line/60">
+              <div className="pt-2.5 mt-2.5">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-faint">
+                  <span className="text-[10px] font-semibold tracking-wider text-faint">
                     Rincian Warna
                   </span>
                   <span className="text-[11px] text-muted">

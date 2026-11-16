@@ -11,7 +11,6 @@ import {
   deleteDoc, 
   writeBatch,
   query,
-  orderBy,
   onSnapshot,
   Firestore
 } from "firebase/firestore";
@@ -298,6 +297,10 @@ export async function getStokFromDb(): Promise<{ items: StokItem[]; summary: Sto
       }
     });
 
+    items.sort((a, b) =>
+      a.tipe.localeCompare(b.tipe, undefined, { numeric: true, sensitivity: "base" })
+    );
+
     return { items, summary };
   } catch (err) {
     console.warn("Error fetching stok:", err);
@@ -332,6 +335,10 @@ export function subscribeToStok(
           });
         }
       });
+
+      items.sort((a, b) =>
+        a.tipe.localeCompare(b.tipe, undefined, { numeric: true, sensitivity: "base" })
+      );
 
       onUpdate({ items, summary });
     },

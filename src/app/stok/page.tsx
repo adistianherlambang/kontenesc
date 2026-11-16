@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Menu, ChevronRight } from "lucide-react";
+import { ArrowLeft, Menu } from "lucide-react";
 import {
   StokItem,
   StokSummary,
@@ -15,7 +15,6 @@ import StokSidebar from "@/components/StokSidebar";
 export default function StokOverviewPage() {
   const [items, setItems] = useState<StokItem[]>([]);
   const [summary, setSummary] = useState<StokSummary | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [firebaseStatus, setFirebaseStatus] = useState<
     "connected" | "offline" | "syncing"
   >("offline");
@@ -33,7 +32,6 @@ export default function StokOverviewPage() {
       if (initItems.length > 0) {
         setItems(initItems);
         setSummary(initSummary);
-        setIsLoading(false);
       }
     });
 
@@ -41,7 +39,6 @@ export default function StokOverviewPage() {
       ({ items: newItems, summary: newSummary }) => {
         setItems(newItems);
         setSummary(newSummary);
-        setIsLoading(false);
         setFirebaseStatus(
           typeof window !== "undefined" && !window.navigator.onLine
             ? "offline"
@@ -74,15 +71,6 @@ export default function StokOverviewPage() {
     return map;
   }, [summary, items]);
 
-  const brandTypeCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    items.forEach((it) => {
-      const b = (it.brand || "Lainnya").trim().toLowerCase();
-      map[b] = (map[b] || 0) + 1;
-    });
-    return map;
-  }, [items]);
-
   const totalUnits = useMemo(() => {
     if (summary?.total_units) return summary.total_units;
     return items.reduce((acc, it) => acc + (it.total_stok || 0), 0);
@@ -114,93 +102,51 @@ export default function StokOverviewPage() {
             >
               <ArrowLeft className="size-4" />
             </Link>
-
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold text-ink truncate leading-tight">
                 Stok Handphone
               </h1>
-              {tanggal && (
-                <p className="text-[11px] text-muted truncate">
-                  Per {tanggal}
-                </p>
-              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="text-xs sm:text-[13px] text-muted">
-              Total <strong className="font-bold text-ink">{totalUnits}</strong> unit
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsMobileSidebarOpen(true)}
-              aria-label="Buka menu navigasi"
-              className="btn btn-ghost btn-icon md:hidden"
-            >
-              <Menu className="size-5" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="Buka menu navigasi"
+            className="btn btn-ghost btn-icon md:hidden"
+          >
+            <Menu className="size-5" />
+          </button>
         </header>
 
         {/* Stretched Brand Cards Grid - Full Width Edge-to-Edge */}
         <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 pb-20 w-full">
-            {BRAND_LIST.map(({ slug, name, bgColor, logoColor }) => {
-                const count =
-                  brandTotals[name] ??
-                  brandTotals[slug] ??
-                  brandTotals[slug.toUpperCase()] ??
-                  0;
-                const typeCount =
-                  brandTypeCounts[slug] ??
-                  brandTypeCounts[name.toLowerCase()] ??
-                  0;
-
-                return (
-                  <Link
-                    key={slug}
-                    href={`/stok/${slug}`}
-                    style={{ backgroundColor: bgColor }}
-                    className="group relative w-full rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer min-h-[84px] sm:min-h-[92px] overflow-hidden"
-                  >
-                    <div className="flex flex-col justify-between h-full min-w-0 pr-3">
-                      <BrandLogo
-                        brand={slug}
-                        color={logoColor}
-                        className={
-                          slug === "xiaomi"
-                            ? "h-7 sm:h-8 w-auto"
-                            : "h-5 sm:h-6 w-auto max-w-[130px] sm:max-w-[150px]"
-                        }
-                      />
-                      <span
-                        className="text-[11px] font-medium opacity-80 mt-2 truncate"
-                        style={{ color: logoColor }}
-                      >
-                        {isLoading ? "…" : `${typeCount} tipe handphone`}
-                      </span>
-                    </div>
-
-                    <div
-                      className="flex items-center gap-2 shrink-0"
-                      style={{ color: logoColor }}
-                    >
-                      <div className="text-right">
-                        <span className="text-sm sm:text-base font-bold block leading-tight">
-                          {isLoading ? "…" : count}
-                        </span>
-                        <span className="text-[10px] font-medium opacity-75 uppercase tracking-wider block">
-                          unit
-                        </span>
-                      </div>
-                      <ChevronRight className="size-4.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            {BRAND_LIST.map(({ slug, bgColor, logoColor }) => {
+              return (
+                <Link
+                  key={slug}
+                  href={`/stok/${slug}`}
+                  style={{ backgroundColor: bgColor }}
+                  className="group relative w-full rounded-2xl p-4 sm:p-5 flex items-center justify-center shadow-2xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer min-h-[84px] sm:min-h-[92px] overflow-hidden"
+                >
+                  <div className="flex items-center justify-center w-full min-w-0">
+                    <BrandLogo
+                      brand={slug}
+                      color={logoColor}
+                      className={
+                        slug === "xiaomi"
+                          ? "h-7 sm:h-8 w-auto"
+                          : "h-5 sm:h-6 w-auto max-w-[130px] sm:max-w-[150px]"
+                      }
+                    />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-        </main>
-      </div>
-    );
-  }
+        </div>
+      </main>
+    </div>
+  );
+}

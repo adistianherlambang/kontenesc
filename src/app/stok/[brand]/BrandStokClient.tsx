@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   AlignJustify,
   Menu,
+  ArrowUpDown,
 } from "lucide-react";
 import {
   StokItem,
@@ -34,6 +35,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"name-asc" | "stok-desc" | "stok-asc">("name-asc");
 
   useEffect(() => {
     const handleOnline = () => {
@@ -96,14 +98,28 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   const tanggal = summary?.tanggal || items[0]?.tanggal || "";
 
   const brandItems = useMemo(() => {
-    return items.filter((it) => {
+    const list = items.filter((it) => {
       const itBrand = (it.brand || "").trim().toLowerCase();
       return (
         itBrand === rawBrandSlug ||
         itBrand === brandConfig.name.toLowerCase()
       );
     });
-  }, [items, rawBrandSlug, brandConfig.name]);
+
+    return list.sort((a, b) => {
+      if (sortBy === "stok-desc") {
+        return (b.total_stok || 0) - (a.total_stok || 0);
+      }
+      if (sortBy === "stok-asc") {
+        return (a.total_stok || 0) - (b.total_stok || 0);
+      }
+      // default: natural alphanumeric A-Z
+      return a.tipe.localeCompare(b.tipe, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+    });
+  }, [items, rawBrandSlug, brandConfig.name, sortBy]);
 
   const brandTotalUnits = useMemo(() => {
     return brandItems.reduce((acc, it) => acc + (it.total_stok || 0), 0);
@@ -182,8 +198,26 @@ export default function BrandStokClient({ brand }: { brand: string }) {
               )}
             </div>
 
-            {/* Right: View Mode Toggle & Mobile Menu */}
-            <div className="flex items-center gap-1.5 shrink-0">
+            {/* Right: Sort, View Mode Toggle & Mobile Menu */}
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="relative hidden sm:flex items-center">
+                <select
+                  value={sortBy}
+                  onChange={(e) =>
+                    setSortBy(
+                      e.target.value as "name-asc" | "stok-desc" | "stok-asc"
+                    )
+                  }
+                  aria-label="Urutkan stok"
+                  className="h-8 pl-2.5 pr-7 rounded-xl text-xs font-medium bg-[#F4F4F6] border border-transparent hover:border-[#D4D4D8] text-[#18181B] cursor-pointer outline-none appearance-none transition-colors"
+                >
+                  <option value="name-asc">Nama (A-Z)</option>
+                  <option value="stok-desc">Stok Terbanyak</option>
+                  <option value="stok-asc">Stok Tersedikit</option>
+                </select>
+                <ArrowUpDown className="w-3.5 h-3.5 text-muted pointer-events-none absolute right-2" />
+              </div>
+
               <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
                 <button
                   type="button"
@@ -224,26 +258,46 @@ export default function BrandStokClient({ brand }: { brand: string }) {
             </div>
           </div>
 
-          {/* Mobile Search Input Row */}
-          <div className="relative w-full sm:hidden">
-            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`Cari tipe atau warna di ${brandConfig.name}...`}
-              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                aria-label="Hapus pencarian"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] cursor-pointer"
+          {/* Mobile Search & Sort Row */}
+          <div className="flex items-center gap-2 w-full sm:hidden">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={`Cari tipe/warna ${brandConfig.name}...`}
+                className="w-full pl-10 pr-9 py-2 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Hapus pencarian"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#71717A] hover:text-[#18181B] cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            <div className="relative shrink-0">
+              <select
+                value={sortBy}
+                onChange={(e) =>
+                  setSortBy(
+                    e.target.value as "name-asc" | "stok-desc" | "stok-asc"
+                  )
+                }
+                aria-label="Urutkan stok"
+                className="h-8.5 pl-2.5 pr-6 rounded-xl text-xs font-medium bg-[#F4F4F6] border border-transparent text-[#18181B] cursor-pointer outline-none appearance-none"
               >
-                <X className="w-4 h-4" />
-              </button>
-            )}
+                <option value="name-asc">A-Z</option>
+                <option value="stok-desc">Stok ↓</option>
+                <option value="stok-asc">Stok ↑</option>
+              </select>
+              <ArrowUpDown className="w-3 h-3 text-muted pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2" />
+            </div>
           </div>
         </header>
 
