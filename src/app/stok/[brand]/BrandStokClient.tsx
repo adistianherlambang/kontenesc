@@ -9,7 +9,6 @@ import {
   LayoutGrid,
   AlignJustify,
   Menu,
-  ArrowUpDown,
 } from "lucide-react";
 import {
   StokItem,
@@ -20,6 +19,7 @@ import {
 import { BrandLogo, getBrandConfig } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
+import SortSelect, { StokSortOption } from "@/components/SortSelect";
 
 export default function BrandStokClient({ brand }: { brand: string }) {
   const rawBrandSlug = (brand || "").toLowerCase();
@@ -35,7 +35,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"name-asc" | "stok-desc" | "stok-asc">("name-asc");
+  const [sortBy, setSortBy] = useState<StokSortOption>("name-asc");
 
   useEffect(() => {
     const handleOnline = () => {
@@ -200,23 +200,11 @@ export default function BrandStokClient({ brand }: { brand: string }) {
 
             {/* Right: Sort, View Mode Toggle & Mobile Menu */}
             <div className="flex items-center gap-2 shrink-0">
-              <div className="relative hidden sm:flex items-center">
-                <select
-                  value={sortBy}
-                  onChange={(e) =>
-                    setSortBy(
-                      e.target.value as "name-asc" | "stok-desc" | "stok-asc"
-                    )
-                  }
-                  aria-label="Urutkan stok"
-                  className="h-8 pl-2.5 pr-7 rounded-xl text-xs font-medium bg-[#F4F4F6] border border-transparent hover:border-[#D4D4D8] text-[#18181B] cursor-pointer outline-none appearance-none transition-colors"
-                >
-                  <option value="name-asc">Nama (A-Z)</option>
-                  <option value="stok-desc">Stok Terbanyak</option>
-                  <option value="stok-asc">Stok Tersedikit</option>
-                </select>
-                <ArrowUpDown className="w-3.5 h-3.5 text-muted pointer-events-none absolute right-2" />
-              </div>
+              <SortSelect
+                value={sortBy}
+                onChange={setSortBy}
+                className="hidden sm:inline-block"
+              />
 
               <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
                 <button
@@ -281,23 +269,11 @@ export default function BrandStokClient({ brand }: { brand: string }) {
               )}
             </div>
 
-            <div className="relative shrink-0">
-              <select
-                value={sortBy}
-                onChange={(e) =>
-                  setSortBy(
-                    e.target.value as "name-asc" | "stok-desc" | "stok-asc"
-                  )
-                }
-                aria-label="Urutkan stok"
-                className="h-8.5 pl-2.5 pr-6 rounded-xl text-xs font-medium bg-[#F4F4F6] border border-transparent text-[#18181B] cursor-pointer outline-none appearance-none"
-              >
-                <option value="name-asc">A-Z</option>
-                <option value="stok-desc">Stok ↓</option>
-                <option value="stok-asc">Stok ↑</option>
-              </select>
-              <ArrowUpDown className="w-3 h-3 text-muted pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2" />
-            </div>
+            <SortSelect
+              value={sortBy}
+              onChange={setSortBy}
+              className="shrink-0"
+            />
           </div>
         </header>
 
