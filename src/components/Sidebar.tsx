@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag, FileSpreadsheet } from "lucide-react";
+import Link from "next/link";
+import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 export type StatusView = "all" | "pending" | "executed" | "priority";
@@ -72,10 +73,14 @@ export default function Sidebar({
       >
         {/* Brand — same height as the main header so the borders line up */}
         <div className="flex min-h-14 shrink-0 items-center justify-between border-b border-line px-4 sm:px-5">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-ink">Semarang Cell</p>
-            <p className="truncate text-xs text-muted">Konten Instagram</p>
-          </div>
+          <Link href="/" className="min-w-0 group flex flex-col justify-center py-1 text-left" title="Kembali ke Beranda Utama">
+            <div className="flex items-center gap-1 text-[11px] font-medium text-muted group-hover:text-brand transition-colors">
+              <ArrowLeft className="size-3" />
+              <span>Portal Hub</span>
+            </div>
+            <p className="truncate text-sm font-semibold text-ink group-hover:text-brand transition-colors leading-tight">Semarang Cell</p>
+            <p className="truncate text-[11px] text-muted">Konten Instagram</p>
+          </Link>
           <button
             type="button"
             onClick={onCloseMobile}

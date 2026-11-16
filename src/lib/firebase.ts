@@ -216,3 +216,195 @@ export async function seedContentsToDb(
 
   return count;
 }
+
+
+// ============================================================================
+// STOK HANDPHONE & LAPORAN PENJUALAN (LAJUL) TYPES & HELPERS
+// ============================================================================
+
+export interface StokColorVariant {
+  warna: string;
+  qty: number;
+}
+
+export interface StokItem {
+  id: string;
+  brand: string;
+  tipe: string;
+  total_stok: number;
+  tanggal: string;
+  rincian_warna: StokColorVariant[];
+}
+
+export interface StokSummary {
+  tanggal: string;
+  total_units: number;
+  brand_totals: Record<string, number>;
+  updated_at?: string;
+}
+
+export interface LajulTransaksi {
+  no: number;
+  rincian: string;
+  user: string;
+  metode: string;
+  harga: number;
+}
+
+export interface LajulBrandDoc {
+  brand_key: string;
+  brand_name: string;
+  tanggal: string;
+  no_sell: boolean;
+  total_transaksi: number;
+  transaksi: LajulTransaksi[];
+}
+
+export interface LajulMetrics {
+  cash: string;
+  debit: string;
+  transfer: string;
+  total_payment: string;
+  unit_terjual: number;
+}
+
+export interface LajulSummary {
+  tanggal: string;
+  metrics: LajulMetrics;
+  total_rows?: number;
+  updated_at?: string;
+}
+
+export async function getStokFromDb(): Promise<{ items: StokItem[]; summary: StokSummary | null }> {
+  try {
+    const q = query(collection(db, "stok"));
+    const snapshot = await getDocs(q);
+    let summary: StokSummary | null = null;
+    const items: StokItem[] = [];
+
+    snapshot.docs.forEach((docSnap) => {
+      if (docSnap.id === "ringkasan") {
+        summary = docSnap.data() as StokSummary;
+      } else {
+        const d = docSnap.data();
+        items.push({
+          id: docSnap.id,
+          brand: d.brand || "Lainnya",
+          tipe: d.tipe || "",
+          total_stok: Number(d.total_stok) || 0,
+          tanggal: d.tanggal || "",
+          rincian_warna: Array.isArray(d.rincian_warna) ? d.rincian_warna : [],
+        });
+      }
+    });
+
+    return { items, summary };
+  } catch (err) {
+    console.warn("Error fetching stok:", err);
+    return { items: [], summary: null };
+  }
+}
+
+export function subscribeToStok(
+  onUpdate: (data: { items: StokItem[]; summary: StokSummary | null }) => void,
+  onError?: (error: Error) => void
+): () => void {
+  const q = query(collection(db, "stok"));
+  return onSnapshot(
+    q,
+    { includeMetadataChanges: true },
+    (snapshot) => {
+      let summary: StokSummary | null = null;
+      const items: StokItem[] = [];
+
+      snapshot.docs.forEach((docSnap) => {
+        if (docSnap.id === "ringkasan") {
+          summary = docSnap.data() as StokSummary;
+        } else {
+          const d = docSnap.data();
+          items.push({
+            id: docSnap.id,
+            brand: d.brand || "Lainnya",
+            tipe: d.tipe || "",
+            total_stok: Number(d.total_stok) || 0,
+            tanggal: d.tanggal || "",
+            rincian_warna: Array.isArray(d.rincian_warna) ? d.rincian_warna : [],
+          });
+        }
+      });
+
+      onUpdate({ items, summary });
+    },
+    (err) => {
+      console.warn("Firestore stok snapshot listener error:", err);
+      if (onError) onError(err);
+    }
+  );
+}
+
+export async function getLajulFromDb(): Promise<{ brands: LajulBrandDoc[]; summary: LajulSummary | null }> {
+  try {
+    const q = query(collection(db, "lajul"));
+    const snapshot = await getDocs(q);
+    let summary: LajulSummary | null = null;
+    const brands: LajulBrandDoc[] = [];
+
+    snapshot.docs.forEach((docSnap) => {
+      if (docSnap.id === "ringkasan") {
+        summary = docSnap.data() as LajulSummary;
+      } else {
+        const d = docSnap.data();
+        brands.push({
+          brand_key: d.brand_key || docSnap.id,
+          brand_name: d.brand_name || docSnap.id,
+          tanggal: d.tanggal || "",
+          no_sell: Boolean(d.no_sell),
+          total_transaksi: Number(d.total_transaksi) || 0,
+          transaksi: Array.isArray(d.transaksi) ? d.transaksi : [],
+        });
+      }
+    });
+
+    return { brands, summary };
+  } catch (err) {
+    console.warn("Error fetching lajul:", err);
+    return { brands: [], summary: null };
+  }
+}
+
+export function subscribeToLajul(
+  onUpdate: (data: { brands: LajulBrandDoc[]; summary: LajulSummary | null }) => void,
+  onError?: (error: Error) => void
+): () => void {
+  const q = query(collection(db, "lajul"));
+  return onSnapshot(
+    q,
+    { includeMetadataChanges: true },
+    (snapshot) => {
+      let summary: LajulSummary | null = null;
+      const brands: LajulBrandDoc[] = [];
+
+      snapshot.docs.forEach((docSnap) => {
+        if (docSnap.id === "ringkasan") {
+          summary = docSnap.data() as LajulSummary;
+        } else {
+          const d = docSnap.data();
+          brands.push({
+            brand_key: d.brand_key || docSnap.id,
+            brand_name: d.brand_name || docSnap.id,
+            tanggal: d.tanggal || "",
+            no_sell: Boolean(d.no_sell),
+            total_transaksi: Number(d.total_transaksi) || 0,
+            transaksi: Array.isArray(d.transaksi) ? d.transaksi : [],
+          });
+        }
+      });
+
+      onUpdate({ brands, summary });
+    },
+    (err) => {
+      console.warn("Firestore lajul snapshot listener error:", err);
+      if (onError) onError(err);
+    }
+  );
+}

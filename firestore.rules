@@ -2,7 +2,44 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper domain validator for contents
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: contents
+    // Document ID: konten-{no} or custom ID
+    // Fields:
+    //   - no: int (required) - Sequence number
+    //   - judul: string (required, <= 500 chars) - Title
+    //   - kategori: string (required, <= 100 chars) - Category
+    //   - copywriting: string (required, <= 10000 chars) - Copy text
+    //   - ambience: string (required, <= 5000 chars) - Ambience / visual direction
+    //   - caption: string (required, <= 10000 chars) - Post caption
+    //   - executed: bool (required) - Execution status
+    //   - priority: bool (optional) - Priority flag
+    //   - platform: string (optional, <= 100 chars) - Target platform
+    //   - targetDate: string (optional, <= 100 chars) - Target publish date
+    //   - notes: string (optional, <= 5000 chars) - Additional notes
+    //   - createdAt: string (optional, <= 100 chars) - Creation timestamp
+    //   - updatedAt: string (optional, <= 100 chars) - Last updated timestamp
+    //   - id: string (optional, <= 100 chars) - Document ID
+    //
+    // Collection: stok
+    // Document ID: stokId (e.g., 'ringkasan' or item ID)
+    // Description: Handphone inventory stock data & summary doc 'ringkasan'.
+    // Permissions: Public read; client writes disabled (managed via server / Admin SDK).
+    //
+    // Collection: lajul
+    // Document ID: lajulId (e.g., 'ringkasan' or report ID)
+    // Description: Sales report data (Laporan Penjualan) & summary doc 'ringkasan'.
+    // Permissions: Public read; client writes disabled (managed via server / Admin SDK).
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions & Domain Validators
+    // ===============================================================
+
     function isValidContent(data) {
       return data.keys().hasAll(['no', 'judul', 'kategori', 'copywriting', 'ambience', 'caption', 'executed'])
         && data.no is int
@@ -12,9 +49,11 @@ service cloud.firestore {
         && data.ambience is string && data.ambience.size() <= 5000
         && data.caption is string && data.caption.size() <= 10000
         && data.executed is bool
+        && (!('priority' in data) || data.priority is bool)
         && (!('platform' in data) || (data.platform is string && data.platform.size() <= 100))
         && (!('targetDate' in data) || (data.targetDate is string && data.targetDate.size() <= 100))
         && (!('notes' in data) || (data.notes is string && data.notes.size() <= 5000))
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100))
         && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100))
         && (!('id' in data) || (data.id is string && data.id.size() <= 100));
     }
@@ -24,6 +63,22 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isValidContent(request.resource.data);
       allow delete: if true;
+    }
+
+    // Koleksi stok: Stok handphone & dokumen ringkasan
+    // Read: Publik untuk kebutuhan display katalog / ketersediaan toko
+    // Write: Hanya melalui backend / Admin SDK (ditolak untuk client SDK langsung)
+    match /stok/{stokId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Koleksi lajul: Laporan penjualan & dokumen ringkasan
+    // Read: Publik untuk kebutuhan visualisasi report toko
+    // Write: Hanya melalui backend / Admin SDK (ditolak untuk client SDK langsung)
+    match /lajul/{lajulId} {
+      allow read: if true;
+      allow write: if false;
     }
 
     // Default deny for all other collections
