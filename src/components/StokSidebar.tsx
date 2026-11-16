@@ -111,7 +111,8 @@ export default function StokSidebar({
                   >
                     <BrandLogo
                       brand={slug}
-                      className="h-3.5 w-auto max-w-[110px] shrink-0 text-ink"
+                      color={slug === "infinix" ? "#2E9E00" : undefined}
+                      className="h-3.5 w-auto max-w-[110px] shrink-0"
                     />
                     <span className="nav-count">{count}</span>
                   </Link>

@@ -16,12 +16,7 @@ import {
   subscribeToStok,
   getStokFromDb,
 } from "@/lib/firebase";
-import {
-  BrandLogo,
-  BrandTileMark,
-  BRAND_LIST,
-  getBrandTileStyle,
-} from "@/lib/brandLogos";
+import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
 
@@ -246,29 +241,32 @@ export default function StokOverviewPage() {
               onResetSearch={() => setSearchQuery("")}
             />
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5 max-w-4xl pb-24">
-              {BRAND_LIST.map(({ slug, name }) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 max-w-4xl pb-24">
+              {BRAND_LIST.map(({ slug, name, bgColor, logoColor }) => {
                 const count =
                   brandTotals[name] ??
                   brandTotals[slug] ??
                   brandTotals[slug.toUpperCase()] ??
                   0;
-                const tile = getBrandTileStyle(slug);
 
                 return (
                   <Link
                     key={slug}
                     href={`/stok/${slug}`}
-                    style={{ backgroundColor: tile.bg, color: tile.fg }}
-                    aria-label={`${name} (${count} unit)`}
-                    className="group relative aspect-square w-full rounded-[22px] sm:rounded-[28px] flex items-center justify-center p-3 sm:p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+                    title={`${name} · ${isLoading ? "…" : `${count} unit`}`}
+                    aria-label={`${name} (${isLoading ? "memuat" : `${count} unit`})`}
+                    style={{ backgroundColor: bgColor }}
+                    className="group relative aspect-square rounded-[22px] sm:rounded-[26px] flex items-center justify-center p-6 sm:p-8 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
                   >
-                    <BrandTileMark brand={slug} />
-                    <span
-                      className={`absolute bottom-2 sm:bottom-3 rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold tracking-tight ${tile.badgeClass}`}
-                    >
-                      {isLoading ? "…" : `${count} unit`}
-                    </span>
+                    <BrandLogo
+                      brand={slug}
+                      color={logoColor}
+                      className={
+                        slug === "xiaomi"
+                          ? "w-[36%] max-h-12 h-auto"
+                          : "w-[70%] max-h-9 h-auto"
+                      }
+                    />
                   </Link>
                 );
               })}
@@ -311,7 +309,8 @@ export default function StokOverviewPage() {
                               >
                                 <BrandLogo
                                   brand={slug}
-                                  className="h-4 w-auto text-ink"
+                                  color={slug === "infinix" ? "#2E9E00" : undefined}
+                                  className="h-4 w-auto"
                                 />
                               </Link>
                             </td>

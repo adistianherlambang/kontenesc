@@ -139,7 +139,11 @@ export default function BrandStokClient({ brand }: { brand: string }) {
               <Menu className="w-5 h-5" />
             </button>
 
-            <BrandLogo brand={rawBrandSlug} className="h-4 w-auto text-ink" />
+            <BrandLogo
+              brand={rawBrandSlug}
+              color={rawBrandSlug === "infinix" ? "#2E9E00" : undefined}
+              className="h-4 w-auto"
+            />
             <span className="text-xs text-[#71717A] shrink-0">
               &middot; {brandTotalUnits} unit
             </span>
