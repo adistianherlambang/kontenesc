@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
+  Menu,
   Search,
-  ChevronDown,
-  ChevronRight,
   X,
+  LayoutGrid,
+  AlignJustify,
+  ChevronRight,
 } from "lucide-react";
 import {
   StokItem,
@@ -16,15 +17,29 @@ import {
   getStokFromDb,
 } from "@/lib/firebase";
 import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
+import StokSidebar from "@/components/StokSidebar";
+import StokItemList from "@/components/StokItemList";
 
 export default function StokOverviewPage() {
   const [items, setItems] = useState<StokItem[]>([]);
   const [summary, setSummary] = useState<StokSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [firebaseStatus, setFirebaseStatus] = useState<
+    "connected" | "offline" | "syncing"
+  >("offline");
+
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    const handleOnline = () => {
+      setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
+    };
+    const handleOffline = () => setFirebaseStatus("offline");
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
     getStokFromDb().then(({ items: initItems, summary: initSummary }) => {
       if (initItems.length > 0) {
         setItems(initItems);
@@ -33,13 +48,29 @@ export default function StokOverviewPage() {
       }
     });
 
-    const unsub = subscribeToStok(({ items: newItems, summary: newSummary }) => {
-      setItems(newItems);
-      setSummary(newSummary);
-      setIsLoading(false);
-    });
+    const unsub = subscribeToStok(
+      ({ items: newItems, summary: newSummary }) => {
+        setItems(newItems);
+        setSummary(newSummary);
+        setIsLoading(false);
+        setFirebaseStatus(
+          typeof window !== "undefined" && !window.navigator.onLine
+            ? "offline"
+            : "connected"
+        );
+      },
+      () => {
+        if (typeof window !== "undefined" && !window.navigator.onLine) {
+          setFirebaseStatus("offline");
+        }
+      }
+    );
 
-    return () => unsub();
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+      unsub();
+    };
   }, []);
 
   const brandTotals = useMemo(() => {
@@ -53,6 +84,15 @@ export default function StokOverviewPage() {
     });
     return map;
   }, [summary, items]);
+
+  const brandTypeCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    items.forEach((it) => {
+      const b = (it.brand || "Lainnya").trim().toLowerCase();
+      map[b] = (map[b] || 0) + 1;
+    });
+    return map;
+  }, [items]);
 
   const totalUnits = useMemo(() => {
     if (summary?.total_units) return summary.total_units;
@@ -74,164 +114,238 @@ export default function StokOverviewPage() {
     });
   }, [items, searchQuery]);
 
-  const toggleItem = (id: string) => {
-    setExpandedItems((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
-    <div className="min-h-dvh bg-canvas flex flex-col overflow-y-auto">
-      <header className="border-b border-line bg-canvas sticky top-0 z-20">
-        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <Link
-              href="/"
-              className="btn btn-ghost btn-icon -ml-2"
-              aria-label="Kembali"
-            >
-              <ArrowLeft className="size-4" />
-            </Link>
-            <h1 className="text-sm font-semibold text-ink">Stok</h1>
-            {tanggal && (
-              <span className="text-xs text-faint">&middot; {tanggal}</span>
-            )}
-          </div>
+    <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
+      <StokSidebar
+        activeBrand="all"
+        brandTotals={brandTotals}
+        totalUnits={totalUnits}
+        tanggal={tanggal}
+        firebaseStatus={firebaseStatus}
+        isOpenMobile={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
+      />
 
-          <span className="text-xs font-medium text-muted">
-            Total <strong className="text-ink font-semibold">{totalUnits}</strong>
-          </span>
-        </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 py-5 w-full flex-1 space-y-5">
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-faint pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari tipe atau warna..."
-            className="input pl-10 pr-9"
-          />
-          {searchQuery && (
+      <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
+        {/* Top Header — matches /konten */}
+        <header className="min-h-[60px] sm:min-h-[62px] px-4 sm:px-8 py-2.5 border-b border-[#ECEBE8] flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 bg-white">
+          <div className="flex items-center gap-2.5 min-w-0">
             <button
               type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-faint hover:text-ink cursor-pointer"
-              aria-label="Hapus pencarian"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              aria-label="Buka menu navigasi"
+              className="md:hidden -ml-1 p-2.5 min-w-[42px] min-h-[42px] flex items-center justify-center text-gray-700 hover:text-gray-900 rounded-xl hover:bg-gray-100 active:bg-gray-200 cursor-pointer transition-colors"
             >
-              <X className="size-4" />
+              <Menu className="w-5 h-5" />
             </button>
-          )}
-        </div>
 
-        {searchQuery.trim() ? (
-          /* Hasil Pencarian Langsung */
-          <div className="rounded-xl border border-line bg-canvas overflow-hidden">
-            <div className="px-4 py-2.5 bg-surface border-b border-line flex items-center justify-between text-xs font-medium text-muted">
-              <div className="flex items-center gap-3">
-                <span className="w-6">No</span>
-                <span>Rincian</span>
-              </div>
-              <span className="pr-6">Stok</span>
-            </div>
-
-            {filteredItems.length === 0 ? (
-              <div className="p-8 text-center text-xs text-muted">
-                Tidak ditemukan hasil untuk &ldquo;{searchQuery}&rdquo;
-              </div>
-            ) : (
-              <div className="divide-y divide-line">
-                {filteredItems.map((item, idx) => {
-                  const isExpanded = expandedItems.has(item.id);
-                  const hasWarna =
-                    Array.isArray(item.rincian_warna) &&
-                    item.rincian_warna.length > 0;
-
-                  return (
-                    <div key={item.id}>
-                      <button
-                        type="button"
-                        onClick={() => hasWarna && toggleItem(item.id)}
-                        className="w-full px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-subtle/60 transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <span className="text-xs text-faint w-6 shrink-0">
-                            {idx + 1}
-                          </span>
-                          <span className="text-[13px] font-medium text-ink truncate">
-                            {item.tipe}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2.5 shrink-0">
-                          <span className="text-[13px] font-semibold text-ink">
-                            {item.total_stok}
-                          </span>
-                          <ChevronDown
-                            className={`size-4 text-faint transition-transform ${
-                              isExpanded ? "rotate-180 text-ink" : ""
-                            }`}
-                          />
-                        </div>
-                      </button>
-
-                      {isExpanded && hasWarna && (
-                        <div className="bg-surface border-t border-line px-4 py-2 divide-y divide-line/50">
-                          {item.rincian_warna.map((w, wIdx) => (
-                            <div
-                              key={wIdx}
-                              className="flex items-center justify-between pl-9 pr-6 py-1.5 text-xs"
-                            >
-                              <span className="text-muted capitalize">
-                                {w.warna}
-                              </span>
-                              <span className="font-medium text-ink">
-                                {w.qty}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+            <h2 className="text-sm sm:text-base font-bold text-[#18181B] truncate">
+              {isSearching ? "Hasil Pencarian" : "Semua Brand"}
+            </h2>
+            {tanggal && (
+              <span className="text-xs text-[#71717A] shrink-0 hidden sm:inline">
+                &middot; {tanggal}
+              </span>
             )}
           </div>
-        ) : (
-          /* Daftar Brand */
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {BRAND_LIST.map(({ slug, name }) => {
-              const count =
-                brandTotals[name] ??
-                brandTotals[slug] ??
-                brandTotals[slug.toUpperCase()] ??
-                0;
 
-              return (
-                <Link
-                  key={slug}
-                  href={`/stok/${slug}`}
-                  className="flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3.5 text-ink transition-colors hover:bg-subtle active:bg-line/60"
-                >
-                  <BrandLogo brand={slug} className="h-4 w-auto text-ink" />
-                  <span className="flex items-center gap-2.5">
-                    <span className="text-[13px] font-semibold text-ink">
-                      {isLoading ? "…" : count}
-                    </span>
-                    <ChevronRight className="size-4 text-faint" />
-                  </span>
-                </Link>
-              );
-            })}
+          {/* Center Search Input (Desktop) */}
+          <div className="relative flex-1 max-w-sm hidden sm:block">
+            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari tipe, brand, atau warna..."
+              className="w-full pl-10 pr-9 py-2 rounded-xl text-xs bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#A1A1AA] hover:text-[#18181B] hover:bg-black/5 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        )}
+
+          {/* Right Actions: View switch */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
+              <button
+                type="button"
+                onClick={() => setViewMode("table")}
+                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
+                  viewMode === "table"
+                    ? "bg-white text-[#18181B] shadow-2xs font-semibold"
+                    : "text-[#71717A] hover:text-[#18181B]"
+                }`}
+                title="Tampilan Tabel"
+                aria-label="Tampilan Tabel"
+              >
+                <AlignJustify className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={`p-2 sm:p-1.5 min-w-[38px] min-h-[36px] sm:min-w-[32px] sm:min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
+                  viewMode === "grid"
+                    ? "bg-white text-[#18181B] shadow-2xs font-semibold"
+                    : "text-[#71717A] hover:text-[#18181B]"
+                }`}
+                title="Tampilan Kartu"
+                aria-label="Tampilan Kartu"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Search Input Row */}
+          <div className="relative w-full sm:hidden">
+            <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari tipe, brand, atau warna..."
+              className="w-full pl-10 pr-10 py-2.5 rounded-xl text-base bg-[#F4F4F6] border border-transparent focus:border-[#D4D4D8] focus:bg-white text-[#18181B] placeholder-[#A1A1AA] outline-none transition-all"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => setSearchQuery("")}
+                aria-label="Hapus pencarian"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-[#71717A] hover:text-[#18181B] active:bg-black/5 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </header>
+
+        {/* Scrollable Content Body */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6">
+          {isSearching ? (
+            <StokItemList
+              items={filteredItems}
+              viewMode={viewMode}
+              isLoading={isLoading}
+              showBrand
+              emptyMessage={`Tidak ditemukan hasil untuk "${searchQuery}"`}
+              onResetSearch={() => setSearchQuery("")}
+            />
+          ) : viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
+              {BRAND_LIST.map(({ slug, name }, idx) => {
+                const count =
+                  brandTotals[name] ??
+                  brandTotals[slug] ??
+                  brandTotals[slug.toUpperCase()] ??
+                  0;
+                const typeCount = brandTypeCounts[slug] ?? 0;
+
+                return (
+                  <Link
+                    key={slug}
+                    href={`/stok/${slug}`}
+                    className="group flex flex-col rounded-2xl border border-line bg-surface p-2 sm:p-1.5 transition-all duration-200 hover:shadow-sm"
+                  >
+                    <div className="flex min-h-10 items-center justify-between gap-2 pl-3 pr-2 pb-2">
+                      <span className="text-[13px] font-semibold text-muted">
+                        #{idx + 1} &middot; {typeCount} tipe
+                      </span>
+                      <ChevronRight className="size-4 text-faint group-hover:text-ink transition-colors" />
+                    </div>
+
+                    <div className="flex flex-1 items-center justify-between rounded-xl border border-black/[0.04] bg-canvas p-4 transition-colors group-hover:bg-surface/60">
+                      <BrandLogo
+                        brand={slug}
+                        className="h-4.5 w-auto text-ink"
+                      />
+                      <span className="text-sm font-semibold text-ink">
+                        {isLoading ? "…" : count}{" "}
+                        <span className="text-xs font-normal text-muted">
+                          unit
+                        </span>
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="pb-24">
+              <div className="rounded-xl border border-line bg-canvas overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr>
+                        <th className="th w-14 text-center">No</th>
+                        <th className="th">Brand</th>
+                        <th className="th w-28 text-right">Jumlah Tipe</th>
+                        <th className="th w-28 text-right">Total Stok</th>
+                        <th className="th w-20 text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-line">
+                      {BRAND_LIST.map(({ slug, name }, idx) => {
+                        const count =
+                          brandTotals[name] ??
+                          brandTotals[slug] ??
+                          brandTotals[slug.toUpperCase()] ??
+                          0;
+                        const typeCount = brandTypeCounts[slug] ?? 0;
+
+                        return (
+                          <tr
+                            key={slug}
+                            className="hover:bg-subtle/50 transition-colors"
+                          >
+                            <td className="td text-center text-muted">
+                              {idx + 1}
+                            </td>
+                            <td className="td">
+                              <Link
+                                href={`/stok/${slug}`}
+                                className="inline-flex items-center py-0.5"
+                              >
+                                <BrandLogo
+                                  brand={slug}
+                                  className="h-4 w-auto text-ink"
+                                />
+                              </Link>
+                            </td>
+                            <td className="td text-right text-muted">
+                              {isLoading ? "…" : `${typeCount} tipe`}
+                            </td>
+                            <td className="td text-right font-semibold text-ink">
+                              {isLoading ? "…" : count}
+                            </td>
+                            <td className="td text-right">
+                              <Link
+                                href={`/stok/${slug}`}
+                                className="inline-flex items-center gap-1 rounded-lg border border-line bg-surface hover:bg-subtle px-2.5 py-1 text-[11px] font-medium text-ink transition-colors"
+                              >
+                                <span>Buka</span>
+                                <ChevronRight className="size-3.5 text-faint" />
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
