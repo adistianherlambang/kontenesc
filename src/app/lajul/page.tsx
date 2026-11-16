@@ -349,18 +349,16 @@ export default function LajulPage() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className={`rounded-2xl border border-line bg-surface p-1.5 ${
+                  className={`rounded-xl border border-line bg-surface px-4 py-3 ${
                     stat.fullWidthOnMobile ? "col-span-2 sm:col-span-1" : ""
                   }`}
                 >
-                  <div className="rounded-xl border border-black/[0.04] bg-canvas px-3.5 py-2.5">
-                    <p className="text-[11px] font-medium text-muted">
-                      {stat.label}
-                    </p>
-                    <p className="text-sm font-semibold text-ink mt-0.5 truncate">
-                      {stat.value}
-                    </p>
-                  </div>
+                  <p className="text-[11px] font-medium text-muted">
+                    {stat.label}
+                  </p>
+                  <p className="text-sm sm:text-[15px] font-bold text-ink mt-0.5 truncate">
+                    {stat.value}
+                  </p>
                 </div>
               ))}
             </div>
