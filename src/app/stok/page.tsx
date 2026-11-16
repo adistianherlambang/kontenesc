@@ -16,7 +16,12 @@ import {
   subscribeToStok,
   getStokFromDb,
 } from "@/lib/firebase";
-import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
+import {
+  BrandLogo,
+  BrandTileMark,
+  BRAND_LIST,
+  getBrandTileStyle,
+} from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
 
@@ -241,40 +246,29 @@ export default function StokOverviewPage() {
               onResetSearch={() => setSearchQuery("")}
             />
           ) : viewMode === "grid" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
-              {BRAND_LIST.map(({ slug, name }, idx) => {
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5 max-w-4xl pb-24">
+              {BRAND_LIST.map(({ slug, name }) => {
                 const count =
                   brandTotals[name] ??
                   brandTotals[slug] ??
                   brandTotals[slug.toUpperCase()] ??
                   0;
-                const typeCount = brandTypeCounts[slug] ?? 0;
+                const tile = getBrandTileStyle(slug);
 
                 return (
                   <Link
                     key={slug}
                     href={`/stok/${slug}`}
-                    className="group flex flex-col rounded-2xl border border-line bg-surface p-2 sm:p-1.5 transition-all duration-200 hover:shadow-sm"
+                    style={{ backgroundColor: tile.bg, color: tile.fg }}
+                    aria-label={`${name} (${count} unit)`}
+                    className="group relative aspect-square w-full rounded-[22px] sm:rounded-[28px] flex items-center justify-center p-3 sm:p-5 shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
                   >
-                    <div className="flex min-h-10 items-center justify-between gap-2 pl-3 pr-2 pb-2">
-                      <span className="text-[13px] font-semibold text-muted">
-                        #{idx + 1} &middot; {typeCount} tipe
-                      </span>
-                      <ChevronRight className="size-4 text-faint group-hover:text-ink transition-colors" />
-                    </div>
-
-                    <div className="flex flex-1 items-center justify-between rounded-xl border border-black/[0.04] bg-canvas p-4 transition-colors group-hover:bg-surface/60">
-                      <BrandLogo
-                        brand={slug}
-                        className="h-4.5 w-auto text-ink"
-                      />
-                      <span className="text-sm font-semibold text-ink">
-                        {isLoading ? "…" : count}{" "}
-                        <span className="text-xs font-normal text-muted">
-                          unit
-                        </span>
-                      </span>
-                    </div>
+                    <BrandTileMark brand={slug} />
+                    <span
+                      className={`absolute bottom-2 sm:bottom-3 rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold tracking-tight ${tile.badgeClass}`}
+                    >
+                      {isLoading ? "…" : `${count} unit`}
+                    </span>
                   </Link>
                 );
               })}
