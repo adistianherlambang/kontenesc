@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Menu } from "lucide-react";
+import { ArrowLeft, Menu, ChevronRight } from "lucide-react";
 import {
   StokItem,
   StokSummary,
@@ -74,6 +74,15 @@ export default function StokOverviewPage() {
     return map;
   }, [summary, items]);
 
+  const brandTypeCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    items.forEach((it) => {
+      const b = (it.brand || "Lainnya").trim().toLowerCase();
+      map[b] = (map[b] || 0) + 1;
+    });
+    return map;
+  }, [items]);
+
   const totalUnits = useMemo(() => {
     if (summary?.total_units) return summary.total_units;
     return items.reduce((acc, it) => acc + (it.total_stok || 0), 0);
@@ -133,45 +142,61 @@ export default function StokOverviewPage() {
           </div>
         </header>
 
-        {/* Brand App Launcher Grid — 3 columns matching reference image */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 sm:py-10">
-          <div className="w-full max-w-xs sm:max-w-md md:max-w-xl mx-auto">
-            <div className="grid grid-cols-3 gap-3 sm:gap-4.5 md:gap-6 pb-20">
+        {/* Stretched Brand Cards Grid */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-5 sm:py-7">
+          <div className="w-full max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-20">
               {BRAND_LIST.map(({ slug, name, bgColor, logoColor }) => {
                 const count =
                   brandTotals[name] ??
                   brandTotals[slug] ??
                   brandTotals[slug.toUpperCase()] ??
                   0;
+                const typeCount =
+                  brandTypeCounts[slug] ??
+                  brandTypeCounts[name.toLowerCase()] ??
+                  0;
 
                 return (
-                  <div key={slug} className="flex flex-col items-center group">
-                    <Link
-                      href={`/stok/${slug}`}
-                      title={`${name} (${count} unit)`}
-                      aria-label={`${name} (${count} unit)`}
-                      style={{ backgroundColor: bgColor }}
-                      className="w-full aspect-square rounded-[20px] sm:rounded-[26px] md:rounded-[30px] flex items-center justify-center p-3 sm:p-4 md:p-5 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-lg active:scale-95 cursor-pointer"
-                    >
+                  <Link
+                    key={slug}
+                    href={`/stok/${slug}`}
+                    style={{ backgroundColor: bgColor }}
+                    className="group relative w-full rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer min-h-[84px] sm:min-h-[92px] overflow-hidden"
+                  >
+                    <div className="flex flex-col justify-between h-full min-w-0 pr-3">
                       <BrandLogo
                         brand={slug}
                         color={logoColor}
                         className={
                           slug === "xiaomi"
-                            ? "w-[44%] max-h-12 h-auto"
-                            : "w-[76%] max-h-8 sm:max-h-10 md:max-h-12 h-auto"
+                            ? "h-7 sm:h-8 w-auto"
+                            : "h-5 sm:h-6 w-auto max-w-[130px] sm:max-w-[150px]"
                         }
                       />
-                    </Link>
-                    <div className="mt-1.5 text-center select-none">
-                      <p className="text-xs sm:text-[13px] font-semibold text-ink leading-tight group-hover:text-brand transition-colors">
-                        {name}
-                      </p>
-                      <p className="text-[11px] text-muted">
-                        {isLoading ? "…" : `${count} unit`}
-                      </p>
+                      <span
+                        className="text-[11px] font-medium opacity-80 mt-2 truncate"
+                        style={{ color: logoColor }}
+                      >
+                        {isLoading ? "…" : `${typeCount} tipe handphone`}
+                      </span>
                     </div>
-                  </div>
+
+                    <div
+                      className="flex items-center gap-2 shrink-0"
+                      style={{ color: logoColor }}
+                    >
+                      <div className="text-right">
+                        <span className="text-sm sm:text-base font-bold block leading-tight">
+                          {isLoading ? "…" : count}
+                        </span>
+                        <span className="text-[10px] font-medium opacity-75 uppercase tracking-wider block">
+                          unit
+                        </span>
+                      </div>
+                      <ChevronRight className="size-4.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </Link>
                 );
               })}
             </div>
