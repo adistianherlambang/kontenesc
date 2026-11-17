@@ -26,17 +26,20 @@ export function cleanIp(ip: string): string {
  * Extracts client public IP from Next.js request headers.
  */
 export function extractClientIp(req: Request): string {
+  // 1. Vercel: x-real-ip di-overwrite langsung oleh Edge Network Vercel dari TCP socket (tidak dapat dimanipulasi header user)
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return cleanIp(realIp);
+
+  // 2. Cloudflare: cf-connecting-ip diset oleh CDN Cloudflare
+  const cfConnectingIp = req.headers.get("cf-connecting-ip");
+  if (cfConnectingIp) return cleanIp(cfConnectingIp);
+
+  // 3. Fallback: x-forwarded-for
   const xForwardedFor = req.headers.get("x-forwarded-for");
   if (xForwardedFor) {
     const firstIp = xForwardedFor.split(",")[0].trim();
     return cleanIp(firstIp);
   }
-
-  const cfConnectingIp = req.headers.get("cf-connecting-ip");
-  if (cfConnectingIp) return cleanIp(cfConnectingIp);
-
-  const realIp = req.headers.get("x-real-ip");
-  if (realIp) return cleanIp(realIp);
 
   return "127.0.0.1";
 }
