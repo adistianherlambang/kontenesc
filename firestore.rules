@@ -34,16 +34,6 @@ service cloud.firestore {
     // Description: Sales report data (Laporan Penjualan) & summary doc 'ringkasan'.
     // Permissions: Public read; client writes disabled (managed via server / Admin SDK).
     //
-    // Collection: security
-    // Document ID: store_network
-    // Description: Store Wi-Fi public IP synchronization & network security configuration.
-    // Fields:
-    //   - current_ip: string (required, 7-45 chars) - Store public IP (IPv4 or IPv6)
-    //   - updated_at: string (required, <= 100 chars) - ISO 8601 update timestamp
-    //   - store: string (required, <= 100 chars) - Store name/identifier
-    //   - sync_secret: string (optional, <= 100 chars) - Optional synchronization secret
-    // Permissions: Public read; validate schema on create/update; client delete disabled.
-    //
     // ===============================================================
 
     // ===============================================================
@@ -68,15 +58,6 @@ service cloud.firestore {
         && (!('id' in data) || (data.id is string && data.id.size() <= 100));
     }
 
-    function isValidStoreNetwork(data) {
-      return data.keys().hasAll(['current_ip', 'updated_at', 'store'])
-        && data.keys().hasOnly(['current_ip', 'updated_at', 'store', 'sync_secret'])
-        && data.current_ip is string && data.current_ip.size() >= 7 && data.current_ip.size() <= 45
-        && data.updated_at is string && data.updated_at.size() <= 100
-        && data.store is string && data.store.size() <= 100
-        && (!('sync_secret' in data) || (data.sync_secret is string && data.sync_secret.size() <= 100));
-    }
-
     // Koleksi contents: Semarang Cell Instagram Content Hub
     match /contents/{contentId} {
       allow read: if true;
@@ -98,13 +79,6 @@ service cloud.firestore {
     match /lajul/{lajulId} {
       allow read: if true;
       allow write: if false;
-    }
-
-    // Koleksi security: Pengaturan keamanan dan sinkronisasi jaringan toko
-    match /security/store_network {
-      allow read: if true;
-      allow create, update: if isValidStoreNetwork(request.resource.data);
-      allow delete: if false;
     }
 
     // Default deny for all other collections
