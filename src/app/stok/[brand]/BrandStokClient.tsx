@@ -20,6 +20,7 @@ import { BrandLogo, getBrandConfig } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
 import SortSelect, { StokSortOption } from "@/components/SortSelect";
+import StoreSecurityGate from "@/components/StoreSecurityGate";
 
 export default function BrandStokClient({ brand }: { brand: string }) {
   const rawBrandSlug = (brand || "").toLowerCase();
@@ -138,18 +139,19 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   }, [brandItems, searchQuery]);
 
   return (
-    <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
-      <StokSidebar
-        activeBrand={rawBrandSlug}
-        brandTotals={brandTotals}
-        totalUnits={totalUnits}
-        tanggal={tanggal}
-        firebaseStatus={firebaseStatus}
-        isOpenMobile={isMobileSidebarOpen}
-        onCloseMobile={() => setIsMobileSidebarOpen(false)}
-      />
+    <StoreSecurityGate pageTitle={`Stok ${brandConfig.name}`}>
+      <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
+        <StokSidebar
+          activeBrand={rawBrandSlug}
+          brandTotals={brandTotals}
+          totalUnits={totalUnits}
+          tanggal={tanggal}
+          firebaseStatus={firebaseStatus}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        />
 
-      <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
+        <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">
         {/* Responsive Header */}
         <header className="px-3 sm:px-6 py-3 border-b border-[#ECEBE8] flex flex-col gap-2.5 shrink-0 bg-white">
           <div className="flex items-center justify-between gap-3">
@@ -288,5 +290,6 @@ export default function BrandStokClient({ brand }: { brand: string }) {
         </div>
       </main>
     </div>
+  </StoreSecurityGate>
   );
 }

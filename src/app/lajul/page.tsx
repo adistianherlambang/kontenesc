@@ -16,6 +16,7 @@ import {
   getLajulFromDb,
 } from "@/lib/firebase";
 import LajulSidebar, { LajulStatusView } from "@/components/LajulSidebar";
+import StoreSecurityGate from "@/components/StoreSecurityGate";
 
 const ORDERED_BRAND_KEYS = [
   "samsung",
@@ -175,8 +176,9 @@ export default function LajulPage() {
   };
 
   return (
-    <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
-      <LajulSidebar
+    <StoreSecurityGate pageTitle="Laporan Penjualan (Lajul)">
+      <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
+        <LajulSidebar
         activeView={activeView}
         onSelectView={setActiveView}
         totalBrandsCount={sortedBrands.length}
@@ -524,5 +526,6 @@ export default function LajulPage() {
         </div>
       </main>
     </div>
+  </StoreSecurityGate>
   );
 }
