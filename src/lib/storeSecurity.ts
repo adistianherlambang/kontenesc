@@ -24,17 +24,26 @@ export function cleanIp(ip: string): string {
 
 /**
  * Extracts client public IP from Next.js request headers.
+ * Prioritizes Vercel's tamper-proof headers (x-vercel-forwarded-for, x-real-ip)
+ * to prevent header spoofing from external clients.
  */
 export function extractClientIp(req: Request): string {
-  // 1. Vercel: x-real-ip di-overwrite langsung oleh Edge Network Vercel dari TCP socket (tidak dapat dimanipulasi header user)
-  const realIp = req.headers.get("x-real-ip");
-  if (realIp) return cleanIp(realIp);
+  // 1. Vercel official tamper-proof header (overwritten at Vercel's TCP socket edge)
+  const vercelIp = req.headers.get("x-vercel-forwarded-for");
+  if (vercelIp) {
+    const firstIp = vercelIp.split(",")[0].trim();
+    return cleanIp(firstIp);
+  }
 
-  // 2. Cloudflare: cf-connecting-ip diset oleh CDN Cloudflare
+  // 2. Cloudflare Connecting IP (if domain uses Cloudflare proxy)
   const cfConnectingIp = req.headers.get("cf-connecting-ip");
   if (cfConnectingIp) return cleanIp(cfConnectingIp);
 
-  // 3. Fallback: x-forwarded-for
+  // 3. Real IP injected by reverse proxies
+  const realIp = req.headers.get("x-real-ip");
+  if (realIp) return cleanIp(realIp);
+
+  // 4. Standard X-Forwarded-For
   const xForwardedFor = req.headers.get("x-forwarded-for");
   if (xForwardedFor) {
     const firstIp = xForwardedFor.split(",")[0].trim();
