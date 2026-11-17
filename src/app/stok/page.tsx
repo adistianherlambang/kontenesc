@@ -94,14 +94,14 @@ export default function StokOverviewPage() {
         {/* Top Header */}
         <header className="h-14 sm:h-16 px-3 sm:px-6 border-b border-[#ECEBE8] flex items-center justify-between shrink-0 bg-white">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Link
+            {/* <Link
               href="/"
               className="btn btn-ghost btn-icon -ml-2"
               title="Kembali ke Beranda"
               aria-label="Kembali ke Beranda"
             >
               <ArrowLeft className="size-4" />
-            </Link>
+            </Link> */}
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold text-ink truncate leading-tight">
                 Stok Handphone

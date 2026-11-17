@@ -170,9 +170,6 @@ export default function BrandStokClient({ brand }: { brand: string }) {
                   color={rawBrandSlug === "infinix" ? "#2E9E00" : undefined}
                   className="h-4 sm:h-4.5 w-auto"
                 />
-                <span className="text-xs text-muted font-medium">
-                  {isLoading ? "…" : `${brandTotalUnits} unit`}
-                </span>
               </div>
             </div>
 
@@ -200,21 +197,20 @@ export default function BrandStokClient({ brand }: { brand: string }) {
 
             {/* Right: Sort, View Mode Toggle & Mobile Menu */}
             <div className="flex items-center gap-2 shrink-0">
-              <SortSelect
+              {/* <SortSelect
                 value={sortBy}
                 onChange={setSortBy}
                 className="hidden sm:inline-block"
-              />
+              /> */}
 
               <div className="flex items-center p-1 bg-[#F0F0F2] rounded-xl border border-[#E4E4E7]">
                 <button
                   type="button"
                   onClick={() => setViewMode("grid")}
-                  className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
-                    viewMode === "grid"
-                      ? "bg-white text-[#18181B] shadow-2xs font-semibold"
-                      : "text-[#71717A] hover:text-[#18181B]"
-                  }`}
+                  className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${viewMode === "grid"
+                    ? "bg-white text-[#18181B] shadow-2xs font-semibold"
+                    : "text-[#71717A] hover:text-[#18181B]"
+                    }`}
                   title="Tampilan Kartu"
                   aria-label="Tampilan Kartu"
                 >
@@ -223,11 +219,10 @@ export default function BrandStokClient({ brand }: { brand: string }) {
                 <button
                   type="button"
                   onClick={() => setViewMode("table")}
-                  className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${
-                    viewMode === "table"
-                      ? "bg-white text-[#18181B] shadow-2xs font-semibold"
-                      : "text-[#71717A] hover:text-[#18181B]"
-                  }`}
+                  className={`p-1.5 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-lg text-xs transition-colors cursor-pointer ${viewMode === "table"
+                    ? "bg-white text-[#18181B] shadow-2xs font-semibold"
+                    : "text-[#71717A] hover:text-[#18181B]"
+                    }`}
                   title="Tampilan Tabel"
                   aria-label="Tampilan Tabel"
                 >

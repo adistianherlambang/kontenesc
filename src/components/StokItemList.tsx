@@ -79,16 +79,7 @@ export default function StokItemList({
                       {item.tipe}
                     </h3>
                   </div>
-
-                  {/* Stock Count — clean typography, zero badge */}
-                  <div className="shrink-0 text-right">
-                    <span className="text-base sm:text-lg font-bold text-ink tabular-nums block leading-tight">
-                      {item.total_stok}
-                    </span>
-                    <span className="text-[10px] text-muted font-medium uppercase tracking-wider block">
-                      unit
-                    </span>
-                  </div>
+                  <p className="font-bold">x {item.total_stok}</p>
                 </div>
               </div>
 
