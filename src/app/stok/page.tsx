@@ -90,6 +90,7 @@ export default function StokOverviewPage() {
           firebaseStatus={firebaseStatus}
           isOpenMobile={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
+          items={items}
         />
 
         <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden bg-white">

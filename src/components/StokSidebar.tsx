@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -8,8 +8,11 @@ import {
   Cloud,
   CloudOff,
   X,
+  Copy,
 } from "lucide-react";
 import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
+import { StokItem } from "@/lib/firebase";
+import CopyStokModal from "@/components/CopyStokModal";
 
 interface StokSidebarProps {
   activeBrand: string; // "all" or brand slug
@@ -19,6 +22,7 @@ interface StokSidebarProps {
   firebaseStatus: "connected" | "offline" | "syncing";
   isOpenMobile: boolean;
   onCloseMobile: () => void;
+  items?: StokItem[];
 }
 
 export default function StokSidebar({
@@ -29,7 +33,10 @@ export default function StokSidebar({
   firebaseStatus,
   isOpenMobile,
   onCloseMobile,
+  items = [],
 }: StokSidebarProps) {
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
+
   return (
     <>
       {isOpenMobile && (
@@ -120,6 +127,23 @@ export default function StokSidebar({
               })}
             </div>
           </nav>
+
+          <nav>
+            <p className="section-label">Tools</p>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => {
+                  onCloseMobile();
+                  setIsCopyModalOpen(true);
+                }}
+                className="nav-item"
+              >
+                <Copy className="size-4 shrink-0" />
+                <span className="truncate">Copy Stok WhatsApp</span>
+              </button>
+            </div>
+          </nav>
         </div>
 
         {/* Footer — matches /konten Sidebar footer */}
@@ -156,6 +180,16 @@ export default function StokSidebar({
           </div>
         </div>
       </aside>
+
+      {isCopyModalOpen && (
+        <CopyStokModal
+          isOpen={true}
+          onClose={() => setIsCopyModalOpen(false)}
+          items={items}
+          tanggal={tanggal}
+          defaultBrand={activeBrand}
+        />
+      )}
     </>
   );
 }
