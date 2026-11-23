@@ -50,7 +50,6 @@ interface StoreSecurityGateProps {
 
 export default function StoreSecurityGate({
   children,
-  pageTitle = "Data Toko",
 }: StoreSecurityGateProps) {
   const router = useRouter();
   const isUnlocked = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
@@ -68,7 +67,7 @@ export default function StoreSecurityGate({
     e.preventDefault();
 
     if (!password) {
-      setError("Password wajib diisi.");
+      setError("Password wajib diisi");
       inputRef.current?.focus();
       return;
     }
@@ -77,7 +76,7 @@ export default function StoreSecurityGate({
       setError("");
       unlockAccess();
     } else {
-      setError("Password yang Anda masukkan salah.");
+      setError("Password salah");
       inputRef.current?.focus();
       inputRef.current?.select();
     }
@@ -94,8 +93,7 @@ export default function StoreSecurityGate({
         maxWidth="sm"
         title="Akses Terkunci"
         titleIcon={<Lock className="size-4 text-ink shrink-0" />}
-        subtitle={pageTitle}
-        ariaLabel={`Masukkan password untuk mengakses ${pageTitle}`}
+        ariaLabel="Akses Terkunci"
         footer={
           <>
             <Link href="/" className="btn btn-secondary">
@@ -106,7 +104,7 @@ export default function StoreSecurityGate({
               form="store-security-form"
               className="btn btn-primary"
             >
-              Buka Akses
+              Masuk
             </button>
           </>
         }
@@ -116,17 +114,12 @@ export default function StoreSecurityGate({
             id="store-security-form"
             method="POST"
             onSubmit={handleSubmit}
-            className="space-y-4"
+            className="space-y-3"
             noValidate
           >
-            <p className="text-xs text-muted leading-relaxed">
-              Masukkan password keamanan untuk membuka halaman{" "}
-              <strong className="font-semibold text-ink">{pageTitle}</strong>.
-            </p>
-
             <div>
               <label htmlFor="store-access-password" className="field-label">
-                Password <span aria-hidden="true" className="text-danger">*</span>
+                Password
               </label>
               <div className="relative">
                 <input
@@ -139,7 +132,7 @@ export default function StoreSecurityGate({
                     setPassword(e.target.value);
                     if (error) setError("");
                   }}
-                  placeholder="Masukkan password..."
+                  placeholder="Masukkan password"
                   autoComplete="current-password"
                   enterKeyHint="done"
                   required
