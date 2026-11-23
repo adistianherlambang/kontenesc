@@ -21,6 +21,7 @@ import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
 import SortSelect, { StokSortOption } from "@/components/SortSelect";
 import StoreSecurityGate from "@/components/StoreSecurityGate";
+import { addOneDay } from "@/app/stok/page";
 
 export default function BrandStokClient({ brand }: { brand: string }) {
   const rawBrandSlug = (brand || "").toLowerCase();
@@ -96,7 +97,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     return items.reduce((acc, it) => acc + (it.total_stok || 0), 0);
   }, [summary, items]);
 
-  const tanggal = summary?.tanggal || items[0]?.tanggal || "";
+  const tanggal = addOneDay(summary?.tanggal || items[0]?.tanggal || "");
 
   const brandItems = useMemo(() => {
     const list = items.filter((it) => {

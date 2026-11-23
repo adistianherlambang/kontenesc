@@ -13,6 +13,86 @@ import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StoreSecurityGate from "@/components/StoreSecurityGate";
 
+export function addOneDay(rawDate: string): string {
+  if (!rawDate || typeof rawDate !== "string") return "";
+  const trimmed = rawDate.trim();
+  if (!trimmed) return "";
+
+  const prefixMatch = trimmed.match(/^([A-Za-z]+[\s:]+)(.*)$/);
+  const prefix = prefixMatch ? prefixMatch[1] : "";
+  const dateStr = prefixMatch ? prefixMatch[2].trim() : trimmed;
+
+  // Pattern 1: DD/MM/YYYY or D/M/YYYY or DD/MM/YY
+  const slashMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (slashMatch) {
+    const day = parseInt(slashMatch[1], 10);
+    const month = parseInt(slashMatch[2], 10);
+    let year = parseInt(slashMatch[3], 10);
+    if (year < 100) year += 2000;
+    const d = new Date(year, month - 1, day);
+    d.setDate(d.getDate() + 1);
+    const newDay = String(d.getDate()).padStart(slashMatch[1].length === 1 ? 1 : 2, "0");
+    const newMonth = String(d.getMonth() + 1).padStart(slashMatch[2].length === 1 ? 1 : 2, "0");
+    const newYear = slashMatch[3].length === 2 ? String(d.getFullYear()).slice(-2) : d.getFullYear();
+    return `${prefix}${newDay}/${newMonth}/${newYear}`;
+  }
+
+  // Pattern 2: DD-MM-YYYY or D-M-YYYY
+  const dashMatch = dateStr.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+  if (dashMatch) {
+    const day = parseInt(dashMatch[1], 10);
+    const month = parseInt(dashMatch[2], 10);
+    let year = parseInt(dashMatch[3], 10);
+    if (year < 100) year += 2000;
+    const d = new Date(year, month - 1, day);
+    d.setDate(d.getDate() + 1);
+    const newDay = String(d.getDate()).padStart(dashMatch[1].length === 1 ? 1 : 2, "0");
+    const newMonth = String(d.getMonth() + 1).padStart(dashMatch[2].length === 1 ? 1 : 2, "0");
+    const newYear = dashMatch[3].length === 2 ? String(d.getFullYear()).slice(-2) : d.getFullYear();
+    return `${prefix}${newDay}-${newMonth}-${newYear}`;
+  }
+
+  // Pattern 3: YYYY-MM-DD
+  const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const year = parseInt(isoMatch[1], 10);
+    const month = parseInt(isoMatch[2], 10);
+    const day = parseInt(isoMatch[3], 10);
+    const d = new Date(year, month - 1, day);
+    d.setDate(d.getDate() + 1);
+    const newDay = String(d.getDate()).padStart(2, "0");
+    const newMonth = String(d.getMonth() + 1).padStart(2, "0");
+    return `${prefix}${d.getFullYear()}-${newMonth}-${newDay}`;
+  }
+
+  // Pattern 4: Indonesian month name, e.g. 15 November 2026
+  const idMonths = [
+    "januari", "februari", "maret", "april", "mei", "juni",
+    "juli", "agustus", "september", "oktober", "november", "desember"
+  ];
+  const textMatch = dateStr.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/);
+  if (textMatch) {
+    const day = parseInt(textMatch[1], 10);
+    const monthIdx = idMonths.indexOf(textMatch[2].toLowerCase());
+    if (monthIdx !== -1) {
+      const year = parseInt(textMatch[3], 10);
+      const d = new Date(year, monthIdx, day);
+      d.setDate(d.getDate() + 1);
+      const capMonth = idMonths[d.getMonth()].charAt(0).toUpperCase() + idMonths[d.getMonth()].slice(1);
+      return `${prefix}${d.getDate()} ${capMonth} ${d.getFullYear()}`;
+    }
+  }
+
+  // Fallback: Date parse
+  const fallbackDate = new Date(dateStr);
+  if (!isNaN(fallbackDate.getTime())) {
+    fallbackDate.setDate(fallbackDate.getDate() + 1);
+    return `${prefix}${fallbackDate.toLocaleDateString("id-ID")}`;
+  }
+
+  return rawDate;
+}
+
 export default function StokOverviewPage() {
   const [items, setItems] = useState<StokItem[]>([]);
   const [summary, setSummary] = useState<StokSummary | null>(null);
@@ -77,7 +157,7 @@ export default function StokOverviewPage() {
     return items.reduce((acc, it) => acc + (it.total_stok || 0), 0);
   }, [summary, items]);
 
-  const tanggal = summary?.tanggal || items[0]?.tanggal || "";
+  const tanggal = addOneDay(summary?.tanggal || items[0]?.tanggal || "");
 
   return (
     <StoreSecurityGate pageTitle="Stok Handphone">
