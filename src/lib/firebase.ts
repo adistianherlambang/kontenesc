@@ -13,6 +13,9 @@ import {
   writeBatch,
   query,
   onSnapshot,
+  Query,
+  QuerySnapshot,
+  DocumentData,
   Firestore
 } from "firebase/firestore";
 
@@ -136,19 +139,61 @@ export async function checkFirestoreHealth(): Promise<{ ok: boolean; count?: num
   }
 }
 
+async function fetchCollectionReliable(
+  q: Query<DocumentData>
+): Promise<QuerySnapshot<DocumentData>> {
+  try {
+    const serverSnap = await getDocsFromServer(q);
+    if (!serverSnap.empty) return serverSnap;
+  } catch {
+    // Fall through to local cache / snapshot listener
+  }
+
+  try {
+    const localSnap = await getDocs(q);
+    if (!localSnap.empty) return localSnap;
+  } catch {
+    // Fall through to snapshot listener
+  }
+
+  return new Promise<QuerySnapshot<DocumentData>>((resolve, reject) => {
+    let settled = false;
+    let unsub: (() => void) | null = null;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      unsub?.();
+      reject(new Error("Firestore fetch timed out"));
+    }, 8000);
+
+    unsub = onSnapshot(
+      q,
+      { includeMetadataChanges: true },
+      (snapshot) => {
+        if (settled) return;
+        if (!snapshot.empty || !snapshot.metadata.fromCache) {
+          settled = true;
+          clearTimeout(timer);
+          unsub?.();
+          resolve(snapshot);
+        }
+      },
+      (err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        unsub?.();
+        reject(err);
+      }
+    );
+  });
+}
+
 // Fetch all contents from Firestore
 export async function getContentsFromDb(): Promise<ContentItem[]> {
   try {
     const q = query(collection(db, COLLECTION_NAME));
-    let snapshot;
-    try {
-      snapshot = await getDocsFromServer(q);
-    } catch {
-      snapshot = await getDocs(q);
-      if (snapshot.empty && snapshot.metadata.fromCache) {
-        throw new Error("Offline contents cache is empty");
-      }
-    }
+    const snapshot = await fetchCollectionReliable(q);
     if (snapshot.empty) return [];
     
     return snapshot.docs.map(docSnap => ({
@@ -288,19 +333,9 @@ export async function getStokFromDb(
 ): Promise<{ items: StokItem[]; summary: StokSummary | null }> {
   try {
     const q = query(collection(db, "stok"));
-    let snapshot;
-    if (throwOnError) {
-      try {
-        snapshot = await getDocsFromServer(q);
-      } catch {
-        snapshot = await getDocs(q);
-        if (snapshot.empty && snapshot.metadata.fromCache) {
-          throw new Error("Offline stok cache is empty");
-        }
-      }
-    } else {
-      snapshot = await getDocs(q);
-    }
+    const snapshot = throwOnError
+      ? await fetchCollectionReliable(q)
+      : await getDocs(q);
     let summary: StokSummary | null = null;
     const items: StokItem[] = [];
 
@@ -378,19 +413,9 @@ export async function getLajulFromDb(
 ): Promise<{ brands: LajulBrandDoc[]; summary: LajulSummary | null }> {
   try {
     const q = query(collection(db, "lajul"));
-    let snapshot;
-    if (throwOnError) {
-      try {
-        snapshot = await getDocsFromServer(q);
-      } catch {
-        snapshot = await getDocs(q);
-        if (snapshot.empty && snapshot.metadata.fromCache) {
-          throw new Error("Offline lajul cache is empty");
-        }
-      }
-    } else {
-      snapshot = await getDocs(q);
-    }
+    const snapshot = throwOnError
+      ? await fetchCollectionReliable(q)
+      : await getDocs(q);
     let summary: LajulSummary | null = null;
     const brands: LajulBrandDoc[] = [];
 

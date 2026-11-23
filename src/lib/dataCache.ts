@@ -12,9 +12,9 @@ import {
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-const CACHE_KEY_CONTENTS = "semarang_cell_cache_contents_v1";
-const CACHE_KEY_STOK = "semarang_cell_cache_stok_v1";
-const CACHE_KEY_LAJUL = "semarang_cell_cache_lajul_v1";
+const CACHE_KEY_CONTENTS = "semarang_cell_cache_contents_v2";
+const CACHE_KEY_STOK = "semarang_cell_cache_stok_v2";
+const CACHE_KEY_LAJUL = "semarang_cell_cache_lajul_v2";
 
 interface CacheEntry<T> {
   timestamp: number;
@@ -176,7 +176,7 @@ export async function fetchStokCached(
     () => getStokFromDb(true),
     {
       force,
-      isValid: (d) => Array.isArray(d.items) && (d.items.length > 0 || d.summary !== null),
+      isValid: (d) => Array.isArray(d.items) && d.items.length > 0,
     }
   );
   return { ...data, fromCache };
@@ -190,7 +190,7 @@ export async function fetchLajulCached(
     () => getLajulFromDb(true),
     {
       force,
-      isValid: (d) => Array.isArray(d.brands) && (d.brands.length > 0 || d.summary !== null),
+      isValid: (d) => Array.isArray(d.brands) && d.brands.length > 0,
     }
   );
   return { ...data, fromCache };
