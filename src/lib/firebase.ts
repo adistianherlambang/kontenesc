@@ -274,7 +274,9 @@ export interface LajulSummary {
   updated_at?: string;
 }
 
-export async function getStokFromDb(): Promise<{ items: StokItem[]; summary: StokSummary | null }> {
+export async function getStokFromDb(
+  throwOnError = false
+): Promise<{ items: StokItem[]; summary: StokSummary | null }> {
   try {
     const q = query(collection(db, "stok"));
     const snapshot = await getDocs(q);
@@ -304,6 +306,7 @@ export async function getStokFromDb(): Promise<{ items: StokItem[]; summary: Sto
     return { items, summary };
   } catch (err) {
     console.warn("Error fetching stok:", err);
+    if (throwOnError) throw err;
     return { items: [], summary: null };
   }
 }
@@ -349,7 +352,9 @@ export function subscribeToStok(
   );
 }
 
-export async function getLajulFromDb(): Promise<{ brands: LajulBrandDoc[]; summary: LajulSummary | null }> {
+export async function getLajulFromDb(
+  throwOnError = false
+): Promise<{ brands: LajulBrandDoc[]; summary: LajulSummary | null }> {
   try {
     const q = query(collection(db, "lajul"));
     const snapshot = await getDocs(q);
@@ -375,6 +380,7 @@ export async function getLajulFromDb(): Promise<{ brands: LajulBrandDoc[]; summa
     return { brands, summary };
   } catch (err) {
     console.warn("Error fetching lajul:", err);
+    if (throwOnError) throw err;
     return { brands: [], summary: null };
   }
 }

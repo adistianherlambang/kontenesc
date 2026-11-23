@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -10,12 +10,8 @@ import {
   AlignJustify,
   Menu,
 } from "lucide-react";
-import {
-  StokItem,
-  StokSummary,
-  subscribeToStok,
-  getStokFromDb,
-} from "@/lib/firebase";
+import { StokItem, StokSummary } from "@/lib/firebase";
+import { fetchStokCached } from "@/lib/dataCache";
 import { BrandLogo, getBrandConfig } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
@@ -31,6 +27,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   const [items, setItems] = useState<StokItem[]>([]);
   const [summary, setSummary] = useState<StokSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [firebaseStatus, setFirebaseStatus] = useState<
     "connected" | "offline" | "syncing"
   >("offline");
@@ -47,52 +44,63 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     }, 2500);
 
     const handleOnline = () => {
-      setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
+      setFirebaseStatus((prev) => (prev === "offline" ? "connected" : prev));
     };
     const handleOffline = () => setFirebaseStatus("offline");
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    getStokFromDb().then(({ items: initItems, summary: initSummary }) => {
-      if (!isMounted) return;
-      if (initItems.length > 0) {
+    fetchStokCached()
+      .then(({ items: initItems, summary: initSummary }) => {
+        if (!isMounted) return;
         setItems(initItems);
         setSummary(initSummary);
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
-      }
-    });
-
-    const unsub = subscribeToStok(
-      ({ items: newItems, summary: newSummary }) => {
-        if (!isMounted) return;
-        setItems(newItems);
-        setSummary(newSummary);
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
         setFirebaseStatus(
           typeof window !== "undefined" && !window.navigator.onLine
             ? "offline"
             : "connected"
         );
-      },
-      () => {
+      })
+      .catch(() => {
         if (!isMounted) return;
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
         if (typeof window !== "undefined" && !window.navigator.onLine) {
           setFirebaseStatus("offline");
         }
-      }
-    );
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
+      });
 
     return () => {
       isMounted = false;
       clearTimeout(safetyTimer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
-      unsub();
     };
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    setFirebaseStatus("syncing");
+    try {
+      const { items: freshItems, summary: freshSummary } =
+        await fetchStokCached(true);
+      setItems(freshItems);
+      setSummary(freshSummary);
+      setFirebaseStatus(
+        typeof window !== "undefined" && !window.navigator.onLine
+          ? "offline"
+          : "connected"
+      );
+    } catch {
+      if (typeof window !== "undefined" && !window.navigator.onLine) {
+        setFirebaseStatus("offline");
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
   }, []);
 
   const brandTotals = useMemo(() => {
@@ -166,6 +174,8 @@ export default function BrandStokClient({ brand }: { brand: string }) {
           totalUnits={totalUnits}
           tanggal={tanggal}
           firebaseStatus={firebaseStatus}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
           isOpenMobile={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
           items={items}

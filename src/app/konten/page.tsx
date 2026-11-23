@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { flushSync } from "react-dom";
 import Sidebar, { StatusView } from "@/components/Sidebar";
 import ContentCard from "@/components/ContentCard";
@@ -19,9 +19,8 @@ import {
   saveContentToDb,
   deleteContentFromDb,
   seedContentsToDb,
-  subscribeToContents,
-  SnapshotMetadataInfo
 } from "@/lib/firebase";
+import { fetchContentsCached, setContentsCache } from "@/lib/dataCache";
 import { INITIAL_BRIEF_DATA } from "@/lib/initialData";
 import {
   Search,
@@ -29,8 +28,7 @@ import {
   AlignJustify,
   Plus,
   Menu,
-  X,
-  CheckCircle2
+  X
 } from "lucide-react";
 
 function runWithViewTransition(updateFn: () => void) {
@@ -49,14 +47,13 @@ function runWithViewTransition(updateFn: () => void) {
   }
 }
 
-const STORAGE_KEY = "semarang_cell_brief_contents_v3";
-
 export default function DashboardPage() {
   // Initialize with INITIAL_BRIEF_DATA to ensure identical SSR and client initial hydration
   const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
 
   const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // View & Nav State
   const [activeSidebarView, setActiveSidebarView] = useState<StatusView>("all");
@@ -81,29 +78,15 @@ export default function DashboardPage() {
   const [deletingItem, setDeletingItem] = useState<ContentItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Real-time Firestore subscription with offline persistence & online sync
+  // Cached fetch on mount (avoids redundant Firestore requests across navigations)
   useEffect(() => {
     let isMounted = true;
     const safetyTimer = setTimeout(() => {
       if (isMounted) setIsLoading(false);
     }, 2500);
 
-    // Restore local cache immediately on client mount without causing SSR hydration mismatch
-    try {
-      const cached = localStorage.getItem(STORAGE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setItems(parsed);
-        }
-      }
-    } catch (e) {
-      console.warn("Error reading cold-start cache", e);
-    }
-
     const handleOnline = () => {
-      // Let snapshot metadata or pending writes determine status
-      setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
+      setFirebaseStatus((prev) => (prev === "offline" ? "connected" : prev));
     };
 
     const handleOffline = () => {
@@ -113,52 +96,48 @@ export default function DashboardPage() {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Subscribe to Firestore collection directly
-    const unsubscribe = subscribeToContents(
-      (remoteItems, info: SnapshotMetadataInfo) => {
+    fetchContentsCached()
+      .then(({ items: cachedItems }) => {
+        if (!isMounted) return;
+        if (cachedItems.length > 0) {
+          setItems(cachedItems);
+        }
+        setFirebaseStatus(
+          typeof window !== "undefined" && !window.navigator.onLine
+            ? "offline"
+            : "connected"
+        );
+      })
+      .finally(() => {
         if (!isMounted) return;
         clearTimeout(safetyTimer);
         setIsLoading(false);
-
-        if (remoteItems.length > 0) {
-          setItems(remoteItems);
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteItems));
-          } catch (e) {
-            console.warn("Storage write error", e);
-          }
-        } else if (!info.isFromCache) {
-          // Empty database on server: auto-seed INITIAL_BRIEF_DATA once
-          seedContentsToDb(INITIAL_BRIEF_DATA).catch(console.error);
-        }
-
-        // Update real-time connection status
-        if (typeof window !== "undefined" && !window.navigator.onLine) {
-          setFirebaseStatus("offline");
-        } else if (info.hasPendingWrites) {
-          setFirebaseStatus("syncing");
-        } else {
-          setFirebaseStatus("connected");
-        }
-      },
-      (err) => {
-        console.warn("Firestore listener error:", err);
-        if (!isMounted) return;
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
-        if (typeof window !== "undefined" && !window.navigator.onLine) {
-          setFirebaseStatus("offline");
-        }
-      }
-    );
+      });
 
     return () => {
       isMounted = false;
       clearTimeout(safetyTimer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
-      unsubscribe();
     };
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    setFirebaseStatus("syncing");
+    try {
+      const { items: freshItems } = await fetchContentsCached(true);
+      if (freshItems.length > 0) {
+        setItems(freshItems);
+      }
+      setFirebaseStatus(
+        typeof window !== "undefined" && !window.navigator.onLine
+          ? "offline"
+          : "connected"
+      );
+    } finally {
+      setIsRefreshing(false);
+    }
   }, []);
 
   // Listen for category tone customization to trigger reactive UI updates
@@ -171,11 +150,7 @@ export default function DashboardPage() {
   const updateItemsState = (updater: ContentItem[] | ((prev: ContentItem[]) => ContentItem[])) => {
     setItems((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch (e) {
-        console.warn("Could not write to local cache", e);
-      }
+      setContentsCache(next);
       return next;
     });
   };
@@ -421,6 +396,8 @@ export default function DashboardPage() {
         executedCount={executedCount}
         priorityCount={priorityCount}
         firebaseStatus={firebaseStatus}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         categories={categoriesWithCounts}

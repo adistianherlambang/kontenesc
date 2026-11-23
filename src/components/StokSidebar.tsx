@@ -9,6 +9,7 @@ import {
   CloudOff,
   X,
   Copy,
+  RefreshCw,
 } from "lucide-react";
 import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
 import { StokItem } from "@/lib/firebase";
@@ -20,6 +21,8 @@ interface StokSidebarProps {
   totalUnits: number;
   tanggal?: string;
   firebaseStatus: "connected" | "offline" | "syncing";
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
   items?: StokItem[];
@@ -31,6 +34,8 @@ export default function StokSidebar({
   totalUnits,
   tanggal,
   firebaseStatus,
+  onRefresh,
+  isRefreshing = false,
   isOpenMobile,
   onCloseMobile,
   items = [],
@@ -163,7 +168,7 @@ export default function StokSidebar({
             )}
           </div>
 
-          <div className="flex items-center gap-2.5 px-2.5 py-1 text-xs text-muted select-none">
+          <div className="flex items-center gap-2 px-2.5 py-1 text-xs text-muted select-none">
             {firebaseStatus === "connected" ? (
               <Cloud className="size-4 shrink-0 text-success" />
             ) : (
@@ -177,6 +182,20 @@ export default function StokSidebar({
                 ? "…"
                 : "Lokal"}
             </span>
+            {onRefresh && (
+              <button
+                type="button"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                title="Muat ulang data dari server"
+                aria-label="Muat ulang data dari server"
+                className="p-1 -mr-1 rounded-md text-faint hover:text-ink hover:bg-subtle transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw
+                  className={`size-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+              </button>
+            )}
           </div>
         </div>
       </aside>

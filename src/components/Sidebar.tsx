@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag, FileSpreadsheet, ArrowLeft } from "lucide-react";
+import { Layers, Circle, CheckCircle2, Lightbulb, Cloud, CloudOff, X, FileCode2, Sparkles, ShoppingBag, FileSpreadsheet, ArrowLeft, RefreshCw } from "lucide-react";
 import { getCategoryTone } from "@/lib/categoryTone";
 
 export type StatusView = "all" | "pending" | "executed" | "priority";
@@ -23,6 +23,8 @@ interface SidebarProps {
   onOpenToccoExcelModal?: () => void;
   onOpenColorPicker?: (category: string) => void;
   firebaseStatus: "connected" | "offline" | "syncing";
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
 }
@@ -43,6 +45,8 @@ export default function Sidebar({
   onOpenToccoExcelModal,
   onOpenColorPicker,
   firebaseStatus,
+  onRefresh,
+  isRefreshing = false,
   isOpenMobile,
   onCloseMobile,
 }: SidebarProps) {
@@ -216,7 +220,7 @@ export default function Sidebar({
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 px-2.5 py-1 text-xs text-muted select-none">
+          <div className="flex items-center gap-2 px-2.5 py-1 text-xs text-muted select-none">
             {firebaseStatus === "connected" ? (
               <Cloud className="size-4 shrink-0 text-success" />
             ) : (
@@ -226,6 +230,18 @@ export default function Sidebar({
             <span className="ml-auto text-[11px] text-faint">
               {firebaseStatus === "connected" ? "Cloud" : firebaseStatus === "syncing" ? "…" : "Lokal"}
             </span>
+            {onRefresh && (
+              <button
+                type="button"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                title="Muat ulang data dari server"
+                aria-label="Muat ulang data dari server"
+                className="p-1 -mr-1 rounded-md text-faint hover:text-ink hover:bg-subtle transition-colors cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`size-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+              </button>
+            )}
           </div>
         </div>
       </aside>

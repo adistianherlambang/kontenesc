@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Menu,
   Search,
@@ -9,12 +9,8 @@ import {
   AlignJustify,
   BarChart3,
 } from "lucide-react";
-import {
-  LajulBrandDoc,
-  LajulSummary,
-  subscribeToLajul,
-  getLajulFromDb,
-} from "@/lib/firebase";
+import { LajulBrandDoc, LajulSummary } from "@/lib/firebase";
+import { fetchLajulCached } from "@/lib/dataCache";
 import LajulSidebar, { LajulStatusView } from "@/components/LajulSidebar";
 import StoreSecurityGate from "@/components/StoreSecurityGate";
 import LoadingPage from "@/components/LoadingPage";
@@ -42,6 +38,7 @@ export default function LajulPage() {
   const [brands, setBrands] = useState<LajulBrandDoc[]>([]);
   const [summary, setSummary] = useState<LajulSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [firebaseStatus, setFirebaseStatus] = useState<
     "connected" | "offline" | "syncing"
   >("offline");
@@ -59,52 +56,63 @@ export default function LajulPage() {
     }, 2500);
 
     const handleOnline = () => {
-      setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
+      setFirebaseStatus((prev) => (prev === "offline" ? "connected" : prev));
     };
     const handleOffline = () => setFirebaseStatus("offline");
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    getLajulFromDb().then(({ brands: initBrands, summary: initSummary }) => {
-      if (!isMounted) return;
-      if (initBrands.length > 0) {
+    fetchLajulCached()
+      .then(({ brands: initBrands, summary: initSummary }) => {
+        if (!isMounted) return;
         setBrands(initBrands);
         setSummary(initSummary);
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
-      }
-    });
-
-    const unsub = subscribeToLajul(
-      ({ brands: newBrands, summary: newSummary }) => {
-        if (!isMounted) return;
-        setBrands(newBrands);
-        setSummary(newSummary);
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
         setFirebaseStatus(
           typeof window !== "undefined" && !window.navigator.onLine
             ? "offline"
             : "connected"
         );
-      },
-      () => {
+      })
+      .catch(() => {
         if (!isMounted) return;
-        clearTimeout(safetyTimer);
-        setIsLoading(false);
         if (typeof window !== "undefined" && !window.navigator.onLine) {
           setFirebaseStatus("offline");
         }
-      }
-    );
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
+      });
 
     return () => {
       isMounted = false;
       clearTimeout(safetyTimer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
-      unsub();
     };
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    setFirebaseStatus("syncing");
+    try {
+      const { brands: freshBrands, summary: freshSummary } =
+        await fetchLajulCached(true);
+      setBrands(freshBrands);
+      setSummary(freshSummary);
+      setFirebaseStatus(
+        typeof window !== "undefined" && !window.navigator.onLine
+          ? "offline"
+          : "connected"
+      );
+    } catch {
+      if (typeof window !== "undefined" && !window.navigator.onLine) {
+        setFirebaseStatus("offline");
+      }
+    } finally {
+      setIsRefreshing(false);
+    }
   }, []);
 
   const tanggal = summary?.tanggal || brands[0]?.tanggal || "";
@@ -209,6 +217,8 @@ export default function LajulPage() {
           metrics={metrics}
           tanggal={tanggal}
           firebaseStatus={firebaseStatus}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
           isOpenMobile={isMobileSidebarOpen}
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
