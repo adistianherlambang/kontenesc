@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -10,8 +10,10 @@ import {
   Cloud,
   CloudOff,
   X,
+  Copy,
 } from "lucide-react";
 import { LajulBrandDoc, LajulMetrics } from "@/lib/firebase";
+import CopyLajulModal from "@/components/CopyLajulModal";
 
 export type LajulStatusView = "all" | "sold" | "nosell";
 
@@ -48,6 +50,8 @@ export default function LajulSidebar({
   isOpenMobile,
   onCloseMobile,
 }: LajulSidebarProps) {
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
+
   const views: {
     id: LajulStatusView;
     label: string;
@@ -171,6 +175,23 @@ export default function LajulSidebar({
               })}
             </div>
           </nav>
+
+          <nav>
+            <p className="section-label">Tools</p>
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => {
+                  onCloseMobile();
+                  setIsCopyModalOpen(true);
+                }}
+                className="nav-item"
+              >
+                <Copy className="size-4 shrink-0" />
+                <span className="truncate">Copy Laporan WhatsApp</span>
+              </button>
+            </div>
+          </nav>
         </div>
 
         {/* Footer — matches /konten Sidebar footer */}
@@ -219,6 +240,18 @@ export default function LajulSidebar({
           </div>
         </div>
       </aside>
+
+      {isCopyModalOpen && (
+        <CopyLajulModal
+          isOpen={true}
+          onClose={() => setIsCopyModalOpen(false)}
+          brands={brands}
+          metrics={metrics}
+          tanggal={tanggal}
+          defaultBrand={selectedBrand}
+          activeView={activeView}
+        />
+      )}
     </>
   );
 }
