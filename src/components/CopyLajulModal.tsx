@@ -184,10 +184,9 @@ function formatLajulForWhatsApp({
       return blocks.join("\n");
     }
 
-    const separator = style === "rincian" ? "\n\n" : "\n";
     const sections = soldBrands.map((b) => {
       const lines = formatTxLines(b.transaksi, style);
-      return `*${b.brand_name.toUpperCase()} (${b.transaksi.length} unit)*\n${lines.join(separator)}`;
+      return `*${b.brand_name.toUpperCase()} (${b.transaksi.length} unit)*\n${lines.join("\n")}`;
     });
 
     const blocks = [
@@ -226,9 +225,9 @@ function formatLajulForWhatsApp({
     const lines = isNoSell
       ? ["• Status: No Sell (0 unit)"]
       : [
-          `• Unit Terjual: ${txList.length} unit`,
-          brandTotalHarga > 0 ? `• Total: *${formatHarga(brandTotalHarga)}*` : "",
-        ].filter(Boolean);
+        `• Unit Terjual: ${txList.length} unit`,
+        brandTotalHarga > 0 ? `• Total: *${formatHarga(brandTotalHarga)}*` : "",
+      ].filter(Boolean);
 
     return [
       `*REKAP PENJUALAN ${target.brand_name.toUpperCase()} — SEMARANG CELL*`,
@@ -248,10 +247,9 @@ function formatLajulForWhatsApp({
     .filter(Boolean)
     .join(" • ");
 
-  const separator = style === "rincian" ? "\n\n" : "\n";
   const body = isNoSell
     ? "No Sell (0 transaksi)"
-    : formatTxLines(txList, style).join(separator);
+    : formatTxLines(txList, style).join("\n");
 
   return [
     `*PENJUALAN ${target.brand_name.toUpperCase()} — SEMARANG CELL*`,
