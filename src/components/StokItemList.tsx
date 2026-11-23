@@ -9,6 +9,8 @@ interface StokItemListProps {
   viewMode: "grid" | "table";
   isLoading: boolean;
   showBrand?: boolean;
+  itemLabel?: string;
+  embedded?: boolean;
   emptyMessage?: string;
   onResetSearch?: () => void;
 }
@@ -18,6 +20,8 @@ export default function StokItemList({
   viewMode,
   isLoading,
   showBrand = false,
+  itemLabel = "Tipe Handphone",
+  embedded = false,
   emptyMessage = "Tidak ada data stok ditemukan",
   onResetSearch,
 }: StokItemListProps) {
@@ -31,7 +35,7 @@ export default function StokItemList({
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-12 px-4 text-gray-400">
+      <div className={`flex flex-col items-center justify-center text-center px-4 text-gray-400 ${embedded ? "py-6" : "py-12"}`}>
         <div className="size-14 rounded-2xl bg-surface border border-line flex items-center justify-center text-muted mb-3 shadow-2xs">
           <Smartphone className="size-6" />
         </div>
@@ -56,7 +60,7 @@ export default function StokItemList({
 
   if (viewMode === "grid") {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4 pb-20 w-full">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3.5 sm:gap-4 w-full ${embedded ? "" : "pb-20"}`}>
         {items.map((item) => {
           const hasWarna =
             Array.isArray(item.rincian_warna) && item.rincian_warna.length > 0;
@@ -124,7 +128,7 @@ export default function StokItemList({
 
   // Table view
   return (
-    <div className="pb-20 w-full">
+    <div className={`w-full ${embedded ? "" : "pb-20"}`}>
       <div className="rounded-xl border border-line bg-canvas overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
@@ -132,7 +136,7 @@ export default function StokItemList({
               <tr>
                 <th className="th w-12 text-center">No</th>
                 {showBrand && <th className="th whitespace-nowrap">Brand</th>}
-                <th className="th min-w-[200px]">Tipe Handphone</th>
+                <th className="th min-w-[200px]">{itemLabel}</th>
                 <th className="th w-24 text-right">Total Stok</th>
                 <th className="th min-w-[260px]">Rincian Warna</th>
               </tr>

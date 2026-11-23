@@ -219,4 +219,37 @@ label {
       text-muted whitespace-nowrap;
   }
   .td { @apply border-b border-line px-3 py-2.5 align-top text-[13px] text-ink; }
+
+  /* ---------- Stock Category Disclosure (<details>) ---------- */
+  .stok-disclosure > summary {
+    list-style: none;
+  }
+  .stok-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+  .stok-disclosure > summary .stok-disclosure-chevron {
+    transform: rotate(-90deg);
+  }
+  .stok-disclosure[open] > summary .stok-disclosure-chevron {
+    transform: rotate(0deg);
+  }
+  .stok-disclosure::details-content {
+    interpolate-size: allow-keywords;
+    overflow: clip;
+    contain: layout;
+  }
+  .stok-disclosure:not([open])::details-content {
+    block-size: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .stok-disclosure > summary .stok-disclosure-chevron {
+      transition: transform 0.2s ease;
+    }
+    .stok-disclosure::details-content {
+      transition: block-size, content-visibility, display;
+      transition-duration: 0.24s;
+      transition-timing-function: ease-in-out;
+      transition-behavior: allow-discrete;
+    }
+  }
 }

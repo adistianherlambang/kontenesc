@@ -19,6 +19,8 @@ interface StokSidebarProps {
   activeBrand: string; // "all" or brand slug
   brandTotals: Record<string, number>;
   totalUnits: number;
+  totalHpUnits?: number;
+  totalAccUnits?: number;
   tanggal?: string;
   firebaseStatus: "connected" | "offline" | "syncing";
   onRefresh?: () => void;
@@ -32,6 +34,8 @@ export default function StokSidebar({
   activeBrand,
   brandTotals,
   totalUnits,
+  totalHpUnits,
+  totalAccUnits,
   tanggal,
   firebaseStatus,
   onRefresh,
@@ -160,6 +164,22 @@ export default function StokSidebar({
                 {totalUnits} unit
               </span>
             </div>
+            {typeof totalAccUnits === "number" && totalAccUnits > 0 && (
+              <>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[11px] text-faint">Handphone</span>
+                  <span className="text-[11px] text-muted">
+                    {totalHpUnits ?? Math.max(0, totalUnits - totalAccUnits)} unit
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[11px] text-faint">ACC</span>
+                  <span className="text-[11px] text-muted">
+                    {totalAccUnits} unit
+                  </span>
+                </div>
+              </>
+            )}
             {tanggal && (
               <div className="flex items-baseline justify-between">
                 <span className="text-[11px] text-faint">Update</span>

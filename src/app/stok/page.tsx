@@ -2,9 +2,13 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, ChevronDown, Smartphone, Headphones } from "lucide-react";
 import { StokItem, StokSummary } from "@/lib/firebase";
 import { fetchStokCached } from "@/lib/dataCache";
+import {
+  computeStokTotals,
+  getBrandCategoryCounts,
+} from "@/lib/stokHelpers";
 import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StoreSecurityGate from "@/components/StoreSecurityGate";
@@ -166,22 +170,10 @@ export default function StokOverviewPage() {
     }
   }, []);
 
-  const brandTotals = useMemo(() => {
-    if (summary?.brand_totals) {
-      return summary.brand_totals;
-    }
-    const map: Record<string, number> = {};
-    items.forEach((it) => {
-      const b = it.brand || "Lainnya";
-      map[b] = (map[b] || 0) + (it.total_stok || 0);
-    });
-    return map;
-  }, [summary, items]);
-
-  const totalUnits = useMemo(() => {
-    if (summary?.total_units) return summary.total_units;
-    return items.reduce((acc, it) => acc + (it.total_stok || 0), 0);
-  }, [summary, items]);
+  const stokTotals = useMemo(
+    () => computeStokTotals(items, summary),
+    [items, summary]
+  );
 
   const tanggal = addOneDay(summary?.tanggal || items[0]?.tanggal || "");
 
@@ -193,8 +185,10 @@ export default function StokOverviewPage() {
         <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
         <StokSidebar
           activeBrand="all"
-          brandTotals={brandTotals}
-          totalUnits={totalUnits}
+          brandTotals={stokTotals.brandTotals}
+          totalUnits={stokTotals.totalUnits}
+          totalHpUnits={stokTotals.totalHpUnits}
+          totalAccUnits={stokTotals.totalAccUnits}
           tanggal={tanggal}
           firebaseStatus={firebaseStatus}
           onRefresh={handleRefresh}
@@ -235,27 +229,82 @@ export default function StokOverviewPage() {
 
           {/* Stretched Brand Cards Grid - Full Width Edge-to-Edge */}
           <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 pb-20 w-full">
-              {BRAND_LIST.map(({ slug, bgColor, logoColor }) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 pb-20 w-full items-start">
+              {BRAND_LIST.map(({ slug, name, bgColor, logoColor }) => {
+                const counts = getBrandCategoryCounts(stokTotals, name);
+
                 return (
-                  <Link
+                  <article
                     key={slug}
-                    href={`/stok/${slug}`}
-                    style={{ backgroundColor: bgColor }}
-                    className="group relative w-full rounded-2xl p-4 sm:p-5 flex items-center justify-center shadow-2xs hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] transition-all cursor-pointer min-h-[84px] sm:min-h-[92px] overflow-hidden"
+                    className="flex flex-col rounded-2xl border border-line bg-canvas overflow-hidden shadow-2xs hover:shadow-sm transition-shadow"
                   >
-                    <div className="flex items-center justify-center w-full min-w-0">
-                      <BrandLogo
-                        brand={slug}
-                        color={logoColor}
-                        className={
-                          slug === "xiaomi"
-                            ? "h-7 sm:h-8 w-auto"
-                            : "h-5 sm:h-6 w-auto max-w-[130px] sm:max-w-[150px]"
-                        }
-                      />
-                    </div>
-                  </Link>
+                    <Link
+                      href={`/stok/${slug}`}
+                      style={{ backgroundColor: bgColor }}
+                      className="group relative w-full p-4 sm:p-5 flex items-center justify-center min-h-[80px] sm:min-h-[88px] transition-opacity hover:opacity-95 active:scale-[0.99]"
+                    >
+                      <div className="flex items-center justify-center w-full min-w-0">
+                        <BrandLogo
+                          brand={slug}
+                          color={logoColor}
+                          className={
+                            slug === "xiaomi"
+                              ? "h-7 sm:h-8 w-auto"
+                              : "h-5 sm:h-6 w-auto max-w-[130px] sm:max-w-[150px]"
+                          }
+                        />
+                      </div>
+                    </Link>
+
+                    <details className="stok-disclosure border-t border-line bg-surface">
+                      <summary className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-medium text-ink cursor-pointer select-none hover:bg-subtle transition-colors">
+                        <ChevronDown
+                          className="stok-disclosure-chevron size-3.5 text-muted shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span className="truncate">Handphone &amp; ACC</span>
+                        <span className="ml-auto text-[11px] font-semibold text-muted tabular-nums shrink-0">
+                          {counts.total} unit
+                        </span>
+                      </summary>
+
+                      <div className="border-t border-line bg-canvas p-1.5 space-y-1">
+                        <Link
+                          href={`/stok/${slug}?kategori=handphone`}
+                          className="flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-xs text-ink hover:bg-subtle transition-colors"
+                        >
+                          <span className="flex items-center gap-2 min-w-0">
+                            <Smartphone
+                              className="size-3.5 text-muted shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span className="font-medium truncate">
+                              Handphone
+                            </span>
+                          </span>
+                          <span className="text-[11px] font-semibold text-muted tabular-nums shrink-0">
+                            {counts.hp} unit
+                          </span>
+                        </Link>
+
+                        <Link
+                          href={`/stok/${slug}?kategori=acc`}
+                          className="flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-xs text-ink hover:bg-subtle transition-colors"
+                        >
+                          <span className="flex items-center gap-2 min-w-0">
+                            <Headphones
+                              className="size-3.5 text-muted shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span className="font-medium truncate">ACC</span>
+                          </span>
+                          <span className="text-[11px] font-semibold text-muted tabular-nums shrink-0">
+                            {counts.acc} unit
+                          </span>
+                        </Link>
+                      </div>
+                    </details>
+                  </article>
                 );
               })}
             </div>

@@ -284,6 +284,7 @@ export interface StokItem {
   id: string;
   brand: string;
   tipe: string;
+  kategori?: string;
   total_stok: number;
   tanggal: string;
   rincian_warna: StokColorVariant[];
@@ -292,7 +293,9 @@ export interface StokItem {
 export interface StokSummary {
   tanggal: string;
   total_units: number;
+  total_units_acc?: number;
   brand_totals: Record<string, number>;
+  acc_brand_totals?: Record<string, number>;
   updated_at?: string;
 }
 
@@ -348,6 +351,7 @@ export async function getStokFromDb(
           id: docSnap.id,
           brand: d.brand || "Lainnya",
           tipe: d.tipe || "",
+          kategori: typeof d.kategori === "string" && d.kategori.trim() ? d.kategori.trim().toLowerCase() : "handphone",
           total_stok: Number(d.total_stok) || 0,
           tanggal: d.tanggal || "",
           rincian_warna: Array.isArray(d.rincian_warna) ? d.rincian_warna : [],
@@ -388,6 +392,7 @@ export function subscribeToStok(
             id: docSnap.id,
             brand: d.brand || "Lainnya",
             tipe: d.tipe || "",
+            kategori: typeof d.kategori === "string" && d.kategori.trim() ? d.kategori.trim().toLowerCase() : "handphone",
             total_stok: Number(d.total_stok) || 0,
             tanggal: d.tanggal || "",
             rincian_warna: Array.isArray(d.rincian_warna) ? d.rincian_warna : [],

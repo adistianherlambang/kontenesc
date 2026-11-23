@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Search,
@@ -9,9 +10,13 @@ import {
   LayoutGrid,
   AlignJustify,
   Menu,
+  ChevronDown,
+  Smartphone,
+  Headphones,
 } from "lucide-react";
 import { StokItem, StokSummary } from "@/lib/firebase";
 import { fetchStokCached } from "@/lib/dataCache";
+import { computeStokTotals, isAccItem } from "@/lib/stokHelpers";
 import { BrandLogo, getBrandConfig } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StokItemList from "@/components/StokItemList";
@@ -21,6 +26,8 @@ import { addOneDay } from "@/app/stok/page";
 import LoadingPage from "@/components/LoadingPage";
 
 export default function BrandStokClient({ brand }: { brand: string }) {
+  const searchParams = useSearchParams();
+  const kategoriParam = (searchParams.get("kategori") || "").toLowerCase();
   const rawBrandSlug = (brand || "").toLowerCase();
   const brandConfig = getBrandConfig(rawBrandSlug);
 
@@ -36,6 +43,8 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<StokSortOption>("name-asc");
+  const [hpOpen, setHpOpen] = useState(() => kategoriParam !== "acc");
+  const [accOpen, setAccOpen] = useState(() => kategoriParam === "acc");
 
   useEffect(() => {
     let isMounted = true;
@@ -103,22 +112,10 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     }
   }, []);
 
-  const brandTotals = useMemo(() => {
-    if (summary?.brand_totals) {
-      return summary.brand_totals;
-    }
-    const map: Record<string, number> = {};
-    items.forEach((it) => {
-      const b = it.brand || "Lainnya";
-      map[b] = (map[b] || 0) + (it.total_stok || 0);
-    });
-    return map;
-  }, [summary, items]);
-
-  const totalUnits = useMemo(() => {
-    if (summary?.total_units) return summary.total_units;
-    return items.reduce((acc, it) => acc + (it.total_stok || 0), 0);
-  }, [summary, items]);
+  const stokTotals = useMemo(
+    () => computeStokTotals(items, summary),
+    [items, summary]
+  );
 
   const tanggal = addOneDay(summary?.tanggal || items[0]?.tanggal || "");
 
@@ -146,10 +143,6 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     });
   }, [items, rawBrandSlug, brandConfig.name, sortBy]);
 
-  const brandTotalUnits = useMemo(() => {
-    return brandItems.reduce((acc, it) => acc + (it.total_stok || 0), 0);
-  }, [brandItems]);
-
   const filteredBrandItems = useMemo(() => {
     if (!searchQuery.trim()) return brandItems;
     const q = searchQuery.toLowerCase().trim();
@@ -162,6 +155,30 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     });
   }, [brandItems, searchQuery]);
 
+  const handphoneItems = useMemo(
+    () => filteredBrandItems.filter((it) => !isAccItem(it)),
+    [filteredBrandItems]
+  );
+
+  const accItems = useMemo(
+    () => filteredBrandItems.filter((it) => isAccItem(it)),
+    [filteredBrandItems]
+  );
+
+  const handphoneUnits = useMemo(
+    () => handphoneItems.reduce((acc, it) => acc + (it.total_stok || 0), 0),
+    [handphoneItems]
+  );
+
+  const accUnits = useMemo(
+    () => accItems.reduce((acc, it) => acc + (it.total_stok || 0), 0),
+    [accItems]
+  );
+
+  const isSearching = Boolean(searchQuery.trim());
+  const effectiveHpOpen = isSearching ? handphoneItems.length > 0 : hpOpen;
+  const effectiveAccOpen = isSearching ? accItems.length > 0 : accOpen;
+
   return (
     <StoreSecurityGate pageTitle={`Stok ${brandConfig.name}`}>
       {isLoading ? (
@@ -170,8 +187,10 @@ export default function BrandStokClient({ brand }: { brand: string }) {
         <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
         <StokSidebar
           activeBrand={rawBrandSlug}
-          brandTotals={brandTotals}
-          totalUnits={totalUnits}
+          brandTotals={stokTotals.brandTotals}
+          totalUnits={stokTotals.totalUnits}
+          totalHpUnits={stokTotals.totalHpUnits}
+          totalAccUnits={stokTotals.totalAccUnits}
           tanggal={tanggal}
           firebaseStatus={firebaseStatus}
           onRefresh={handleRefresh}
@@ -306,17 +325,89 @@ export default function BrandStokClient({ brand }: { brand: string }) {
 
         {/* Scrollable Content Body */}
         <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6">
-          <StokItemList
-            items={filteredBrandItems}
-            viewMode={viewMode}
-            isLoading={isLoading}
-            emptyMessage={
-              searchQuery
-                ? `Tidak ada hasil untuk "${searchQuery}"`
-                : `Belum ada data stok ${brandConfig.name}`
-            }
-            onResetSearch={searchQuery ? () => setSearchQuery("") : undefined}
-          />
+          <div className="space-y-4 pb-20">
+            <details
+              open={effectiveHpOpen}
+              onToggle={(e) => {
+                if (!isSearching) setHpOpen(e.currentTarget.open);
+              }}
+              className="stok-disclosure rounded-2xl border border-line bg-surface overflow-hidden"
+            >
+              <summary className="flex items-center gap-2.5 px-4 py-3 text-xs sm:text-[13px] font-semibold text-ink cursor-pointer select-none hover:bg-subtle transition-colors">
+                <ChevronDown
+                  className="stok-disclosure-chevron size-4 text-muted shrink-0"
+                  aria-hidden="true"
+                />
+                <Smartphone
+                  className="size-4 text-muted shrink-0"
+                  aria-hidden="true"
+                />
+                <span>Handphone</span>
+                <span className="ml-auto text-xs font-medium text-muted tabular-nums">
+                  {handphoneItems.length} tipe • {handphoneUnits} unit
+                </span>
+              </summary>
+
+              <div className="border-t border-line bg-canvas p-3 sm:p-4">
+                <StokItemList
+                  items={handphoneItems}
+                  viewMode={viewMode}
+                  isLoading={false}
+                  itemLabel="Tipe Handphone"
+                  embedded
+                  emptyMessage={
+                    searchQuery
+                      ? `Tidak ada hasil handphone untuk "${searchQuery}"`
+                      : `Belum ada data stok handphone ${brandConfig.name}`
+                  }
+                  onResetSearch={
+                    searchQuery ? () => setSearchQuery("") : undefined
+                  }
+                />
+              </div>
+            </details>
+
+            <details
+              open={effectiveAccOpen}
+              onToggle={(e) => {
+                if (!isSearching) setAccOpen(e.currentTarget.open);
+              }}
+              className="stok-disclosure rounded-2xl border border-line bg-surface overflow-hidden"
+            >
+              <summary className="flex items-center gap-2.5 px-4 py-3 text-xs sm:text-[13px] font-semibold text-ink cursor-pointer select-none hover:bg-subtle transition-colors">
+                <ChevronDown
+                  className="stok-disclosure-chevron size-4 text-muted shrink-0"
+                  aria-hidden="true"
+                />
+                <Headphones
+                  className="size-4 text-muted shrink-0"
+                  aria-hidden="true"
+                />
+                <span>ACC</span>
+                <span className="ml-auto text-xs font-medium text-muted tabular-nums">
+                  {accItems.length} tipe • {accUnits} unit
+                </span>
+              </summary>
+
+              <div className="border-t border-line bg-canvas p-3 sm:p-4">
+                <StokItemList
+                  items={accItems}
+                  viewMode={viewMode}
+                  isLoading={false}
+                  itemLabel="Nama ACC"
+                  embedded
+                  emptyMessage={
+                    searchQuery
+                      ? `Tidak ada hasil ACC untuk "${searchQuery}"`
+                      : `Belum ada data stok ACC ${brandConfig.name}`
+                  }
+                  onResetSearch={
+                    searchQuery ? () => setSearchQuery("") : undefined
+                  }
+                />
+              </div>
+            </details>
+          </div>
         </div>
       </main>
     </div>
