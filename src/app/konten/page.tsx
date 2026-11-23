@@ -13,6 +13,7 @@ import PromptModal from "@/components/PromptModal";
 import ToccoPromptModal from "@/components/ToccoPromptModal";
 import ToccoExcelModal from "@/components/ToccoExcelModal";
 import CategoryColorModal from "@/components/CategoryColorModal";
+import LoadingPage from "@/components/LoadingPage";
 import {
   ContentItem,
   saveContentToDb,
@@ -55,6 +56,7 @@ export default function DashboardPage() {
   const [items, setItems] = useState<ContentItem[]>(INITIAL_BRIEF_DATA);
 
   const [firebaseStatus, setFirebaseStatus] = useState<"connected" | "offline" | "syncing">("offline");
+  const [isLoading, setIsLoading] = useState(true);
 
   // View & Nav State
   const [activeSidebarView, setActiveSidebarView] = useState<StatusView>("all");
@@ -82,6 +84,9 @@ export default function DashboardPage() {
   // Real-time Firestore subscription with offline persistence & online sync
   useEffect(() => {
     let isMounted = true;
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 2500);
 
     // Restore local cache immediately on client mount without causing SSR hydration mismatch
     try {
@@ -112,6 +117,8 @@ export default function DashboardPage() {
     const unsubscribe = subscribeToContents(
       (remoteItems, info: SnapshotMetadataInfo) => {
         if (!isMounted) return;
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
 
         if (remoteItems.length > 0) {
           setItems(remoteItems);
@@ -136,6 +143,9 @@ export default function DashboardPage() {
       },
       (err) => {
         console.warn("Firestore listener error:", err);
+        if (!isMounted) return;
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
         if (typeof window !== "undefined" && !window.navigator.onLine) {
           setFirebaseStatus("offline");
         }
@@ -144,6 +154,7 @@ export default function DashboardPage() {
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
       unsubscribe();
@@ -393,6 +404,10 @@ export default function DashboardPage() {
       default: return "Semua Konten";
     }
   }, [activeSidebarView]);
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
 
   return (
     <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">

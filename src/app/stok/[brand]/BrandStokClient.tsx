@@ -22,6 +22,7 @@ import StokItemList from "@/components/StokItemList";
 import SortSelect, { StokSortOption } from "@/components/SortSelect";
 import StoreSecurityGate from "@/components/StoreSecurityGate";
 import { addOneDay } from "@/app/stok/page";
+import LoadingPage from "@/components/LoadingPage";
 
 export default function BrandStokClient({ brand }: { brand: string }) {
   const rawBrandSlug = (brand || "").toLowerCase();
@@ -40,6 +41,11 @@ export default function BrandStokClient({ brand }: { brand: string }) {
   const [sortBy, setSortBy] = useState<StokSortOption>("name-asc");
 
   useEffect(() => {
+    let isMounted = true;
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 2500);
+
     const handleOnline = () => {
       setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
     };
@@ -48,17 +54,21 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     window.addEventListener("offline", handleOffline);
 
     getStokFromDb().then(({ items: initItems, summary: initSummary }) => {
+      if (!isMounted) return;
       if (initItems.length > 0) {
         setItems(initItems);
         setSummary(initSummary);
+        clearTimeout(safetyTimer);
         setIsLoading(false);
       }
     });
 
     const unsub = subscribeToStok(
       ({ items: newItems, summary: newSummary }) => {
+        if (!isMounted) return;
         setItems(newItems);
         setSummary(newSummary);
+        clearTimeout(safetyTimer);
         setIsLoading(false);
         setFirebaseStatus(
           typeof window !== "undefined" && !window.navigator.onLine
@@ -67,6 +77,9 @@ export default function BrandStokClient({ brand }: { brand: string }) {
         );
       },
       () => {
+        if (!isMounted) return;
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
         if (typeof window !== "undefined" && !window.navigator.onLine) {
           setFirebaseStatus("offline");
         }
@@ -74,6 +87,8 @@ export default function BrandStokClient({ brand }: { brand: string }) {
     );
 
     return () => {
+      isMounted = false;
+      clearTimeout(safetyTimer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
       unsub();
@@ -141,7 +156,10 @@ export default function BrandStokClient({ brand }: { brand: string }) {
 
   return (
     <StoreSecurityGate pageTitle={`Stok ${brandConfig.name}`}>
-      <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
+      {isLoading ? (
+        <LoadingPage />
+      ) : (
+        <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
         <StokSidebar
           activeBrand={rawBrandSlug}
           brandTotals={brandTotals}
@@ -292,6 +310,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
         </div>
       </main>
     </div>
+      )}
   </StoreSecurityGate>
   );
 }

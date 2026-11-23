@@ -12,6 +12,7 @@ import {
 import { BrandLogo, BRAND_LIST } from "@/lib/brandLogos";
 import StokSidebar from "@/components/StokSidebar";
 import StoreSecurityGate from "@/components/StoreSecurityGate";
+import LoadingPage from "@/components/LoadingPage";
 
 export function addOneDay(rawDate: string): string {
   if (!rawDate || typeof rawDate !== "string") return "";
@@ -99,9 +100,15 @@ export default function StokOverviewPage() {
   const [firebaseStatus, setFirebaseStatus] = useState<
     "connected" | "offline" | "syncing"
   >("offline");
+  const [isLoading, setIsLoading] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 2500);
+
     const handleOnline = () => {
       setFirebaseStatus((prev) => (prev === "offline" ? "syncing" : prev));
     };
@@ -110,16 +117,22 @@ export default function StokOverviewPage() {
     window.addEventListener("offline", handleOffline);
 
     getStokFromDb().then(({ items: initItems, summary: initSummary }) => {
+      if (!isMounted) return;
       if (initItems.length > 0) {
         setItems(initItems);
         setSummary(initSummary);
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
       }
     });
 
     const unsub = subscribeToStok(
       ({ items: newItems, summary: newSummary }) => {
+        if (!isMounted) return;
         setItems(newItems);
         setSummary(newSummary);
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
         setFirebaseStatus(
           typeof window !== "undefined" && !window.navigator.onLine
             ? "offline"
@@ -127,6 +140,9 @@ export default function StokOverviewPage() {
         );
       },
       () => {
+        if (!isMounted) return;
+        clearTimeout(safetyTimer);
+        setIsLoading(false);
         if (typeof window !== "undefined" && !window.navigator.onLine) {
           setFirebaseStatus("offline");
         }
@@ -134,6 +150,8 @@ export default function StokOverviewPage() {
     );
 
     return () => {
+      isMounted = false;
+      clearTimeout(safetyTimer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
       unsub();
@@ -161,7 +179,10 @@ export default function StokOverviewPage() {
 
   return (
     <StoreSecurityGate pageTitle="Stok Handphone">
-      <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
+      {isLoading ? (
+        <LoadingPage />
+      ) : (
+        <div className="h-dvh w-full overflow-hidden flex bg-white text-[#18181B] font-sans">
         <StokSidebar
           activeBrand="all"
           brandTotals={brandTotals}
@@ -231,6 +252,7 @@ export default function StokOverviewPage() {
           </div>
         </main>
       </div>
+      )}
     </StoreSecurityGate>
   );
 }
