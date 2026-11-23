@@ -325,15 +325,15 @@ export default function BrandStokClient({ brand }: { brand: string }) {
 
         {/* Scrollable Content Body */}
         <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-6">
-          <div className="space-y-4 pb-20">
+          <div className="space-y-6 pb-20">
             <details
               open={effectiveHpOpen}
               onToggle={(e) => {
                 if (!isSearching) setHpOpen(e.currentTarget.open);
               }}
-              className="stok-disclosure rounded-2xl border border-line bg-surface overflow-hidden"
+              className="stok-disclosure"
             >
-              <summary className="flex items-center gap-2.5 px-4 py-3 text-xs sm:text-[13px] font-semibold text-ink cursor-pointer select-none hover:bg-subtle transition-colors">
+              <summary className="flex items-center gap-2 py-2.5 border-b border-line text-xs sm:text-[13px] font-semibold text-ink cursor-pointer select-none hover:text-brand transition-colors">
                 <ChevronDown
                   className="stok-disclosure-chevron size-4 text-muted shrink-0"
                   aria-hidden="true"
@@ -348,7 +348,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
                 </span>
               </summary>
 
-              <div className="border-t border-line bg-canvas p-3 sm:p-4">
+              <div className="pt-4">
                 <StokItemList
                   items={handphoneItems}
                   viewMode={viewMode}
@@ -372,9 +372,9 @@ export default function BrandStokClient({ brand }: { brand: string }) {
               onToggle={(e) => {
                 if (!isSearching) setAccOpen(e.currentTarget.open);
               }}
-              className="stok-disclosure rounded-2xl border border-line bg-surface overflow-hidden"
+              className="stok-disclosure"
             >
-              <summary className="flex items-center gap-2.5 px-4 py-3 text-xs sm:text-[13px] font-semibold text-ink cursor-pointer select-none hover:bg-subtle transition-colors">
+              <summary className="flex items-center gap-2 py-2.5 border-b border-line text-xs sm:text-[13px] font-semibold text-ink cursor-pointer select-none hover:text-brand transition-colors">
                 <ChevronDown
                   className="stok-disclosure-chevron size-4 text-muted shrink-0"
                   aria-hidden="true"
@@ -389,7 +389,7 @@ export default function BrandStokClient({ brand }: { brand: string }) {
                 </span>
               </summary>
 
-              <div className="border-t border-line bg-canvas p-3 sm:p-4">
+              <div className="pt-4">
                 <StokItemList
                   items={accItems}
                   viewMode={viewMode}

@@ -268,10 +268,10 @@ export default function StokOverviewPage() {
                         </span>
                       </summary>
 
-                      <div className="border-t border-line bg-canvas p-1.5 space-y-1">
+                      <div className="border-t border-line bg-canvas divide-y divide-line">
                         <Link
                           href={`/stok/${slug}?kategori=handphone`}
-                          className="flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-xs text-ink hover:bg-subtle transition-colors"
+                          className="flex items-center justify-between gap-2 px-3.5 py-2.5 text-xs text-ink hover:bg-subtle transition-colors"
                         >
                           <span className="flex items-center gap-2 min-w-0">
                             <Smartphone
@@ -289,7 +289,7 @@ export default function StokOverviewPage() {
 
                         <Link
                           href={`/stok/${slug}?kategori=acc`}
-                          className="flex items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-xs text-ink hover:bg-subtle transition-colors"
+                          className="flex items-center justify-between gap-2 px-3.5 py-2.5 text-xs text-ink hover:bg-subtle transition-colors"
                         >
                           <span className="flex items-center gap-2 min-w-0">
                             <Headphones
