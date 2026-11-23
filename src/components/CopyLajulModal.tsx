@@ -54,28 +54,19 @@ function formatTxLines(
 ): string[] {
   return txList.map((tx, idx) => {
     const rincian = (tx.rincian || "-").trim();
-    const rawUser = tx.user?.trim() || "";
-    const user = rawUser && rawUser !== "-" ? rawUser : "";
+    if (style === "ringkas") {
+      return `${idx + 1}. ${rincian}`;
+    }
+
     const rawMetode = tx.metode?.trim() || "";
     const metode = rawMetode && rawMetode !== "-" ? rawMetode : "";
     const harga = formatHarga(tx.harga);
+    const parts = [metode, harga].filter(Boolean);
 
-    if (style === "ringkas") {
-      const metaParts = [user, metode, harga].filter(Boolean);
-      return metaParts.length > 0
-        ? `${idx + 1}. *${rincian}* — ${metaParts.join(" • ")}`
-        : `${idx + 1}. *${rincian}*`;
+    if (parts.length > 0) {
+      return `${idx + 1}. ${rincian}, ${parts.join(", ")}`;
     }
-
-    const detailParts = [
-      user ? `User: ${user}` : "",
-      metode,
-      harga,
-    ].filter(Boolean);
-    const header = `${idx + 1}. *${rincian}*`;
-    return detailParts.length > 0
-      ? `${header}\n   • ${detailParts.join(" • ")}`
-      : header;
+    return `${idx + 1}. ${rincian}`;
   });
 }
 
@@ -90,32 +81,31 @@ function formatPaymentSummary(
       metrics.debit ? `Debit: ${metrics.debit}` : "",
     ]
       .filter(Boolean)
-      .join(" | ");
+      .join(", ");
 
     return [
       "*RINGKASAN PAYMENT*",
-      `• Unit Terjual: ${metrics.unit_terjual} unit`,
-      methods ? `• ${methods}` : "",
+      `Unit Terjual: ${metrics.unit_terjual} unit`,
+      methods,
       metrics.total_payment
-        ? `• Total Payment: *${metrics.total_payment}*`
+        ? `Total Payment: *${metrics.total_payment}*`
         : "",
     ]
       .filter(Boolean)
       .join("\n");
   }
 
-  return [
-    "*RINGKASAN PAYMENT*",
-    `• Unit Terjual: ${metrics.unit_terjual} unit`,
-    metrics.cash ? `• Cash: ${metrics.cash}` : "",
-    metrics.transfer ? `• Transfer: ${metrics.transfer}` : "",
-    metrics.debit ? `• Debit: ${metrics.debit}` : "",
+  const lines = [
+    `Unit Terjual: ${metrics.unit_terjual} unit`,
+    metrics.cash ? `Cash: ${metrics.cash}` : "",
+    metrics.transfer ? `Transfer: ${metrics.transfer}` : "",
+    metrics.debit ? `Debit: ${metrics.debit}` : "",
     metrics.total_payment
-      ? `• Total Payment: *${metrics.total_payment}*`
+      ? `Total Payment: *${metrics.total_payment}*`
       : "",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  ].filter(Boolean);
+
+  return ["*RINGKASAN PAYMENT*", ...lines].join("\n");
 }
 
 function formatLajulForWhatsApp({
@@ -158,20 +148,20 @@ function formatLajulForWhatsApp({
     const displayUnits = metrics?.unit_terjual ?? totalUnitsFromBrands;
     const meta = [dateLabel, `${displayUnits} unit terjual`]
       .filter(Boolean)
-      .join(" • ");
+      .join(", ");
 
     if (style === "rekap") {
       const brandLines = [
         ...soldBrands.map(
-          (b) => `• ${b.brand_name}: ${b.transaksi.length} unit`
+          (b) => `${b.brand_name}: ${b.transaksi.length} unit`
         ),
         ...(includeNoSell
-          ? noSellBrands.map((b) => `• ${b.brand_name}: No Sell`)
+          ? noSellBrands.map((b) => `${b.brand_name}: No Sell`)
           : []),
       ];
 
       const blocks = [
-        "*REKAP PENJUALAN — SEMARANG CELL*",
+        "*REKAP PENJUALAN SEMARANG CELL*",
         `_${meta}_`,
       ];
 
@@ -190,7 +180,7 @@ function formatLajulForWhatsApp({
     });
 
     const blocks = [
-      "*LAPORAN PENJUALAN — SEMARANG CELL*",
+      "*LAPORAN PENJUALAN SEMARANG CELL*",
       `_${meta}_`,
     ];
 
@@ -223,14 +213,14 @@ function formatLajulForWhatsApp({
   if (style === "rekap") {
     const meta = dateLabel || "Laporan Harian";
     const lines = isNoSell
-      ? ["• Status: No Sell (0 unit)"]
+      ? ["Status: No Sell (0 unit)"]
       : [
-        `• Unit Terjual: ${txList.length} unit`,
-        brandTotalHarga > 0 ? `• Total: *${formatHarga(brandTotalHarga)}*` : "",
+        `Unit Terjual: ${txList.length} unit`,
+        brandTotalHarga > 0 ? `Total: *${formatHarga(brandTotalHarga)}*` : "",
       ].filter(Boolean);
 
     return [
-      `*REKAP PENJUALAN ${target.brand_name.toUpperCase()} — SEMARANG CELL*`,
+      `*REKAP PENJUALAN ${target.brand_name.toUpperCase()}*`,
       `_${meta}_`,
       "",
       ...lines,
@@ -245,14 +235,14 @@ function formatLajulForWhatsApp({
       : "",
   ]
     .filter(Boolean)
-    .join(" • ");
+    .join(", ");
 
   const body = isNoSell
     ? "No Sell (0 transaksi)"
     : formatTxLines(txList, style).join("\n");
 
   return [
-    `*PENJUALAN ${target.brand_name.toUpperCase()} — SEMARANG CELL*`,
+    `*PENJUALAN ${target.brand_name.toUpperCase()}*`,
     `_${meta}_`,
     "",
     body,
