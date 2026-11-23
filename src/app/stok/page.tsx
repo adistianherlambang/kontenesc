@@ -104,7 +104,7 @@ export default function StokOverviewPage() {
     let isMounted = true;
     const safetyTimer = setTimeout(() => {
       if (isMounted) setIsLoading(false);
-    }, 2500);
+    }, 10000);
 
     const handleOnline = () => {
       setFirebaseStatus((prev) => (prev === "offline" ? "connected" : prev));

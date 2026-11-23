@@ -6,6 +6,7 @@ import {
   persistentMultipleTabManager,
   collection, 
   getDocs, 
+  getDocsFromServer,
   doc, 
   setDoc, 
   deleteDoc, 
@@ -139,7 +140,15 @@ export async function checkFirestoreHealth(): Promise<{ ok: boolean; count?: num
 export async function getContentsFromDb(): Promise<ContentItem[]> {
   try {
     const q = query(collection(db, COLLECTION_NAME));
-    const snapshot = await getDocs(q);
+    let snapshot;
+    try {
+      snapshot = await getDocsFromServer(q);
+    } catch {
+      snapshot = await getDocs(q);
+      if (snapshot.empty && snapshot.metadata.fromCache) {
+        throw new Error("Offline contents cache is empty");
+      }
+    }
     if (snapshot.empty) return [];
     
     return snapshot.docs.map(docSnap => ({
@@ -279,7 +288,19 @@ export async function getStokFromDb(
 ): Promise<{ items: StokItem[]; summary: StokSummary | null }> {
   try {
     const q = query(collection(db, "stok"));
-    const snapshot = await getDocs(q);
+    let snapshot;
+    if (throwOnError) {
+      try {
+        snapshot = await getDocsFromServer(q);
+      } catch {
+        snapshot = await getDocs(q);
+        if (snapshot.empty && snapshot.metadata.fromCache) {
+          throw new Error("Offline stok cache is empty");
+        }
+      }
+    } else {
+      snapshot = await getDocs(q);
+    }
     let summary: StokSummary | null = null;
     const items: StokItem[] = [];
 
@@ -357,7 +378,19 @@ export async function getLajulFromDb(
 ): Promise<{ brands: LajulBrandDoc[]; summary: LajulSummary | null }> {
   try {
     const q = query(collection(db, "lajul"));
-    const snapshot = await getDocs(q);
+    let snapshot;
+    if (throwOnError) {
+      try {
+        snapshot = await getDocsFromServer(q);
+      } catch {
+        snapshot = await getDocs(q);
+        if (snapshot.empty && snapshot.metadata.fromCache) {
+          throw new Error("Offline lajul cache is empty");
+        }
+      }
+    } else {
+      snapshot = await getDocs(q);
+    }
     let summary: LajulSummary | null = null;
     const brands: LajulBrandDoc[] = [];
 

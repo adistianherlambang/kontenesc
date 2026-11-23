@@ -42,11 +42,29 @@ function isOffline(): boolean {
   return typeof navigator !== "undefined" && !navigator.onLine;
 }
 
-function readCache<T>(key: string, allowStale = false): T | null {
+function removeCache(key: string): void {
+  memoryCache.delete(key);
+  if (!isBrowser()) return;
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+function readCache<T>(
+  key: string,
+  allowStale = false,
+  isValid?: (data: T) => boolean
+): T | null {
   const now = Date.now();
   const mem = memoryCache.get(key) as CacheEntry<T> | undefined;
-  if (mem && (allowStale || now - mem.timestamp < CACHE_TTL_MS)) {
-    return mem.data;
+  if (mem) {
+    if (isValid && !isValid(mem.data)) {
+      removeCache(key);
+    } else if (allowStale || now - mem.timestamp < CACHE_TTL_MS) {
+      return mem.data;
+    }
   }
 
   if (!isBrowser()) return null;
@@ -58,11 +76,16 @@ function readCache<T>(key: string, allowStale = false): T | null {
     if (
       parsed &&
       typeof parsed.timestamp === "number" &&
-      "data" in parsed &&
-      (allowStale || now - parsed.timestamp < CACHE_TTL_MS)
+      "data" in parsed
     ) {
-      memoryCache.set(key, parsed);
-      return parsed.data;
+      if (isValid && !isValid(parsed.data)) {
+        removeCache(key);
+        return null;
+      }
+      if (allowStale || now - parsed.timestamp < CACHE_TTL_MS) {
+        memoryCache.set(key, parsed);
+        return parsed.data;
+      }
     }
   } catch {
     // Ignore storage read errors
@@ -89,17 +112,22 @@ function writeCache<T>(key: string, data: T): void {
 async function fetchWithCache<T>(
   key: string,
   fetcher: () => Promise<T>,
-  force = false
+  options: {
+    force?: boolean;
+    isValid?: (data: T) => boolean;
+  } = {}
 ): Promise<{ data: T; fromCache: boolean }> {
+  const { force = false, isValid } = options;
+
   if (!force) {
-    const fresh = readCache<T>(key, false);
+    const fresh = readCache<T>(key, false, isValid);
     if (fresh !== null) {
       return { data: fresh, fromCache: true };
     }
   }
 
   if (isOffline()) {
-    const stale = readCache<T>(key, true);
+    const stale = readCache<T>(key, true, isValid);
     if (stale !== null) {
       return { data: stale, fromCache: true };
     }
@@ -115,7 +143,10 @@ async function fetchWithCache<T>(
 
   const requestPromise = (async () => {
     const data = await fetcher();
-    writeCache(key, data);
+    // Never cache empty payloads so transient offline/cache misses self-heal
+    if (!isValid || isValid(data)) {
+      writeCache(key, data);
+    }
     return data;
   })();
 
@@ -125,7 +156,7 @@ async function fetchWithCache<T>(
     const data = await requestPromise;
     return { data, fromCache: false };
   } catch (err) {
-    const stale = readCache<T>(key, true);
+    const stale = readCache<T>(key, true, isValid);
     if (stale !== null) {
       return { data: stale, fromCache: true };
     }
@@ -143,7 +174,10 @@ export async function fetchStokCached(
   const { data, fromCache } = await fetchWithCache<StokCachePayload>(
     CACHE_KEY_STOK,
     () => getStokFromDb(true),
-    force
+    {
+      force,
+      isValid: (d) => Array.isArray(d.items) && (d.items.length > 0 || d.summary !== null),
+    }
   );
   return { ...data, fromCache };
 }
@@ -154,7 +188,10 @@ export async function fetchLajulCached(
   const { data, fromCache } = await fetchWithCache<LajulCachePayload>(
     CACHE_KEY_LAJUL,
     () => getLajulFromDb(true),
-    force
+    {
+      force,
+      isValid: (d) => Array.isArray(d.brands) && (d.brands.length > 0 || d.summary !== null),
+    }
   );
   return { ...data, fromCache };
 }
@@ -172,7 +209,10 @@ export async function fetchContentsCached(
         await seedContentsToDb(INITIAL_BRIEF_DATA).catch(console.error);
         return INITIAL_BRIEF_DATA;
       },
-      force
+      {
+        force,
+        isValid: (d) => Array.isArray(d) && d.length > 0,
+      }
     );
     return { items: data, fromCache };
   } catch {
